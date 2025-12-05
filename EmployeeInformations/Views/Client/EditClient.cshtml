@@ -1,0 +1,22 @@
+﻿@using EmployeeInformations.Model.ClientSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ClientViewModel
+@{
+    var roleId = Context.Session.GetInt32("ClientId");    
+        
+}
+
+<div id="bind-clientmodal-content">
+
+</div>
+
+<input type="hidden" id="txt-ClientId" value="@Model.ClientId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var clientId = $("#txt-ClientId").val();
+        PageUtil.goToClient("/Client/UpdateClient?ClientId=" + clientId);
+    });
+
+</script>

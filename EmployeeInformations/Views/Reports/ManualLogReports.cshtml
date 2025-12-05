@@ -1,0 +1,358 @@
+﻿@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums;
+@using EmployeeInformations.Model.ReportsViewModel
+@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model ManualLogReports
+@{
+    ViewBag.Title = "ManualLogReports";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.HolidayModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Manual Log Report</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto" id="btnImportData" value="Import Data" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<form autocomplete="off">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="row">
+
+        <div class="col-lg-3  col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Employees</label>
+                <div>
+                    @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.ReportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId" })
+                </div>
+                @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeId" })
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+            <div class="form-group">
+                <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveFromDate" placeholder="Enter Start Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveFromDate"></span>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6" id="leaveToDatedatepickerblock">
+            <div class="form-group">
+                <label class="form-label" id="leaveToLabel">End Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveToDate" placeholder="Enter End Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveToDate"></span>
+                <span id="errVerify-leaveToDate" style="display:none;" class="error text-danger"> Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+            </div>
+        </div>
+
+        <div class="col manual-report-btn pb-1">
+            <button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+        </div>
+       @*  <div class="col manual-report-btn d-flex justify-content-end pb-1">
+            <button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployeeLeave"><i class="ti-download"></i></button>
+        </div> *@
+    </div>
+</form>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="manualLogReportDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getManualLogReportData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col d-none"><span class="sub-text">EmpId</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Employee Id</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Start Time</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">End Time</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Entry Status</span></th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                @if (Model.ManualLog?.Count() > 0 || Model?.ManualLog != null)
+                {
+                    foreach (var item in Model.ManualLog)
+                    {
+                        <tr>
+                            <td class="nk-tb-col tb-col d-none">
+                                <b class="tb-sub text-primary">@item.EmployeeId</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary">@item.EmployeeUserId</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary"> @item.FirstName + " " + @item.LastName</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary">  @item.StartTime</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary"> @item.EndTime</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary"> @item.EntryStatus</b>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#getManualLogReportData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [
+                [3, "asc"]
+            ],
+        });
+    });
+
+    $(document).ready(function () {
+        $('#btnBack').click(function () {
+            var urlToRedirect = '@Url.Action("EmployeesInfo", "Employees")';
+            window.location.href = urlToRedirect;
+        });
+
+        $("#leaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#leaveToDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        var employee = $("#EmpId").select2();
+        $("#EmpId").select2().on("change", function () {
+
+            $("#errValid-EmployeeId").text("")
+        });
+        //----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Nice scroll
+
+        $("#EmployeeId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Change Summary
+
+    $("#EmployeeId").change(function () {
+        var isValid = true;
+        $("#errValid-EmployeeId").text("");
+        if ($("#EmployeeId").val() == "") {
+            $("#errValid-EmployeeId").text("Employees field is required");
+            isValid = false;
+        }
+        else {
+            $("#errValid-EmployeeId").text("");
+        }
+    });
+
+    $("#leaveFromDate").change(function () {
+
+        $("#errValid-LeaveFromDate").text("");
+        if ($("#leaveFromDate").val() == "") {
+            $("#errValid-LeaveFromDate").text("Start Date field is required");
+        }
+        else {
+            $("#errValid-LeaveFromDate").text("");
+        }
+    });
+
+    $("#leaveToDate").change(function () {
+
+        $("#errValid-LeaveToDate").text("");
+        if ($("#leaveToDate").val() == "") {
+            $("#errValid-LeaveToDate").text("End Date field is required");
+            $("#errVerify-leaveToDate").hide();
+        }
+        else {
+            $("#errValid-LeaveToDate").text("");
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Filter Leave
+
+    $("#btnFilterLeave").click(function () {
+        var isValid = true;
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+
+        $("#errValid-EmployeeId").text("");
+        $("#errVerify-leaveToDate").hide();
+        var employeeId = $("#EmployeeId").val();
+        var startTime = $("#leaveFromDate").val();
+        var endTime = $("#leaveToDate").val();
+
+        if ($("#leaveFromDate").val() == '') {
+            $("#errValid-LeaveFromDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#leaveToDate").val() == '') {
+            $("#errValid-LeaveToDate").text("End Date field is required");
+            isValid = false;
+        }
+
+        var manualLogReports = {
+            EmployeeId: employeeId,
+            StartTime: startTime,
+            EndTime: endTime
+        };
+        if (isValid) {
+            var isValidDate = dateDifference(startTime, endTime);
+            if (isValidDate) {
+                var url = "/Reports/FilterEmployeeByManualLog";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: manualLogReports,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result.manualLog.length != 0) {
+                            $('#manualLogReportDiv').empty();
+                            var tableHeadHtml = "<table class='display employee-holiday-table mb-3' style='width:100%' data-auto-responsive='false' id='getManualLogReportData'><thead><tr class='nk-tb-item'><th class='nk-tb-col tb-col d-none'><span class='sub-text'>EmpId</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Employee Id</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Start Time</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>End Time</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Entry Status</span></th></tr></thead><tbody>";
+                            $.each(result.manualLog, function (key, value) {
+
+                                var valueStartDate = new Date(value.startTime);
+                                var yyyy = valueStartDate.getFullYear();
+                                var mm = valueStartDate.getMonth() + 1;
+                                var dd = valueStartDate.getDate();
+                                if (dd < 10) dd = '0' + dd;
+                                if (mm < 10) mm = '0' + mm;
+                                var repFromDate = dd + '/' + mm + '/' + yyyy;
+                                var startTime = valueStartDate.toLocaleTimeString();
+                                var startDateTimeValue = repFromDate + " " + startTime;
+
+                                var valueEndDate = new Date(value.endTime);
+                                var yyyy = valueEndDate.getFullYear();
+                                var mm = valueEndDate.getMonth() + 1;
+                                var dd = valueEndDate.getDate();
+                                if (dd < 10) dd = '0' + dd;
+                                if (mm < 10) mm = '0' + mm;
+                                var repToDate = dd + '/' + mm + '/' + yyyy;
+                                var endTime = valueEndDate.toLocaleTimeString();
+                                var endDateTimeValue = repToDate + " " + endTime;
+
+                                tableHeadHtml += "<tr><td class='nk-tb-col tb-col d-none'><b class='tb-sub'>" + value.employeeId + " </b></td><td class='nk-tb-col tb-col'><b class='tb-sub text-primary'>" + value.employeeUserId + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + value.firstName + " " + value.lastName + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + startDateTimeValue + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + endDateTimeValue + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + value.entryStatus + "</b></td></tr>";
+                            //$('#displayManualLog').append("<tr><td class='nk-tb-col tb-col d-none'><b class='tb-sub'>" + value.employeeId + " </b></td><td class='nk-tb-col tb-col'><b class='tb-sub text-primary'>" + value.employeeUserId + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + value.firstName + " " + value.lastName + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + startDateTimeValue + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + endDateTimeValue + "</b></td><td class='nk-tb-col tb-col'><b class='tb-sub'>" + value.entryStatus + "</b></td></tr>");
+                            });
+                            tableHeadHtml += "</tbody></table>";
+                            $('#manualLogReportDiv').append(tableHeadHtml);
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            $('#getManualLogReportData').DataTable({
+                                "bInfo": true,
+                                "paging": true,
+                                order: [
+                                    [3, "desc"]
+                                ],
+                            });
+                        }
+                        else {
+                            $('#manualLogReportDiv').empty();
+                            var tableHeadHtml = "<table class='display employee-holiday-table mb-3' style='width:100%' data-auto-responsive='false' id='getManualLogReportData'> <thead> <tr class='nk-tb-item'> <th class='nk-tb-col tb-col d-none'><span class='sub-text'>EmpId</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Start Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>End Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Entry Status</span></th></tr></thead><tbody>";
+                            tableHeadHtml += "</tbody></table></div></div>";
+                            $('#manualLogReportDiv').html(tableHeadHtml);
+
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            table = $('#getManualLogReportData').DataTable({
+                                retrieve: true,
+                                paging: false
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else{
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Date Validation
+
+    function dateDifference(startTime, endTime) {
+        var result = false;
+        var splitFrom = startTime.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = endTime.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+    $('#btnImportData').click(function () {
+        window.location.href = "/Reports/ManualLog";
+    });
+</script>

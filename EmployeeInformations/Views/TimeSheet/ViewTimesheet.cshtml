@@ -1,0 +1,82 @@
+﻿@using EmployeeInformations.Model.TimesheetSummaryViewModel;
+@using EmployeeInformations.Common.Enums;
+@model ViewTimeSheet
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">View TimeSheet Details</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back","TimeSheet","TimeSheet", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-inner">
+            <form autocomplete="off">
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Project Name</label>
+                            <label class="view-text">@Model.ProjectName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Task Name</label>
+                            <label class="view-text">@Model.TaskName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Status</label>
+                            <label class="view-text">@Model.Status</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Start Date</label>
+                            <label class="view-text">@Model.Startdate</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Start Time</label>
+                            <label class="view-text">@Model.StartTime</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">End Time</label>
+                            <label class="view-text">@Model.EndTime</label>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Description</label>
+                            <label class="view-text w-100">@Model.TaskDescription</label>
+                        </div>
+                    </div>
+
+                  @*  <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label">Attachment</label>
+                            <label class="w-100">@Model.AttachementFilePath</label>
+                        </div>
+                    </div>*@
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

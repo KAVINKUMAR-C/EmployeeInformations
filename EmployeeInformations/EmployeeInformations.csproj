@@ -1,0 +1,108 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>18f21a4a-ea3f-4047-a96c-5d60d8e08f29</UserSecretsId>
+    <Version>1.3.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="EmployeesAttendanceDetails\**" />
+    <Compile Remove="wwwroot\Attachments\**" />
+    <Compile Remove="wwwroot\Companylogo\**" />
+    <Compile Remove="wwwroot\Files\**" />
+    <Compile Remove="wwwroot\OtherDetails\**" />
+    <Content Remove="EmployeesAttendanceDetails\**" />
+    <Content Remove="wwwroot\Attachments\**" />
+    <Content Remove="wwwroot\Companylogo\**" />
+    <Content Remove="wwwroot\Files\**" />
+    <Content Remove="wwwroot\OtherDetails\**" />
+    <EmbeddedResource Remove="EmployeesAttendanceDetails\**" />
+    <EmbeddedResource Remove="wwwroot\Attachments\**" />
+    <EmbeddedResource Remove="wwwroot\Companylogo\**" />
+    <EmbeddedResource Remove="wwwroot\Files\**" />
+    <EmbeddedResource Remove="wwwroot\OtherDetails\**" />
+    <None Remove="EmployeesAttendanceDetails\**" />
+    <None Remove="wwwroot\Attachments\**" />
+    <None Remove="wwwroot\Companylogo\**" />
+    <None Remove="wwwroot\Files\**" />
+    <None Remove="wwwroot\OtherDetails\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Shared\_PartialEmployees.cshtml" />
+    <Content Remove="Views\Teams\TeamMeeting.cshtml" />
+    <Content Remove="wwwroot\ProfileImages\profile.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="9.0.1" />
+    <PackageReference Include="EPPlus" Version="8.0.5" />
+    <PackageReference Include="ExcelDataReader" Version="3.7.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
+    <PackageReference Include="FluentScheduler" Version="5.5.1" />
+    <PackageReference Include="Grpc.Core" Version="2.46.3" />
+    <PackageReference Include="HttpFileCollectionBaseExtension" Version="1.1.0" />
+    <PackageReference Include="itext7" Version="8.0.3" />
+    <PackageReference Include="jQuery" Version="3.7.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.15.3" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="2.15.3" />
+    <PackageReference Include="Microsoft.IdentityModel.Clients.ActiveDirectory" Version="5.3.0" />
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NReco.PdfGenerator" Version="1.2.1" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="25.2.0" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="26.1.40" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
+	  <!-- Fix downgrade errors -->
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
+	  <PackageReference Include="System.Text.Json" Version="9.0.6" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Views\Teams\TeamMeeting.cshtml" />
+    <None Include="wwwroot\css\style.css" />
+    <None Include="wwwroot\fonts\.DS_Store" />
+    <None Include="wwwroot\fonts\feather-icons\feather.css" />
+    <None Include="wwwroot\fonts\feather-icons\Feather.svg" />
+    <None Include="wwwroot\fonts\feather-icons\Feather.ttf" />
+    <None Include="wwwroot\fonts\feather-icons\Feather.woff" />
+    <None Include="wwwroot\fonts\muli-light-webfont.woff" />
+    <None Include="wwwroot\fonts\muli-light-webfont.woff2" />
+    <None Include="wwwroot\fonts\Muli-Light.ttf" />
+    <None Include="wwwroot\fonts\muli-webfont.woff" />
+    <None Include="wwwroot\fonts\muli-webfont.woff2" />
+    <None Include="wwwroot\fonts\Muli.ttf" />
+    <None Include="wwwroot\images\.DS_Store" />
+    <None Include="wwwroot\images\logos.png" />
+    <None Include="wwwroot\images\profile.jpeg" />
+    <None Include="wwwroot\ProfileImages\profile.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\LeaveAttachments\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EmployeeInformations.Business\EmployeeInformations.Business.csproj" />
+    <ProjectReference Include="..\EmployeeInformations.Data\EmployeeInformations.Data.csproj" />
+    <ProjectReference Include="..\EmployeeInformations.DI\EmployeeInformations.DI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Teams\TeamMeeting.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Teams\TeamMeeting.cshtml" />
+  </ItemGroup>
+</Project>

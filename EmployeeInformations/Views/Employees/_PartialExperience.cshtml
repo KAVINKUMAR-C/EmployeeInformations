@@ -1,0 +1,798 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Model.EmployeesViewModel
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model ExperienceViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (roleId >= 0)
+    {
+        var id = roleId.Value;
+        int employeeModuleId = (int)EmployeesInformationsPages.SalaryModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(employeeModuleId, id);
+    }
+}
+<div class="d-flex mb-1 title data-head">
+    <h6>Experience Information</h6>
+</div>
+<div class="tab-pane p-3">
+    <div class="card my-4 boxshadow-none edit-page table-card" data-simplebar>
+        <table class="table" id="getexperiencedata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Previous Company</th>
+                    <th>Date Of Joining</th>
+                    <th>Date Of Relieving</th>
+                    <th style="display:none;">File Name</th>
+                    <th class="nk-tb-col">
+                        <div class="nk-tb-col py-0 border-0">
+                            @*<ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                            <div class="dropdown">
+                            <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown" aria-expanded="true">
+                            <em class="icon ni ni-more-h"></em>
+                            </a>
+                            </div>
+                            </li>
+                            </ul>*@
+                            Action
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="displayExperience">
+                @if (Model.Experiences.Count() > 0)
+                {
+                    foreach (var item in Model.Experiences)
+                    {
+                        <tr>
+                            <td>
+                                @item.PreviousCompany
+                            </td>
+
+                            <td>
+                                @item.DateOfJoining.ToString(Constant.DateFormat)
+                            </td>
+
+                            <td>
+                                @item.DateOfRelieving.ToString(Constant.DateFormat)
+                            </td>
+                            <td style="display:none;">
+                                @item.ExperienceName
+                            </td>
+                            <td>
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="editExperienceBtn" data-id="@item.ExperienceId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="deleteExperienceBtn" data-id="@item.ExperienceId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.ExperienceId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="dataTables_empty" style="text-align:center;" colspan="5">No data available</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card boxshadow-none p-3">
+        <div class="row">
+            <input type="hidden" class="form-control" id="experienceId">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.EmpId">          
+            <input type="hidden" class="form-control" id="RoleId" value=@roleId>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="form-label">Previous Company<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="previousCompany">
+                    <span class="error text-danger" id="errValid-PreviousCompany"> </span>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label class="form-label">Date Of Joining<span class="required" style="color: #FF0000">*</span></label>
+                    <div id="datepicker7" class="input-group date" data-date-format="dd/mm/yyyy">
+                        <input type="text" class="form-control" id="dateOfJoining">
+                        <span class="input-group-addon"><i class="icon ti-calendar"></i></span>
+                    </div>
+                    <span class="error text-danger" id="errValid-DateOfJoining"></span>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label class="form-label">Date Of Relieving<span class="required" style="color: #FF0000">*</span></label>
+                    <div id="datepicker3" class="input-group date" data-date-format="dd/mm/yyyy">
+                        <input type="text" class="form-control" id="dateOfRelieving">
+                        <span class="input-group-addon">
+                            <i class="icon ti-calendar"></i>
+                        </span>
+                    </div>
+                    <span id="errVerify-leaveToDate" style="display:none;" class="error text-danger"> Please select <b>Relieve Date</b> should not be less than <b>Joining Date</b> </span>
+                    <span class="error text-danger" id="errValid-DateOfRelieving"></span>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label">Document<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="input-group custom-file-button">
+                        @*       <label class="input-group-text" for="inputGroupFile">Upload</label>*@
+                        @Html.TextBoxFor(m => m.DocumentFilePath, new { type = "file", name = "file", multiple = "multiple", @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DocumentFilePath, "", new { @class = "error text-danger", id = "errValid-DocumentFilePath" })
+                    <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                </div>
+                <div id="hide_documentName" style="display:none;" class="text-primary mt-1">
+                    @* <div class="user-avatar mt-1" id="doc_image">
+                    </div>*@
+                    <ul class="displayExperienceDoc d-flex flex-wrap"></ul>
+                    <lable id="displayDocumentName"></lable>
+                </div>
+
+                <span id="errValid-Document" class="error text-danger" style="display:none;"> Invalid document </span>
+            </div>
+
+            <div class="col-12 d-flex mb-3 mt-auto">
+                <button type="button" class="btn btn-primary ml-auto" id="btnAddExperience" value="add">Add</button>
+                <button type="button" class="btn btn-primary ml-auto" id="btnUpdateExperience" style="display:none" value="update">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 d-flex mt-3">
+        <input type="button" class="btn btn-secondary" id="btnExperienceBack" value="Back" />
+        <input type="button" class="btn btn-primary ml-auto" id="btnCreateExperience" value="Next" />
+    </div>
+</div>
+
+
+<div class="modal" id="success_Createexperience_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title">Experience Created Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseCreateexperience">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_Updateexperience_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title">Experience Updated Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseUpdateexperience">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteExperience_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteExperience">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#datepicker3").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+        });
+
+        $("#datepicker7").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+        });
+
+        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+        //Change Summary
+        $("#dateOfJoining").change(function () {
+            $("#errValid-DateOfJoining").text("");
+            if ($("#dateOfJoining").val() == "") {
+                $("#errValid-DateOfJoining").text("Date Of Joining field is required");
+            }
+            else {
+                $("#errValid-DateOfJoining").text("");
+            }
+        });
+
+        $("#dateOfRelieving").change(function () {
+            $("#errValid-DateOfRelieving").text("");
+
+            $("#errVerify-leaveToDate").hide();
+            if ($("#dateOfRelieving").val() == "") {
+                $("#errValid-DateOfRelieving").text("Date Of Relieving field is required");
+            }
+            else {
+                $("#errValid-DateOfRelieving").text("");
+            }
+        });
+
+        $("#DocumentFilePath").change(function () {
+
+            $("#errValid-DocumentFilePath").text("");
+            $("#displayDocumentName").text('');
+            $("#errValid-DocumentFilePath").hide();
+            //$("#errValid-Document").hide();
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+                $("#errValid-DocumentFilePath").show();
+                $("#errValid-ErrorFileSize").hide();
+            }
+        });
+
+        $('.selectedwizard li').removeClass('current');
+        $("#step6").addClass('current');
+
+        $(".displayExperienceDoc").on('click', 'li', function () {
+            var imgName = $(this).text();
+            var urlName = "Experience/" + imgName;
+            window.open(urlName);
+        });
+    });
+
+    //Keyup Summary
+    $("#previousCompany").keyup(function () {
+        $("#errValid-PreviousCompany").text("");
+        if ($("#previousCompany").val() == "") {
+            $("#errValid-PreviousCompany").text("Pervious Company field is required");
+        }
+    });
+
+    //Click Summary
+    $(".displayExperienceDoc").on('click', 'li', function () {
+        var imgName = $(this).text();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/Experience/' + imgName + '');
+    });
+
+    $("#btnExperienceBack").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/Createqualification?empId=" + empId);
+    });
+
+    $("#btnCreateExperience").click(function () {           
+        var empId = $("#EmpId").val();            
+        if ('@rolePrivileges' == 'True') {          
+            PageUtil.goTo("/Employees/GetAllSalaryByEmpId?empId=" + empId);
+        }
+        else {           
+            PageUtil.goTo("/Employees/CreateBankDetails?empId=" + empId);
+        }
+    });
+
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Create Experience
+    $('#btnAddExperience').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-PreviousCompany").text("");
+        $("#errValid-DateOfJoining").text("");
+        $("#errValid-DateOfRelieving").text("");
+        $("#errValid-DocumentFilePath").text("");
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-DocumentFilePath").hide();
+        $("#displayDocumentName").text(" ");
+        $("#displayDocumentName").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        if ($("#previousCompany").val() == "") {
+            $("#errValid-PreviousCompany").text("Previous Company field is required");
+            isValid = false;
+        }
+
+        if ($("#dateOfJoining").val() == "") {
+            $("#errValid-DateOfJoining").text("Date Of Joining field is required");
+            isValid = false;
+        }
+
+        if ($("#dateOfRelieving").val() == "") {
+            $("#errValid-DateOfRelieving").text("Date Of Relieving field is required");
+            isValid = false;
+        }
+
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        if (attachmentFilePath == '') {
+            $("#errValid-DocumentFilePath").text("Attachment field is required");
+            $("#errValid-DocumentFilePath").show();
+            isValid = false;
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;
+
+        for (var x = 0; x < attachmentLength; x++) {
+
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var empId = $("#EmpId").val();
+        var experienceId = $("#experienceId").val();
+        var previousCompany = $("#previousCompany").val();
+        var dateOfJoining = $("#dateOfJoining").val();
+        var dateOfRelieving = $("#dateOfRelieving").val();
+
+        formData.append("empId", empId);
+        formData.append("experienceId", experienceId);
+        formData.append("previousCompany", previousCompany);
+        formData.append("dateOfJoining", dateOfJoining);
+        formData.append("dateOfRelieving", dateOfRelieving);
+        formData.append("StrDateOfJoining", dateOfJoining);
+        formData.append("StrDateOfRelieving", dateOfRelieving);
+
+        if (isValid) {
+
+            var isValidDate = dateDifference(dateOfJoining, dateOfRelieving);
+
+            if (isValidDate) {
+
+                var url = "/Employees/AddExperience";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+
+                        $('#displayExperience').html("");
+                        $("#success_Createexperience_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                $.each(Result, function (key, value) {
+                                    var obj = new Date(value.dateOfJoining);
+                                    var yyyy = obj.getFullYear();
+                                    var mm = obj.getMonth() + 1;
+                                    var dd = obj.getDate();
+                                    if (dd < 10) dd = '0' + dd;
+                                    if (mm < 10) mm = '0' + mm;
+                                    var dateOfJoining = dd + '/' + mm + '/' + yyyy;
+
+                                    var valueRelieving = new Date(value.dateOfRelieving);
+                                    var yyyy = valueRelieving.getFullYear();
+                                    var mm = valueRelieving.getMonth() + 1;
+                                    var dd = valueRelieving.getDate();
+                                    if (dd < 10) dd = '0' + dd;
+                                    if (mm < 10) mm = '0' + mm;
+                                    var dateOfRelieving = dd + '/' + mm + '/' + yyyy;
+                                    $('#displayExperience').append("<tr><td>" + value.previousCompany + "</td><td>" + dateOfJoining + "</td><td>" + dateOfRelieving + "</td><td style='display:none;'>" + value.experienceName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0' > <ul class='nk-tb-actions gx-1 my-n1' > <li class='me-n1' > <div class='dropdown' > <a href='#' class= 'dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'> <em class='icon ni ni-more-h' > </em></a > <div class='dropdown-menu dropdown-menu-end' > <ul class='link-list-opt no-bdr' > <li><a href='javascript:void(0)' id = 'editExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li > <li><a href='javascript:void(0)' id = 'deleteExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li > <li><a href='javascript:void(0)' id = 'btnDownload' data-id=" + value.experienceId + "><em class='icon ni ni-download'> </em><span>Download</span > </a></li > </ul> </div> </div> </li> </ul> </div> </td></tr>");
+                                });
+                                $('#DocumentFilePath').val('');
+                                $("#errValid-DocumentFilePath").hide();
+                            };
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+        $("#experienceId").val('');
+        $("#previousCompany").val('');
+        $("#dateOfJoining").val('');
+        $("#dateOfRelieving").val('');
+        $("#DocumentFilePath").val('');
+        $("#hide_documentName").val('');
+        $("#hide_documentName").hide();
+    });
+
+    //From Date To Date Validation
+    function dateDifference(validFrom, validTo) {
+        var result = false;
+        var splitFrom = validFrom.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = validTo.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+    //Binding Values
+    $('#getexperiencedata').on('click', '#editExperienceBtn', function () {
+
+        $("#errValid-PreviousCompany").text("");
+        $("#errValid-DateOfJoining").text("");
+        $("#errValid-DateOfRelieving").text("");
+        $("#errValid-DocumentFilePath").text("");
+        $("#errValid-ErrorFileSize").text('');
+        $("#btnUpdateExperience").show();
+        $("#btnAddExperience").hide();
+        $("#hide_documentName").show();
+        $("#displayDocumentName").text(" ");
+        $("#errValid-DocumentFilePath").hide();
+        $("#errValid-ErrorFileSize").hide();
+
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim();
+        var FourthCol = tr.find('td:eq(3)').text().trim();
+
+        $('#experienceId').val(id);
+        $('#previousCompany').val(FirstCol);
+        $('#dateOfJoining').val(SecondCol);
+        $('#dateOfRelieving').val(ThirdCol);
+        $("#datepicker7").datepicker('setDate', SecondCol);
+        $("#datepicker3").datepicker('setDate', ThirdCol);
+        //$('#displayDocumentName').text((FourthCol));
+
+        var experienceId = id;
+        var url = "/Employees/GetExperienceDocument"
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { experienceId: experienceId },
+            beforeSend: function () {
+                $('.loader').removeClass('d-none');
+            },
+            success: (Result) => {
+                $('.loader').addClass('d-none');
+                $('.displayExperienceDoc').html("");
+                $.each(Result, function (key, value) {
+                    var img = "";
+                    var ext = value.split('.').pop();
+                    if (ext == "pdf") {
+                        img = "/images/Pdf-Icon.png";
+                    }
+                    else if (ext == "doc" || ext == "docx") {
+                        img = "/images/Doc-Icon.png";
+                    }
+                    else {
+                        img = "/images/Image-Icon.png";
+                    }
+                    $('.displayExperienceDoc').append("<li><img class='mt-1' src='" + img + "' style='height: 40px;'><div style='display:none;'>" + value + "</div></li>");
+                });
+            }
+        });
+    });
+
+    //Update Experience
+    $('#btnUpdateExperience').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-PreviousCompany").text("");
+        $("#errValid-DateOfJoining").text("");
+        $("#errValid-DateOfRelieving").text("");
+        $("#errValid-Document").hide();
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        $("#errValid-DocumentFilePath").hide();
+        $("#errValid-ErrorFileSize").hide();
+
+        if ($("#previousCompany").val() == "") {
+            $("#errValid-PreviousCompany").text("Previous Company field is required");
+            isValid = false;
+        }
+
+        if ($("#dateOfJoining").val() == "") {
+            $("#errValid-DateOfJoining").text("Date Of Joining field is required");
+            isValid = false;
+        }
+
+        if ($("#dateOfRelieving").val() == "") {
+            $("#errValid-DateOfRelieving").text("Date Of Relieving field is required");
+            isValid = false;
+        }
+
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        var experienceId = $("#experienceId").val();
+        if (experienceId == 0) {
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+                $("#errValid-DocumentFilePath").show();
+                $("#errValid-ErrorFileSize").hide();
+                //$('#displayDocumentName').text('');
+                isValid = false;
+            }
+        }
+        else {
+            $('#displayDocumentName').show();
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;
+
+        for (var x = 0; x < attachmentLength; x++) {
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                $("#errValid-DocumentFilePath").hide();
+                $("#errValid-ErrorFileSize").show();
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var empId = $("#EmpId").val();
+        var experienceId = $("#experienceId").val();
+        var previousCompany = $("#previousCompany").val();
+        var dateOfJoining = $("#dateOfJoining").val();
+        var dateOfRelieving = $("#dateOfRelieving").val();
+
+        formData.append("empId", empId);
+        formData.append("experienceId", experienceId);
+        formData.append("previousCompany", previousCompany);
+        formData.append("dateOfJoining", dateOfJoining);
+        formData.append("dateOfRelieving", dateOfRelieving);
+        formData.append("StrDateOfJoining", dateOfJoining);
+        formData.append("StrDateOfRelieving", dateOfRelieving);
+
+        if (isValid) {
+            var isValidDate = dateDifference(dateOfJoining, dateOfRelieving);
+
+            if (isValidDate) {
+                var url = "/Employees/UpdateExperience";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+                        $('#displayExperience').html("");
+                        $("#success_Updateexperience_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                $.each(Result, function (key, value) {
+                                    var obj = new Date(value.dateOfJoining);
+                                    var yyyy = obj.getFullYear();
+                                    var mm = obj.getMonth() + 1;
+                                    var dd = obj.getDate();
+                                    if (dd < 10) dd = '0' + dd;
+                                    if (mm < 10) mm = '0' + mm;
+                                    var dateOfJoining = dd + '/' + mm + '/' + yyyy;
+
+                                    var valueRelieving = new Date(value.dateOfRelieving);
+                                    var yyyy = valueRelieving.getFullYear();
+                                    var mm = valueRelieving.getMonth() + 1;
+                                    var dd = valueRelieving.getDate();
+                                    if (dd < 10) dd = '0' + dd;
+                                    if (mm < 10) mm = '0' + mm;
+                                    var dateOfRelieving = dd + '/' + mm + '/' + yyyy;
+                                    $('#displayExperience').append("<tr><td>" + value.previousCompany + "</td><td>" + dateOfJoining + "</td><td>" + dateOfRelieving + "</td><td style='display:none;'>" + value.experienceName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0' > <ul class='nk-tb-actions gx-1 my-n1' > <li class='me-n1' > <div class='dropdown' > <a href='#' class= 'dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'> <em class='icon ni ni-more-h' > </em></a > <div class='dropdown-menu dropdown-menu-end' > <ul class='link-list-opt no-bdr' > <li><a href='javascript:void(0)' id = 'editExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li > <li><a href='javascript:void(0)' id = 'deleteExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li > <li><a href='javascript:void(0)' id = 'btnDownload' data-id=" + value.experienceId + " > <em class='icon ni ni-download' > </em><span>Download</span > </a></li > </ul> </div> </div> </li> </ul> </div> </td></tr>");
+                                });
+                                $('#DocumentFilePath').val('');
+                                $("#btnUpdateExperience").hide();
+                                $("#btnAddExperience").show();
+                                $("#errValid-DocumentFilePath").hide();
+
+                            };
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+        $("#experienceId").val('')
+        $("#previousCompany").val('');
+        $("#dateOfJoining").val('');
+        $("#dateOfRelieving").val('');
+        $('#DocumentFilePath').val('');
+        $("#hide_documentName").val('');
+        $("#hide_documentName").hide();
+        $("#displayDocumentName").text('');
+
+    });
+
+    //Delete Experience
+    $('#getexperiencedata').on('click', '#deleteExperienceBtn', function () {
+        $("#errValid-PreviousCompany").text("");
+        $("#errValid-DateOfJoining").text("");
+        $("#errValid-DateOfRelieving").text("");
+        $("#errValid-Document").hide();
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        $("#errValid-DocumentFilePath").hide();
+        $("#errValid-ErrorFileSize").hide();
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var id = $(this).data("id")
+                var experience = {
+                    ExperienceId: id,
+                    EmpId: $("#EmpId").val()
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/DeleteExperience",
+                    data: experience,
+                    success: (Result) => {
+                        $('#displayExperience').html('')
+                        $("#success_DeleteExperience_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Deleted Successfully!',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                if (Result.length == 0) {
+                                    $('#displayExperience').append("<tr><td class='dataTables_empty' style = 'text-align:center;' colspan = '5' > No data available </td></tr>");
+                                }
+                                else {
+                                    $.each(Result, function (key, value) {
+                                        var experienceId = value.experienceId;
+                                        var obj = new Date(value.dateOfJoining);
+                                        var yyyy = obj.getFullYear();
+                                        var mm = obj.getMonth() + 1;
+                                        var dd = obj.getDate();
+                                        if (dd < 10) dd = '0' + dd;
+                                        if (mm < 10) mm = '0' + mm;
+                                        var dateOfJoining = dd + '/' + mm + '/' + yyyy;
+
+                                        var valueRelieving = new Date(value.dateOfRelieving);
+                                        var yyyy = valueRelieving.getFullYear();
+                                        var mm = valueRelieving.getMonth() + 1;
+                                        var dd = valueRelieving.getDate();
+                                        if (dd < 10) dd = '0' + dd;
+                                        if (mm < 10) mm = '0' + mm;
+                                        var dateOfRelieving = dd + '/' + mm + '/' + yyyy;
+                                        if (experienceId > 0) {
+
+                                            $('#displayExperience').append("<tr><td>" + value.previousCompany + "</td><td>" + dateOfJoining + "</td><td>" + dateOfRelieving + "</td><td style='display:none;'>" + value.experienceName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0' > <ul class='nk-tb-actions gx-1 my-n1' > <li class='me-n1' > <div class='dropdown' > <a href='#' class= 'dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'> <em class='icon ni ni-more-h' > </em></a > <div class='dropdown-menu dropdown-menu-end' > <ul class='link-list-opt no-bdr' > <li><a href='javascript:void(0)' id = 'editExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li > <li><a href='javascript:void(0)' id = 'deleteExperienceBtn' data-id=" + value.experienceId + " > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li > <li><a href='javascript:void(0)' id = 'btnDownload' data-id=" + value.experienceId + "><em class='icon ni ni-download'> </em><span>Download</span > </a></li > </ul> </div> </div> </li> </ul> </div> </td></tr>");
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $("#experienceId").val('')
+                $("#previousCompany").val('');
+                $("#dateOfJoining").val('');
+                $("#dateOfRelieving").val('');
+                $('#DocumentFilePath').val('');
+                $("#displayDocumentName").text('');
+            }
+        });
+    });
+
+    //Download Document
+    $('#getexperiencedata').on('click', '#btnDownload', function () {
+        var experienceId = $(this).data("id");
+        window.location.href = "/Employees/DownloadExperienceFile?experienceId=" + experienceId;
+        $('.loader').addClass('d-none');
+
+    });
+
+    $("#btnCloseCreateexperience").click(function () {
+        $('#success_Createexperience_Popup').hide();
+    });
+
+    $("#btnCloseUpdateexperience").click(function () {
+        $('#success_Updateexperience_Popup').hide();
+    });
+
+    $("#btnCloseDeleteExperience").click(function () {
+        $("#success_DeleteExperience_Popup").hide();
+    });
+</script>
+
+
+

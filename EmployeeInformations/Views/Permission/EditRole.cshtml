@@ -1,0 +1,18 @@
+﻿@using EmployeeInformations.Model.PrivilegeViewModel;
+@model RoleViewModel
+
+<div id="bind-rolemodal-content">
+
+</div>
+
+<input type="hidden" id="txt-RoletId" value="@Model.RoleId" />
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var roleId = $("#txt-RoletId").val();
+        PageUtil.goToPermission("/Permission/UpdateRolePermission?roleId=" + roleId);
+    });
+
+</script>

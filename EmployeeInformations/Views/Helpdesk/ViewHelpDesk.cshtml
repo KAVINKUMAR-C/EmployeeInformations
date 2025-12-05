@@ -1,0 +1,90 @@
+﻿@using EmployeeInformations.Model.HelpdeskViewModel
+@model Helpdesk
+@{
+     ViewBag.Title = "ViewHelpDesk";
+}
+
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">View Ticket</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back", "Helpdesks", "Helpdesk", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-header data-head">
+            <h6>HelpDesk Details</h6>
+        </div>
+        <div class="card-inner">
+            <form autocomplete="off">
+                <div class="row">
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Employee Name</label>
+                            <label class="view-text">@Model.EmployeeName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Ticket Type</label>
+                            <label class="view-text">@Model.TicketType</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Status</label>
+                            <label class="view-text">@Model.TicketStatus</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Description</label>
+                            <label class="view-text">@Model.Description</label>
+                        </div>
+                    </div>
+                    
+                    <label class="form-label w-100">Document</label>
+                    <div class="d-flex">
+                        @if (Model.TicketAttachments != null)
+                        {
+                            @if (Model.TicketAttachments.Count() > 0)
+                            {
+                                foreach (var item in Model.TicketAttachments)
+                                {
+                                    <div id="hide_imgName" class="text-primary mt-1">
+                                        <ul class="displayTicketDoc d-flex flex-wrap p-0">
+                                            <li>
+                                                <img class='mt-1' src="~/images/image-icon.png" style='height: 40px;' />
+                                                <lable id="displayDocumentName" class="text-white help-desk-doc">@item.AttachmentName</lable>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                }
+                            }
+                        }                       
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(".displayTicketDoc").on('click', 'li', function () {
+        var imgName = $(this).text().trim();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/HelpdeskTicket/' + imgName + '')
+    });
+</script>

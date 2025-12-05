@@ -1,0 +1,502 @@
+﻿@using EmployeeInformations.Model.TimesheetSummaryViewModel;
+@using EmployeeInformations.Common.Enums;
+@using Microsoft.AspNetCore.Http;
+@model TimeSheet
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Update Timesheet</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner">
+        <form>
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row">
+                @Html.HiddenFor(m => m.EmpId)
+                @Html.HiddenFor(m => m.TimeSheetId)
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Project Name<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m =>m.ProjectId, new SelectList(Model.ProjectNames,"ProjectId","ProjectName"), "--Select Project Name--",new{@class="form-control"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ProjectId,"",new{@class="error text-danger" , id="errValid-ProjectName"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Task Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.TaskName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.TaskName,"",new{@class="error text-danger",id="errValid-TaskName"})
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="datepicker17" class="input-group date" data-date-format="dd/mm/yyyy">
+                            @Html.TextBoxFor(m =>m.Startdate,"{0:dd/MM/yyyy}", new{@class ="form-control",@value =Model.Startdate.ToString("dd/mm/yyyy")})
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+
+                        @Html.ValidationMessageFor(m=>m.Startdate,"",new{@class="error text-danger",id="errValid-Startdate"})
+
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label">Start Time<span class="required" style="color: #FF0000">*</span></label>
+                                <div class="input-group" id="drp_FromTime">
+                                    <input type="text" class="form-control StartTime" id="StartTime" placeholder="" value="@Model.TimeSheetStartTime">
+                                    @*<span class="input-group-addon">
+                                    <i class="icon ti-alarm-clock"></i>
+                                    </span>*@
+                                </div>
+                                <span class="error text-danger" id="errValid-StartTime"></span>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group">
+                                <label class="form-label">End Time<span class="required" style="color: #FF0000">*</span></label>
+                                <div class="input-group" id="drp_ToTime">
+                                    <input type="text" class="form-control EndTime" id="EndTime" placeholder="" value="@Model.TimeSheetEndTime">
+                                    @*<span class="input-group-addon">
+                                    <i class="icon ti-alarm-clock"></i>
+                                    </span>*@
+                                </div>
+                                <span class="error text-danger" id="errValid-EndTime"></span>
+                                <span id="errVerify-timesheetEndTime" class="error text-danger" style="display:none; "> Please select <b>End Time</b> should not be less than <b>Start Time</b> </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Status<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor( m => m.Status,Html.GetEnumSelectList<TimeSheetStatus>(),"--Select Status--",new { @class = "form-control"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Status,"",new{@class="error text-danger" , id="errValid-Status"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Document</label>
+                        <div class="input-group custom-file-button">
+                            @*<label class="input-group-text" for="inputGroupFile">Upload</label>*@
+                            @Html.TextBoxFor(m => m.AttachmentFilePath, new { type = "file", name = "file", @class = "form-control" })
+                        </div>
+                        @if (Model.AttachmentFilePath != null)
+                        {
+                            @if (Model.splitdocname == "pdf")
+                            {
+                                <div class="mt-1 docTimeSheetFile">
+                                    <img src="/images/Pdf-Icon.png" style="height: 40px;">
+                                    <span style="display:none;">@Model.AttachmentFileName</span>
+                                </div>
+
+                            }
+                            else if (Model.splitdocname == "doc" || Model.splitdocname == "docx")
+                            {
+                                <div class="mt-1 docTimeSheetFile">
+                                    <img src="/images/Doc-Icon.png" style="height: 40px;">
+                                    <span style="display:none;">@Model.AttachmentFileName</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mt-1 docTimeSheetFile">
+                                    <img src="/images/Image-Icon.png" style="height: 40px;">
+                                    <span style="display:none;">@Model.AttachmentFileName</span>
+                                </div>
+
+                            }
+                        }
+                        @Html.ValidationMessageFor(m => m.AttachmentFilePath, "", new { @class = "error text-danger", id = "errValid-AttachmentFilePath" })
+                        <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                        @* <span id="errValid-AttachmentFileName" class="error text-danger" style="display:none;"> Invalid AttachmentFileName </span>*@
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Description<span class="required" style="color: #FF0000">*</span></label>
+                        @* @Html.TextBoxFor(m => m.TaskDescription, new { @class = "form-control" })*@
+                        @Html.TextArea("TaskDescription", null, new { cols = "5", rows = "5" ,@class="form-control"})
+                        @Html.ValidationMessageFor(m => m.TaskDescription,"",new{@class="error text-danger" , id="errValid-TaskDescription"})
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 d-flex mt-3 p-0">
+                <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                <input type="button" class="btn btn-primary" id="btnUpdateTimeSheet" value="Save" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="modal" id="success_UpdateTimeSheet_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                TimeSheet Updated Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateTimeSheet">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        // $('#drp_FromTime').click(function(e) {
+        //    $('#StartTime').timepicker('open')
+        //    e.preventDefault();
+        //    $("#drp_FromTime").focus();
+        //    e.stopPropagation();
+        //});
+
+        //$('#drp_ToTime').click(function(e) {
+        //    $('#EndTime').timepicker('open')
+        //    e.preventDefault();
+        //    $("#drp_ToTime").focus();
+        //    e.stopPropagation();
+        //});
+        // dateTime picker
+
+        $('#StartTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function(time) {
+                $("#errValid-StartTime").text("");
+                if ($("#StartTime").val() == "") {
+                    $("#errValid-StartTime").text("Start Time field is required");
+                }
+            }
+        });
+
+        $('#EndTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function(time) {
+                $("#errValid-EndTime").text("");
+                if ($("#EndTime").val() == "") {
+                    $("#errValid-EndTime").text("End Time field is required");
+                }
+            }
+        });
+   
+
+        $("#datepicker17").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+
+        $(".docTimeSheetFile").on('click', function() {
+            var imgName = $(this).text().trim();
+            var urlName = window.location.origin;
+            window.open(urlName + '/Management/TimeSheets/' + imgName + '');
+        });
+
+        // Change summary
+
+        $("#Startdate").change(function() {
+            $("#errValid-Startdate").text("");
+            if ($("#Startdate").val() == "") {
+                $("#errValid-Startdate").text("Start Date field is required");
+            }
+            else {
+                $("#errValid-Startdate").text("");
+            }
+        });
+
+        $("#ProjectId").change(function() {
+            $("#errValid-ProjectName").text("");
+            if ($("#ProjectId").val() == "") {
+                $("#errValid-ProjectName").text("Project Name field is required");
+            }
+        });
+
+        // Nice scroll
+
+        $("#ProjectId,#Status").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+        
+
+    });
+
+    $("#btnBack").click(function() {
+        var urlToRedirect = '@Url.Action("TimeSheet","TimeSheet")';
+        window.location.href = urlToRedirect;
+    });
+
+    //keyup Summary
+
+    $("#TaskName").keyup(function() {
+        $("#errValid-TaskName").text("");
+
+        if ($("#TaskName").val() == "") {
+            $("#errValid-TaskName").text("Task Name field is required");
+        }
+    });
+
+    $("#TaskDescription").keyup(function() {
+        $("#errValid-TaskDescription").text("");
+
+        if ($("#TaskDescription").val() == "") {
+            $("#errValid-TaskDescription").text("Description field is required");
+        }
+    });
+
+    //Change Summary
+
+    $("#Status").change(function() {
+        $("#errValid-Status").text("");
+        if ($("#Status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+        }
+    });
+
+    //$("#AttachementFilePath").change(function () {
+    //    $("#errValid-AttachementFilePath").text("");
+
+    //    var attachmentFilePath = $("#AttachementFilePath").val();
+    //    if (attachmentFilePath == "") {
+    //        $("#errValid-AttachementFilePath").text("Attachment field is required");
+    //    }
+    //});
+
+    // Update Timesheet
+
+    $("#btnUpdateTimeSheet").click(function() {
+
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-ProjectName").text("");
+        $("#errValid-TaskName").text("");
+        $("#errValid-TaskDescription").text("");
+        $("#errValid-Startdate").text("");
+        //$("#errValid-Enddate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errValid-EndTime").text("");
+        $("#errValid-Status").text("");
+        $("#errValid-AttachmentFilePath").text("");
+        //$("#errValid-AttachmentFileName").hide();
+        // $("#hide_attachmentFileName").hide();
+        $("#errVerify-timesheetEndTime").hide();
+        $("#errVerify-timesheetToDate").hide();
+        $("#errValid-ErrorFileSize").text('');
+
+        if ($("#ProjectId").val() == "") {
+            $("#errValid-ProjectName").text("Project Name field is required");
+            isValid = false;
+        }
+
+        if ($("#TaskName").val() == "") {
+            $("#errValid-TaskName").text("Task Name field is required");
+            isValid = false;
+        }
+        if ($("#TaskDescription").val() == "") {
+            $("#errValid-TaskDescription").text("Description field is required");
+            isValid = false;
+        }
+
+        if ($("#Startdate").val() == "") {
+            $("#errValid-Startdate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        //if ($("#Enddate").val() == "") {
+        //    $("#errValid-Enddate").text("Startdate field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#StartTime").val() == "") {
+            $("#errValid-StartTime").text("Start Time field is required");
+            isValid = false;
+        }
+
+        if ($("#EndTime").val() == "") {
+            $("#errValid-EndTime").text("End Time field is required");
+            isValid = false;
+        }
+
+        if ($("#Status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            isValid = false;
+        }
+
+        var attachmentFilePath = $("#AttachmentFilePath").val();
+        if (timeSheetId == 0) {
+            if ($(attachmentFilePath).val() == "") {
+                $("errValid-AttachmentFilePath").text("Attachment field is required");
+                isValid = false;
+            }
+            else {
+                $('#displayAttachmentFileName').hide();
+            }
+        }
+        else {
+            $('#displayAttachmentFileName').show();
+        }
+
+        //if (attachmentFilePath != "") {
+        //    var ext = attachmentFilePath.split('.').pop();
+        //    if (ext == "pdf" || ext == "doc") {
+
+        //    }
+        //    else {
+        //        $("#errValid-AttachmentFileName").show();
+        //        isValid = false;
+        //    }
+        //}
+
+        var attachmentLength = $('#AttachmentFilePath').prop("files").length;
+        if (attachmentLength > 0) {
+            if ($('#AttachmentFilePath').prop("files")[0].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                $(".docTimeSheetFile").hide();
+                return false;
+            }
+            else {
+                formData.append("file", $('#AttachmentFilePath').prop("files")[0]);
+            }
+        }
+        var empId = $("#EmpId").val();
+        var projectId = $("#ProjectId").val();
+        var timeSheetId = $("#TimeSheetId").val();
+        var ProjectId = $("#ProjectId").val();
+        var taskName = $("#TaskName").val();
+        var taskDescription = $("#TaskDescription").val();
+        var startdate = $("#Startdate").val();
+        //var enddate = $("#Enddate").val();
+        var startTime = $("#StartTime").val();
+        var endTime = $("#EndTime").val();
+        var status = $("#Status").val();
+
+        formData.append("EmpId", empId);
+        formData.append("ProjectId", projectId);
+        formData.append("TimeSheetId", timeSheetId);
+        formData.append("TaskName", taskName);
+        formData.append("TaskDescription", taskDescription);
+        formData.append("Startdate", startdate);
+        //formData.append("Enddate", enddate);
+        formData.append("TimeSheetStartTime", startTime);
+        formData.append("TimeSheetEndTime", endTime);
+        formData.append("Status", status);
+
+        formData.append("StrStartdate", startdate);
+
+       
+        if (isValid) {
+            var isTimeValid = getTimeValid(startdate, startTime, endTime);
+            var url = "/TimeSheet/UpdateTimeSheet";
+
+            if (isTimeValid) {
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,                   
+                    success: function(result) {
+                        if (result > 0) {
+                            swal.fire({
+                                title: "Updated Successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("TimeSheet", "TimeSheet")';
+                                window.location.href = urlToRedirect;
+                            });
+                            
+                        }
+                        else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("TimeSheet", "TimeSheet")';
+                                window.location.href = urlToRedirect;
+                            });
+                            
+                        }
+                    },
+                    complete: function() {
+                        $('.loader').addClass('d-none');
+                    }
+                });               
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-timesheetEndTime").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //-----------------------------------------------------------------------------------------------------------------------
+
+    // Time validation
+
+    function getTimeValid(startdate, startTime, endTime) {      
+        console.log("startdate :" + startdate);
+        var result = false;
+        var splitDate = startdate.split('/');
+        var formatDate = splitDate[2] + "/" + splitDate[1] + "/" + splitDate[0];
+        var fromDateTime = new Date(formatDate + ' ' + startTime);
+        var toDateTime = new Date(formatDate + ' ' + endTime);  
+        
+         console.log("fromDateTime :" + fromDateTime);
+         console.log("toDateTime :" + toDateTime);
+        if (fromDateTime < toDateTime) {
+            result = true;
+        }
+        return result;
+    }
+
+</script>
+
+

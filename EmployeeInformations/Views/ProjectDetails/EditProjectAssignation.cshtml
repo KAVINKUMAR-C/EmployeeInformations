@@ -1,0 +1,23 @@
+﻿@using EmployeeInformations.Model.ProjectSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ProjectAssignation
+@{
+    var roleId = Context.Session.GetInt32("Id");
+}
+
+<div id="bind-projectAssignationmodal-content">
+</div>
+
+<input type="hidden" id="txt-Id" value="@Model.ProjectId" />
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {        
+        var projectId = $("#txt-Id").val();
+        PageUtil.goToProjectAssignation("/ProjectDetails/UpdateProjectAssignation?projectId=" + projectId);
+    });
+
+</script>
+

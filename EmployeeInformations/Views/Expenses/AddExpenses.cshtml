@@ -1,0 +1,629 @@
+﻿@using EmployeeInformations.Model.ExpensesViewModel;
+@model ExpensesViewModel
+@{
+    ViewBag.Title = "AddExpenses";
+    Layout = "_Layout"; 
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Expense Request</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">  
+             <button type="button" class="btn btn-secondary  ml-auto mt-auto mb-auto" id="btnBack" value="Back">Back</button>           
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<form>
+    <div class="tab-content">
+        <div class="tab-pane active">
+            <br>
+            @Html.HiddenFor(m => m.ExpenseId)
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Title<span class="required" style="color: #FF0000">*</span></label>
+                        <input type="text" class="form-control" id="ExpenseTitle">
+                        <span class="error text-danger" id="errValid-ExpenceTitle"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+
+                    <div class="form-group">
+                        <label class="form-label">From Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="FromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="FromDate" placeholder="Enter From Date">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-FromDate"></span>                      
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" id="ToDatedatepickerblock">
+                    <div class="form-group">
+                        <label class="form-label" id="leaveToLabel">To Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="ToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="ToDate" placeholder="Enter To Date">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-ToDate"></span>
+                        <span id="errVerify-expenseToDate" class="error text-danger"> Please select <b>To Date</b> should not be less than <b>From Date</b> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 d-flex mt-3 p-0">        
+        <input type="button" class="btn btn-primary ml-auto" id="btnAddExpense" value="Add Expense" />        
+    </div>
+</form>
+
+<div class="tab-pane">
+    <input type="hidden" class="form-control" id="EmailListId">
+    <input type="hidden" id="counter" value="2">
+
+    <div id="row-container">
+        <div class="row containerrow">
+            <input type="hidden" class="form-control DetailId" id="DetailId">
+            <div class="col-lg-3 col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Category<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control ExpenseCategory" >
+                    <span class="error text-danger errValid-expenseCategory_1" id="expenseVal" ></span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Amount<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="number" class="form-control Amount" placeholder="" onkeydown="return event.keyCode !== 69"/>
+                    <span class="error text-danger errValid-amountName_1"></span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <div class="form-group">
+                    <label class="form-label">Bill Number<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control BillNumber" placeholder="" >
+                    <span class="error text-danger errValid-billNumber_1"></span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="form-group">
+                   
+                  <div>
+                            <label class="form-label">Document<span class="required" style="color: #FF0000">*</span></label>
+                        @*<div class="input-group custom-file-button">*@
+                        <input type="file" class="form-control Document" placeholder="">
+                        <span class="error text-danger errValid-fileSize_1" id="errMsg-file_1"></span>
+                        @*</div>*@
+                        @*<span class="error text-danger errValid-fileSize_1"></span>*@
+                    </div>
+                    
+                    @*  <div class="nk-tb-col nk-tb-col-tools border-0">
+                       <input type="button" class="btn btn-warning mt-3  btnDelete"  value="Remove">
+                    </div> *@
+                  
+                   
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="form-group">
+            <label class="form-label"> Description</label>
+           <textarea  class="form-control" id="description" cols="5" rows="5"></textarea>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9 d-flex mt-3">
+            <label class="form-label ml-auto" style="font-size:16px;">Total Amount : </label>
+            <label class="form-label" id="totalAmount" style="font-size:16px;"></label>
+        </div>
+
+        <div class="col-lg-3 d-flex mt-3">
+            <input type="button" class="btn btn-primary ml-auto mr-3" id="btnSave" value="Save">
+            <input type="button" class="btn btn-danger" id="btnCancel" value="Cancel">
+        </div>
+    </div>
+   
+   @* <div class="col-lg-12 d-flex mt-3 p-0">
+        <label class="form-label ml-auto">Total Amount :</label>
+        <lable class="form-label ml-auto" id="totalAmount"></lable>
+        <input type="button" class="btn btn-primary ml-auto mr-3" id="btnSave" value="Save" />
+        <input type="button" class="btn btn-danger" id="btnCancel" value="Cancel" />
+    </div>*@
+</div>
+
+
+<script>
+
+    $('#btnBack').click(function () {
+        var urlToRedirect = '@Url.Action("EmployeeExpenses","Expenses")';
+        window.location.href = urlToRedirect;
+    });
+
+    $('#btnCancel').click(function () {
+        var urlToRedirect = '@Url.Action("EmployeeExpenses","Expenses")';
+        window.location.href = urlToRedirect;
+    });
+  
+ 
+
+    // Add expense
+
+    var errorCount = 0;
+    $('#btnAddExpense').on('click', function (event) {
+        var isExpense = false;
+        $('.error').text("");
+        errorCount = 1;
+        $('.containerrow').each(function () {
+            
+            var inputCount = 1;
+            $(this).find('input').each(function () {
+                var vals = $(this).val();
+           
+                if (vals == "" || vals == 0) {
+                    if (inputCount != 1)
+                    {
+                        isExpense = true;
+                    }                    
+                    if (inputCount == 1) {
+
+                    }
+                    else if (inputCount == 2) {
+                        $('.errValid-expenseCategory_' + errorCount).text("Category field is required");
+                    }
+                    else if (inputCount == 3) {
+                            $('.errValid-amountName_' + errorCount).text("Amount field is required");
+                        if (vals == "0"){
+                            $('.errValid-amountName_' + errorCount).text("please enter valid amount");
+                        }
+                       
+                       
+                    }
+                    else if (inputCount == 4) {
+                        $('.errValid-billNumber_' + errorCount).text("Bill Number field is required");
+                    }
+                    else if(inputCount == 5){
+                        $('.errValid-fileSize_' + errorCount).text("Attachment field is required");
+                    }
+                }
+                else {
+                        if (inputCount == 1) {
+
+                        }
+                        else if (inputCount == 2) {
+
+                            $('.errValid-expenseCategory_' + errorCount).text("");
+                        }
+                        else if (inputCount == 3) {
+                            $('.errValid-amountName_' + errorCount).text("");
+                        }
+                        else if (inputCount == 4) {
+                            $('.errValid-billNumber_' + errorCount).text("");
+                        }
+                        else if (inputCount == 5) {
+                            $('.errValid-fileSize_' + errorCount).text("");
+                        }
+                    
+                }
+                inputCount++;
+            });
+            errorCount++;
+        });
+
+        if (!isExpense) {
+            add_inputs();
+        
+            $('.containerrow').on('keyup', '.Amount', function () {
+                var val2 = 0;
+                $('.Amount').each(function () {
+                    val2 += (parseFloat($(this).val()) || 0);
+                });
+                $('#totalAmount').text(" " + val2.toFixed(2));
+                
+
+            });
+
+            $(".row").on('click', '.btnDelete', function() {              
+                (this).closest('.row').remove();
+                var couner = $('#counter').val();
+                $('#counter').val(couner - 1);
+
+                var val2 = 0;
+                $('.Amount').each(function () {
+                    val2 += (parseFloat($(this).val()) || 0);
+                });
+                $('#totalAmount').text(" " + val2.toFixed(2));
+            });
+           
+            
+        }
+
+        function add_inputs() {
+       
+            var counter = parseInt($('#counter').val());
+            var html = '';
+            if ($("#UserName").text() != '') {
+
+                html = "<div class='row containerrow'><input type='hidden' class='form-control DetailId' id='DetailId'>" +
+                    "<div class='col-lg-3'><div class='form-group'><label class='form-label'>Category<span class='required' style='color: #FF0000'>*</span></label><input type='text' class='form-control ExpenseCategory' value=''><span class='error text-danger errValid-expenseCategory_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-2'><div class='form-group'><label class='form-label'>Amount<span class='required' style='color: #FF0000'>*</span></label><input type='number' class='form-control Amount' placeholder='' value=''><span class='error text-danger errValid-amountName_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-2'><div class='form-group'><label class='form-label'>Bill Number<span class='required' style='color: #FF0000'>*</span></label><input type='text' class='form-control BillNumber' placeholder='' value=''><span class='error text-danger errValid-billNumber_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-5'><div class='form-group'><div class='d-flex'><div><label class='form-label'>Document<span class='required' style='color: #FF0000'>*</span></label><div class='input-group custom-file-button'><input type='file' class='form-control Document' placeholder='' multiple='multiple'></div><span class='error text-danger errValid-fileSize_" + counter +
+                    "'></span></div><div class='nk-tb-col nk-tb-col-tools border-0'><input type='button' class='btn btn-warning mt-3 btnDelete' value='Remove'></div></div></div></div></div>";
+            }
+            else {
+
+                html = "<div class='row containerrow'><input type='hidden' class='form-control DetailId' id='DetailId'>" +
+                    "<div class='col-lg-3'><div class='form-group'><label class='form-label'>Category<span class='required' style='color: #FF0000'>*</span></label><input type='text' class='form-control ExpenseCategory' value=''><span class='error text-danger errValid-expenseCategory_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-2'><div class='form-group'><label class='form-label'>Amount<span class='required' style='color: #FF0000'>*</span></label><input type='number' class='form-control Amount' placeholder='' value=''><span class='error text-danger errValid-amountName_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-2'><div class='form-group'><label class='form-label'>Bill Number<span class='required' style='color: #FF0000'>*</span></label><input type='text' class='form-control BillNumber' placeholder='' value=''><span class='error text-danger errValid-billNumber_" + counter + "'></span></div></div>" +
+                    "<div class='col-lg-5'><div class='form-group'><div class='d-flex'><div><label class='form-label'>Document<span class='required' style='color: #FF0000'>*</span></label><div class='input-group custom-file-button'><input type='file' class='form-control Document' placeholder='' multiple='multiple'></div><span class='error text-danger errValid-fileSize_" + counter +
+                    "'></span></div><div class='nk-tb-col nk-tb-col-tools border-0'><input type='button' class='btn btn-warning mt-3 btnDelete' value='Remove'></div></div></div></div></div>";
+            }
+
+            $('#row-container').append(html);
+            $('#counter').val(counter + 1);
+
+            $('.containerrow').on('keyup', '.ExpenseCategory', function () {
+                var value = $(this).val();
+                if (value !== "") {
+                    $('.errValid-expenseCategory_' + counter).text("");
+                }
+            });
+            $('.containerrow').on('keyup', '.BillNumber', function () {
+                var value = $(this).val();
+                if (value !== "") {
+                    $('.errValid-billNumber_' + counter).text("");
+                }
+            });
+            $('.containerrow').on('keyup', '.Amount', function () {
+         
+                var value = $(this).val();
+                if (value !== "") {
+                    $('.errValid-amountName_' + counter).text("");
+                }
+            });
+            $('.containerrow').on('change', '.Document', function () {
+                var value = $(this).val();
+                var name = value.split('\\').pop();
+                if (name !=="") {
+                    $('.errValid-fileSize_' + counter).text("");
+                }
+            });
+             
+        }
+    });
+
+    $(document).ready(function () {
+
+        $("#errVerify-expenseToDate").hide();
+        $("#FromDate").val('');
+        $("#ToDate").val('');       
+        $("#FromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,           
+            endDate: "today",
+        });
+
+        $("#ToDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,            
+            endDate: "today",
+        });
+
+        $("#ExpenseTitle").keyup(function () {
+            $("#errValid-ExpenceTitle").text("");
+            if ($("#ExpenceTitle").val() == "") {
+                $("#errValid-ExpenceTitle").text("Title field is required");
+            }
+            else {
+                $("#errValid-ExpenceTitle").text("");
+            }
+        });
+
+        $("#FromDate").change(function () {
+            $("#errValid-FromDate").text("");
+            if ($("#FromDate").val() == "") {
+                $("#errValid-FromDate").text("From Date field is required");
+            }
+            else {
+                $("#errValid-FromDate").text("");
+            }
+        });
+
+        $("#ToDate").change(function () {
+            $("#errValid-ToDate").text("");
+            if ($("#ToDate").val() == "") {
+                $("#errValid-ToDate").text("To Date field is required");
+               
+            }
+            else {
+                $("#errValid-ToDate").text("");
+            }
+        });
+    });
+
+    $('.containerrow').on('keyup', '.Amount', function () {
+        var val2 = 0;
+        $('.Amount').each(function () {
+            val2 += (parseFloat($(this).val()) || 0);
+        });
+        $('#totalAmount').text(" " + val2.toFixed(2));
+  
+    });
+
+    $('.containerrow').on('keyup', '.ExpenseCategory', function () {
+        var value = $(this).val();
+        if (value != "") {
+            $('.errValid-expenseCategory_1').text("");
+        }
+    });
+    $('.containerrow').on('keyup', '.BillNumber', function () {
+        var value = $(this).val();
+        if (value !== "") {
+            $('.errValid-billNumber_1' ).text("");
+        }
+    });
+    $('.containerrow').on('keyup', '.Amount', function () {
+        var value = $(this).val();
+        if (value !== "") {
+            $('.errValid-amountName_1').text(""); 
+        }
+    });
+    $('.containerrow').on('change', '.Document', function () {
+        var value = $(this).val();
+        var name = value.split('\\').pop();
+        if (name !== "") {
+            $('.errValid-fileSize_1').text("");
+        }
+    });
+    
+
+    $(".row").on('click', '.btnDelete', function() {        
+        (this).closest('.row').remove();
+        var detailId = $(this).data("id");
+        var couner = $('#counter').val();
+        $('#counter').val(couner - 1);
+
+        var val2 = 0;
+        $('.Amount').each(function () {
+            val2 += (parseFloat($(this).val()) || 0);
+        });
+        $('#totalAmount').text(val2);
+
+       
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    // save expense
+
+    $("#btnSave").click(function () {
+
+        var isValid = true;
+        var formData = new FormData();
+        $("#errValid-ExpenceTitle").text("");
+        $("#errValid-FromDate").text("");
+        $("#errValid-ToDate").text("");        
+        $("#errVerify-expenseToDate").hide();
+
+        if ($("#ExpenseTitle").val() == "") {
+            $("#errValid-ExpenceTitle").text("Title field is required");
+            isValid = false;
+        }
+         if ($("#FromDate").val() == "") {
+            $("#errValid-FromDate").text("From Date field is required");
+            isValid = false;
+        }
+         if ($("#ToDate").val() == "") {
+            $("#errValid-ToDate").text("To Date field is required");
+
+            isValid = false;
+        }
+        
+       
+        var listExpenseDetailView = [];
+        
+      
+        var count = 1;
+        var resInput = $(".containerrow").map(function () {
+
+            return [
+
+                $(this).find('input').map(function () {
+                    console.log("inside" + count);
+                    return $(this).val();
+                }).get()
+            ];
+
+        }).get();
+
+ 
+        var resFilesInput = $(".containerrow").map(function () {
+
+            return [
+
+                $(this).find('input').map(function () {
+                    console.log("inside" + count);
+                    return $(this).prop("files");
+                }).get()
+            ];
+
+        }).get();
+    
+        console.log("resFilesInput  : " + resFilesInput);
+        
+        for (var i = 0; i < resInput.length; i++) {
+           
+                var detailId = resInput[i][0];
+                var category = resInput[i][1];
+                var amount = resInput[i][2];
+                var billNumber = resInput[i][3];
+                var file = resFilesInput[i][0];
+                 var Name = resInput[i][4];
+                 var fileName = Name.split('\\').pop();
+
+          
+                listExpenseDetailView.push({
+                    DetailId: detailId,
+                    ExpenseCategory: category,
+                    Amount: amount,
+                    BillNumber: billNumber,
+                    File: file,
+                    ExpenseFileName: fileName
+                });
+ 
+                if (listExpenseDetailView[i].ExpenseCategory == '') {
+                    $('.errValid-expenseCategory_' + [i + 1]).text("Category field is required");
+                    isValid = false;
+
+                }
+                else {
+                    $('.errValid-expenseCategory_' + [i + 1]).text("");
+                }
+                if (listExpenseDetailView[i].Amount == '' || listExpenseDetailView[i].Amount == 0 ) {
+                
+                      $('.errValid-amountName_' + [i + 1]).text("Amount field is required");
+                       isValid = false;
+    
+                  if (listExpenseDetailView[i].Amount == "0"){
+                      $('.errValid-amountName_' + [i + 1]).text("please enter valid amount");
+                    isValid = false;
+                  }
+                   
+                }
+                else {
+                    $('.errValid-amountName_' + [i + 1]).text("");
+                }
+                if (listExpenseDetailView[i].BillNumber == '') {
+                    $('.errValid-billNumber_' + [i + 1]).text("Bill Number field is required");
+                    isValid = false;
+
+                }
+                else {
+                    $('.errValid-billNumber_' + [i + 1]).text("");
+                }
+                if (listExpenseDetailView[i].File.length == 0) {
+                    $('.errValid-fileSize_' + [i + 1]).text("Attachment field is required");
+                    isValid = false;
+                }
+                else {
+                    $('.errValid-fileSize_' + [i + 1]).text("");
+                }
+               
+        }
+
+   
+        for (var i = 0; i < listExpenseDetailView.length; i++) {
+            formData.append("ListExpenseDetailView[" + i + "].DetailId", listExpenseDetailView[i].DetailId);
+            formData.append("ListExpenseDetailView[" + i + "].ExpenseCategory", listExpenseDetailView[i].ExpenseCategory);
+            formData.append("ListExpenseDetailView[" + i + "].Amount", listExpenseDetailView[i].Amount);
+            formData.append("ListExpenseDetailView[" + i + "].BillNumber", listExpenseDetailView[i].BillNumber);
+            formData.append("ListExpenseDetailView[" + i + "].ExpenseFileName", listExpenseDetailView[i].ExpenseFileName);
+            var attachmentLength = listExpenseDetailView[i].File.length;  //file attachement length
+            
+            for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+                formData.append("files", listExpenseDetailView[i].File[x]);
+            }
+        }
+    
+
+        var expenseTitle = $("#ExpenseTitle").val();
+        var fromDate = $("#FromDate").val();
+        var toDate = $("#ToDate").val();
+        var totalAmount = $("#totalAmount").text();
+        var description = $("#description").val();
+
+        formData.append("ExpenseTitle", expenseTitle);
+        formData.append("strFromDate", fromDate);
+        formData.append("strToDate", toDate);
+        formData.append("TotalAmount", totalAmount); 
+        formData.append("Reason", description);
+        
+
+        if(isValid)
+        {
+            var isValidDate = dateDifference(fromDate, toDate);
+            if (isValidDate == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Expenses/CreateExpenses",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                                Swal.fire({
+        title: 'Added Successfully',
+        text: "",
+        icon: 'success',
+        allowOutsideClick: false
+    }).then((resultValue) => {
+        if (resultValue.isConfirmed) {
+                                    window.location.href = "/Expenses/EmployeeExpenses";
+                                };
+    });                           
+                        }
+                        else {
+                                Swal.fire({
+        title: 'Something error',
+        text: "",
+        icon: 'error',
+        allowOutsideClick: false
+    }).then((resultValue) => {
+         window.location.href = "/Expenses/EmployeeExpenses";
+    });                          
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+             
+                $("#errVerify-expenseToDate").show();
+                return false;
+                $('.loader').addClass('d-none');
+            }          
+        }
+        else{
+            return false;
+        }
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Date Validation
+
+    function dateDifference(fromDate, toDate) {
+        var result = false;
+        var splitFrom = fromDate.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var ExpensefromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = toDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var ExpensetoDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (ExpensetoDate >= ExpensefromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+</script>

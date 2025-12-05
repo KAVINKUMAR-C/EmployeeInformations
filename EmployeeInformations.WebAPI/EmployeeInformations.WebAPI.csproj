@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EmployeeInformations.Business\EmployeeInformations.Business.csproj" />
+    <ProjectReference Include="..\EmployeeInformations.Data\EmployeeInformations.Data.csproj" />
+    <ProjectReference Include="..\EmployeeInformations.DI\EmployeeInformations.DI.csproj" />
+  </ItemGroup>
+</Project>

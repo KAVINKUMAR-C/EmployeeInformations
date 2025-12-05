@@ -1,0 +1,229 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel;
+@using Microsoft.AspNetCore.Http;
+@model Company
+@{
+    ViewBag.Title = "ViewCompany";
+}
+
+<div class="leave-dtl-block">
+
+    <div class="nk-block-head nk-block-head-sm view-block">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Company View</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back","Company","Company", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-header data-head">
+            <h6>Company Details</h6>
+        </div>
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Name</label>
+                            <label class="view-text">@Model.CompanyName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Email</label>
+                            <label class="view-text">@Model.CompanyEmail</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Phone Number</label>
+                            <div>
+
+                                <label class="view-text">
+                                    <span class="flag-img">
+                                        <img src="/images/flags/@(Model.CountryCode).png">
+                                    </span>
+                                    @Model.CompanyPhoneNumber
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Industry</label>
+                            <label class="view-text">@Model.Industry</label>
+                        </div>
+                    </div>                                                      
+                   
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-header data-head">
+            <h6>Contact Person</h6>
+        </div>
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">First Name</label>
+                            <label class="view-text">@Model.ContactPersonFirstName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Last Name</label>
+                            <label class="view-text">@Model.ContactPersonLastName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Gender</label>
+                            <label class="view-text">@Model.PersonGender</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Email</label>
+                            <label class="view-text">@Model.ContactPersonEmail</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Phone Number</label>
+                            <div>
+                                <label class="view-text">
+                                    <span class="flag-img">
+                                        <img src="/images/flags/@(Model.CompanyCountryCode).png">
+                                    </span>
+                                    @Model.ContactPersonPhoneNumber
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-header data-head">
+            <h6>Customer Physical Address</h6>
+        </div>
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Address Line 1</label>
+                            <label class="view-text">@Model.PhysicalAddress1</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Address Line 2</label>
+                            <label class="view-text">@Model.PhysicalAddress2</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Country</label>
+                            <label class="view-text">@Model.CountryName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">State</label>
+                            <label class="view-text">@Model.PhysicalStatename</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">City</label>
+                            <label class="view-text">@Model.PhysicalCityname</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Zip Code</label>
+                            <label class="view-text">@Model.PhysicalAddressZipCode</label>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-header data-head">
+            <h6>Customer Mailing Address</h6>
+        </div>
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Address Line 1</label>
+                            <label class="view-text">@Model.MailingAddress1</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Address Line 2</label>
+                            <label class="view-text">@Model.MailingAddress2</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Country</label>
+                            <label class="view-text">@Model.MailingCountryname</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">State</label>
+                            <label class="view-text">@Model.MailingStatename</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">City</label>
+                            <label class="view-text">@Model.MailingCityname</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Zip Code</label>
+                            <label class="view-text">@Model.MailingAddressZipCode</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+

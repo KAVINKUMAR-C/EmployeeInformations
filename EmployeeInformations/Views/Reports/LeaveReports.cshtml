@@ -1,0 +1,817 @@
+﻿@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common
+@using EmployeeInformations.Common.Enums;
+@using EmployeeInformations.Model.ReportsViewModel
+@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model Reports
+@{
+    ViewBag.Title = "Leave Reports";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.HolidayModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Leave Reports</h3>
+        </div><!-- .nk-block-head-content -->
+
+    </div><!-- .nk-block-between -->
+</div>
+
+<form autocomplete="off">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="row">
+
+        <div class="col-lg-2  col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Employees</label>
+                <div>
+                    @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.reportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId" })
+                </div>
+                @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeId" })
+            </div>
+        </div>
+
+        @*<div class="col-lg-3 col-md-6">
+        <div class="form-group">
+        <label class="form-label">Designation</label>
+        <div class="selectbox">
+        @Html.DropDownListFor(m => m.DesignationId, new SelectList(Model.Designations,"DesignationId","DesignationName"), "--Select Designation--",new{@class="form-control",id="DesignationId"})
+        </div>
+        @Html.ValidationMessageFor(m => m.DesignationId,"",new{@class="error text-danger" , id="errValid-Designation"})
+        </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+        <div class="form-group">
+        <label class="form-label">Department</label>
+        <div class="selectbox">
+        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments,"DepartmentId","DepartmentName"), "--Select Department--",new{@class="form-control",id="DepartmentId"})
+        </div>
+        @Html.ValidationMessageFor(m => m.DepartmentId,"",new{@class="error text-danger" , id="errValid-Department"})
+        </div>
+        </div>*@
+
+        <div class="col-lg-2 col-md-6">
+            <div class="form-group">
+                <label class="form-label">Leave</label>
+                <div>
+                    @Html.DropDownListFor(m => m.LeaveTypeId, new SelectList(Model.LeaveTypes, "LeaveTypeId", "LeaveType"), "--Select LeaveType--", new { @class = "form-control", id = "LeaveTypeId" })
+                </div>
+                @Html.ValidationMessageFor(m => m.LeaveTypeId, "", new { @class = "error text-danger", id = "errValid-Department" })
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+            <div class="form-group">
+                <label class="form-label">From Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveFromDate" placeholder="Enter From Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveFromDate"></span>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6" id="leaveToDatedatepickerblock">
+            <div class="form-group">
+                <label class="form-label" id="leaveToLabel">To Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveToDate" placeholder="Enter To Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveToDate"></span>
+                <span id="errVerify-leaveToDate" style="display:none;" class="error text-danger"> Please select <b>To Date</b> should not be less than <b>From Date</b> </span>
+                <span id="errVerify-leaveCountDate" style="display:none;" class="error text-danger"> <b>Your Not Eligible For Take Leave!</b> </span>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Active / In Active<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.EmployeeStatus, Html.GetEnumSelectList<EmployeeStatus>(), "--Select Active / In Active--", new { @class = "form-control", id = "status" })
+                </div>
+                <span class="error text-danger" id="errValid-Status"></span>
+            </div>
+        </div>
+
+        <div class="col leave-search-btn pb-1">
+            <button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+        </div>
+
+        <div class="col leave-search-btn pb-1 d-flex justify-content-end">
+            <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="genpdfs"><img src="./images/pdf.png" /></button>
+            <button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployeeLeave"><i class="ti-download"></i></button>
+        </div>
+    </div>
+</form>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="leaveReportDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getLeaveReportdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="EmployeeId"><span class="sub-text">Employee Id</span></th>
+                    <th class="nk-tb-col tb-col" data-id="LeaveType"><span class="sub-text">Leave Types</span></th>
+                    <th class="nk-tb-col tb-col" data-id="LeaveFromDate"><span class="sub-text">From Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="LeaveToDate"><span class="sub-text">To Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="LeaveCount"><span class="sub-text">Leave Count</span></th>
+                </tr>
+            </thead>
+           
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="success_DownloadFile_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Qualification created successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseDownloadFile">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        var count = 0;
+        var columnIndex = "";
+        var columnDirection = "";
+        BindLeavereport()
+        function BindLeavereport() {
+        
+            var count = 0;
+            var Url = "";
+            var Type = "";
+            var leaveFromDate = $("#leaveFromDate").val();
+            var employeeId = $("#EmployeeId").val();
+            var leaveToDate = $("#leaveToDate").val();
+            var leaveTypeId = $("#LeaveTypeId").val();
+            var status = $("#status").val();
+            var search = $('#LeaveReportsearch').val();
+            
+            status = status == 1 ? 0 : 1;
+            if (leaveFromDate != "") {
+                Url = "/Reports/FilterEmployeeByLeaveType";
+                Type = "Post";
+            }
+            
+            else {
+                Url = "/Reports/LeaveReportByPager";
+                Type = "Get";
+            }
+
+            var table = $("#getLeaveReportdata").DataTable();
+            $('#getLeaveReportdata').remove()
+            if (table) {
+                
+                table.destroy();
+
+            }
+            $('#getLeaveReportdata').DataTable({
+
+                serverSide: true,
+                processing: true,
+                          
+                ajax: {
+                    url: Url,
+                    type: Type,
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getLeaveReportdata_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var leaveEntry = document.getElementById("getLeaveReportdata_length"); //get entries div id
+                        var entrySelect = leaveEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                        d.leaveFromDate = leaveFromDate;
+                        d.LeaveToDate = leaveToDate;
+                        d.EmployeeStatus = status;
+                        d.EmployeeId = employeeId;
+                    }
+                },
+
+                columns: [
+                    {
+                      
+                        data: 'employeeName',
+                        render: function (data, type, row, meta) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+                            return "<div class='user-card'> <div class='user-avatar " + className + " '><span style='text-transform:uppercase;'> " + (row.employeeSortName)[0] + "</span></div><div class='user-info' >" + (row.employeeName) + "</div></div>";
+                            if (row.isDeleted == false) {
+                                return "<span class='tb-leadfont-weight-bold'> " + row.employeeName + "</span>";
+                            }
+                            else {
+                                return "  <span class='tb-lead text-danger' >" + row.employeeName + "</span>";
+                            }
+                        }
+                    },
+
+                    {
+                        data: 'employeeId',
+                        render: function (data, type, row) {
+                
+                            if (row.isDeleted == false) {
+                                return '<b class="tb-sub text-primary">' + (row.employeeUserId) + '</b>'
+                            }
+                            else {
+                                return '<b class="tb-lead text-danger">' + (row.employeeUserId) + '</b>'
+                            }
+
+                        }
+                    },
+
+                    {
+                        data: 'leaveTypes',
+                        render: function (data, type, row) {
+
+                            return "<span class='badge badge-dim bg-primary'>" + row.leaveType + "</span>";
+                        }
+                    },
+
+                    {
+                        data: 'fromDate',
+                        render: function (data, type, row) {
+
+                            return "<span>" + dateFormat(row.leaveFromDate) + "</span>";
+                        }
+                    },
+
+
+                    {
+                        data: 'toDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateFormat(row.leaveToDate) + "</span>";
+                        }
+                    },
+
+                    {
+                        data: 'leaveCount',
+                        render: function (data, type, row) {
+                       
+                            return "<span class='text-info'>" + parseFloat(row.leaveCount).toFixed(1) + "</span>";
+                        }
+                    },
+
+
+                ],
+
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+                "initComplete": function (settings, json) {
+                    // Access recordsTotal and recordFiltered
+                    var recordsTotal = json.recordsTotal;
+                    var recordFiltered = json.recordFiltered;
+                    console.log("Total records: " + recordsTotal);
+                    console.log("Filtered records: " + recordFiltered);
+                }
+            });
+
+            $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+                var target = e.target;
+                var parent = target.parentNode;
+                var index = [].indexOf.call(parent.children, target);
+
+                if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+                columnIndex = $(this).data('id');
+            });
+            function getClassNameForGrid(input) {
+                var className = "";
+            
+                switch (input) {
+                    case 1:
+                        className = "bg-success";
+                        break;
+                    case 2:
+                        className = "bg-warning";
+                        break;
+                    case 3:
+                        className = "bg-info";
+                        break;
+                    case 4:
+                        className = "bg-blue";
+                        break;
+                    case 5:
+                        className = "bg-pink";
+                        break;
+                    case 6:
+                        className = "bg-danger";
+                        break;
+                }
+                return className;
+            }
+        }
+
+        $("#btnFilterLeave").click(function () {
+        
+            var status = $("#status").val();
+            var formData = new FormData();
+            var isValid = true;
+            $("#errValid-LeaveFromDate").text("");
+            $("#errValid-LeaveToDate").text("");
+            $("#errVerify-leaveToDate").hide();
+            $("#errValid-Status").hide();
+
+            if ($("#leaveFromDate").val() == '') {
+                $("#errValid-LeaveFromDate").text("From Date field is required");
+                isValid = false;
+            }
+
+            if ($("#leaveToDate").val() == '') {
+                $("#errValid-LeaveToDate").text("To Date field is required");
+                isValid = false;
+            }
+            var status = $("#status").val();
+           
+            status = status == 1 ? 0 : 1;
+
+            if (status == "") {
+                $("#errValid-Status").text("status field is required");
+                isvalid = false;
+            }
+           
+
+            var employeeId = $("#EmployeeId").val();
+            var leaveFromDate = $("#leaveFromDate").val();
+            var leaveToDate = $("#leaveToDate").val();
+            var leaveTypeId = $("#LeaveTypeId").val();
+            var employees = {
+                EmployeeId: employeeId,
+                LeaveFromDate: leaveFromDate,
+                LeaveToDate: leaveToDate,
+                LeaveTypeId: leaveTypeId,
+                EmployeeStatus: status,
+            };
+
+            if (isValid) {
+                var isValidDate = dateDifference(leaveFromDate, leaveToDate);
+                if (isValidDate) {
+
+                    BindLeavereport();
+
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-leaveToDate").show();
+                    return false;
+                }
+
+            }
+            else {
+
+                return false;
+            }
+
+        });       
+       
+    });
+
+    // pdf generate
+
+    $("#genpdfs").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-Status").text('');
+        $("#errValid-Status").hide();
+
+        var status = $("#status").val();
+        if ($("#leaveFromDate").val() == '') {
+            $("#errValid-LeaveFromDate").text("From Date field is required");
+            isValid = false;
+        }
+
+        if ($("#leaveToDate").val() == '') {
+            $("#errValid-LeaveToDate").text("To Date field is required");
+            isValid = false;
+        }
+        var sortedCol = $('#getLeaveReportdata').dataTable().fnSettings().aaSorting[0][0];
+        var sortedDir = $('#getLeaveReportdata').dataTable().fnSettings().aaSorting[0][1];
+      
+        status = status == 1 ? 0 : 1;
+
+        if (status == "0" || status == "") {
+            $("#errvalid-status").text("status field is required");
+            isvalid = false;
+        }
+
+       
+
+        var employeeId = $("#EmployeeId").val();
+        var leaveFromDate = $("#leaveFromDate").val();
+        var leaveToDate = $("#leaveToDate").val();
+        var leaveTypeId = $("#LeaveTypeId").val();
+        var employees = {
+            EmployeeId: employeeId,
+            LeaveFromDate: leaveFromDate,
+            LeaveToDate: leaveToDate,
+            LeaveTypeId: leaveTypeId,
+            EmployeeStatus: status,
+            FromDatecol: sortedCol,
+            FromOrder: sortedDir
+        };
+
+        if (isValid) {
+            var isValidDate = dateDifference(leaveFromDate, leaveToDate);
+            if (isValidDate) {
+                var url = "/Reports/CreatePdf";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: employees,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Reports/DownloadPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+
+        }
+        else {
+
+            return false;
+        }
+
+
+    });
+    //------------------------------------------------------------------------------------------------------------------------------
+
+    $(document).ready(function () {
+        // $('#btnBack').click(function () {
+        //     var urlToRedirect = '@Url.Action("EmployeesInfo", "Employees")';
+        //     window.location.href = urlToRedirect;
+        // });
+
+        $("#leaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#leaveToDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        var employee = $("#EmployeeId").select2();
+        $("#EmployeeId").select2().on("change", function () {
+
+            $("#errValid-EmployeeId").text("")
+        });
+
+        // Nice scroll
+
+        $("#EmployeeId,#LeaveTypeId,#status").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        $("#leaveFromDate").change(function () {
+
+            $("#errValid-LeaveFromDate").text("");
+            if ($("#leaveFromDate").val() == "") {
+                $("#errValid-LeaveFromDate").text("From Date field is required");
+            }
+            else {
+                $("#errValid-LeaveFromDate").text("");
+            }
+        });
+
+        $("#status").change(function () {
+            $("#errValid-Status").text("");
+            var status = $("#status").val();
+            if (status == "0" || status == "") {
+                $("#errValid-Status").text(" Status field is required");
+            }
+            else {
+                $("#errValid-Status").text("");
+            }
+
+        });
+
+        $("#leaveToDate").change(function () {
+
+            $("#errValid-LeaveToDate").text("");
+            if ($("#leaveToDate").val() == "") {
+                $("#errValid-LeaveToDate").text("To Date field is required");
+                $("#errVerify-leaveToDate").hide();
+                $("#errVerify-leaveCountDate").hide();
+            }
+            else {
+                $("#errValid-LeaveToDate").text("");
+            }
+        });
+
+    });
+
+    //Change Summary
+
+    $("#DesignationId").change(function () {
+        $("#errValid-Designation").text("");
+
+        if ($("#DesignationId").val() == "") {
+            $("#errValid-Designation").text("Designation field is required");
+        }
+        else {
+            $("#errValid-Designation").text("");
+        }
+
+    });
+
+    $("#DepartmentId").change(function () {
+        $("#errValid-Department").text("");
+        if ($("#DepartmentId").val() == "") {
+            $("#errValid-Department").text("Department field is required");
+        }
+        else {
+            $("#errValid-Department").text("");
+        }
+    });
+
+    $("#EmployeeId").change(function () {
+        var isValid = true;
+        $("#errValid-EmployeeId").text("");
+        if ($("#EmployeeId option:selected").val() == "") {
+            $("#errValid-EmployeeId").text("Employees field is required");
+            isValid = false;
+        }
+        else {
+            $("#errValid-EmployeeId").text("");
+        }
+    });
+
+    $("#leaveFromDate").change(function () {
+
+        $("#errValid-LeaveFromDate").text("");
+        if ($("#leaveFromDate").val() == "") {
+            $("#errValid-LeaveFromDate").text("From Date field is required");
+        }
+        else {
+            $("#errValid-LeaveFromDate").text("");
+        }
+    });
+
+    $("#leaveToDate").change(function () {
+
+        $("#errValid-LeaveToDate").text("");
+        if ($("#leaveToDate").val() == "") {
+            $("#errValid-LeaveToDate").text("To Date field is required");
+            $("#errVerify-leaveToDate").hide();
+            $("#errVerify-leaveCountDate").hide();
+        }
+        else {
+            $("#errValid-LeaveToDate").text("");
+        }
+    });
+   
+    
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    // Filter active and in active Employee
+
+
+    $("#status").change(function () {
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        $("#EmployeeId").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/Attendance/GetByStatusId?StatusId=" + validStatus,
+            success: (Result) => {
+
+                if (Result.length == 0) {
+                    $("#EmployeeId").prop('disabled', false);
+                    $('#EmployeeId').val('');
+                    $('#EmployeeId').append($('<option> ' + "--All Employees--" + ' </option>').val("0").html("--All Employees--"));
+                    $("#EmployeeId").prop('disabled', true);
+                }
+                else {
+                    $('#EmployeeId').html('')
+                    $("#errValid-State").text(" ");
+                    $.each(Result, function (id, option) {
+                        $('#EmployeeId').append($('<option> ' + option.employeeIdWithName + ' </option>').val(option.employeeId).html(option.employeeIdWithName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+    // Download Leave Report
+
+    $('#DownloadEmployeeLeave').click(function () {
+        var formData = new FormData();
+        var status = $("#status").val();
+        var isValid = true;
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-Status").text("");
+        $("#errValid-Status").hide();
+
+        if ($("#leaveFromDate").val() == '') {
+            $("#errValid-LeaveFromDate").text("From Date field is required");
+            isValid = false;
+        }
+
+        if ($("#leaveToDate").val() == '') {
+            $("#errValid-LeaveToDate").text("To Date field is required");
+            isValid = false;
+        }
+
+        if (status == "0" || status == "") {
+            $("#errValid-Status").text("Status field is required");
+            isValid = false;
+        }
+        var sortedCol = $('#getLeaveReportdata').dataTable().fnSettings().aaSorting[0][0];
+        var sortedDir = $('#getLeaveReportdata').dataTable().fnSettings().aaSorting[0][1];
+        status = status == 1 ? 0 : 1;
+
+        var employeeId = $("#EmployeeId").val();
+        var leaveFromDate = $("#leaveFromDate").val();
+        var leaveToDate = $("#leaveToDate").val();
+        var leaveTypeId = $("#LeaveTypeId").val();
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("LeaveFromDate", leaveFromDate);
+        formData.append("LeaveToDate", leaveToDate);
+        formData.append("LeaveTypeId", leaveTypeId);
+        formData.append("EmployeeStatus", status);
+        formData.append("FromDatecol", sortedCol);
+        formData.append("FromOrder", sortedDir);
+
+        if (isValid) {
+            var isValidDate = dateDifference(leaveFromDate, leaveToDate);
+            if (isValidDate) {
+                var url = "/Reports/DownloadExcelLeave";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Reports/Download?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $('.loader').addClass('d-none');
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Date Validation
+
+    function dateDifference(leaveFromDate, leaveToDate) {
+        var result = false;
+        var splitFrom = leaveFromDate.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = leaveToDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+
+            result = true;
+        }
+        return result;
+    }
+
+    $("#btnCloseDownloadFile").click(function () {
+        $("#success_DownloadFile_Popup").hide();
+    });
+    function dateFormat(startDate) {
+
+        var dateObject = new Date(startDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+    function convertdecimal(leavecount) {
+
+        return parseFloat(leavecount + '.0')
+    }
+
+
+</script>

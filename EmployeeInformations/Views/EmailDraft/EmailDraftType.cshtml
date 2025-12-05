@@ -1,0 +1,485 @@
+﻿@using EmployeeInformations.Model.EmailDraftViewModel;
+@model EmailDraftTypeViewModel
+@{
+    ViewBag.Title = "EmailDraftType";
+    Layout = "_Layout";
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Email Content</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreateEmailDraftType" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmailDraftType">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="DraftType"><span class="sub-text">Name</span></th>
+                    <th class="nk-tb-col" data-id="Status"><span class="sub-text">Status</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+<div class="modal" id="success_EmailDraftType_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Status</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <div class="col-12 d-flex mb-2">
+                    <label class="form-label my-auto">Draft Name</label>
+                    <div class="form-group m-0">
+                        <lable class="badge badge-sm bg-outline-primary ml-2" id="AssetDraftType"> </lable>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="custom-control custom-control-sm custom-checkbox">
+                            <input type="checkbox" name="chkIsActive" class="custom-control-input chkIsActive" id="chkIsActive">
+                            <label class="custom-control-label" for="chkIsActive">Status</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreateDraftType" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnClose" value="Cancel"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_DeleteEmailDraftType_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title">Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteEmailDraftType">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Draft Type</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="DraftType" />
+                            @Html.ValidationMessageFor(m => m.DraftType,"",new{@class="error text-danger",id="errValid-DraftType"})
+                            <span id="errVerify-DraftType" style="display:none;" class="error text-danger">Name Already Exists! </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-DraftType"></span>
+                    </div>
+                </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseDraftType" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.ckeditor.com/4.19.1/standard/ckeditor.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+      
+        var columnIndex = "";
+        var columnDirection = "";
+        BindEmaildrafTypes();
+        function BindEmaildrafTypes() {
+            var table = $('#getEmailDraftType').DataTable();
+
+            if (table) {
+                table.destroy();
+            }
+
+            $('#getEmailDraftType').DataTable({
+            
+                serverSide: true,
+                processing: true,
+
+                ajax: {
+                    url: '/EmailDraft/EmailDraftTypePagination',
+                    type: 'Get',
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getEmailDraftType_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var leaveEntry = document.getElementById("getEmailDraftType_length"); //get entries div id
+                        var entrySelect = leaveEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                    }
+                },
+                columns: [
+                    {
+                    data: 'name',
+                    render: function (data, type, row) {
+                        return "<b class='tb-sub text-primary'>" + row.draftType + "</b> ";
+                    }
+                },
+                 {
+                    data: 'status',
+                    render: function (data, type, row) {
+                        if (row.statusName == "Enable") {
+                                return "<b class='badge badge-dot bg-success'>" + row.statusName + "</b>";
+                        }
+                        else {
+                                return "<b class='badge badge-dot bg-danger'>" + row.statusName + "</b>";
+                        }
+                         
+                       
+                    }
+                },
+                {
+
+                    data: 'null',
+                        "orderable": false,
+                    render: function (data, type, row) {
+                    var result ="<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnUpdate' data-id="+row.id+"><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' class='btnAdd' data-id="+row.id+" data-categoryname="+row.draftType+" data-isactive="+row.status+"><em class='icon ni ni-edit'></em><span>Status</span></a></li> <li><a href='javascript:void(0)' id='btnDelete' data-id="+row.id+"><em class='icon ni ni-delete'></em><span>Delete</span></a></li></ul></div></div></li></ul></div>";
+                    return result;
+                    }
+                },
+                ],
+                 "columnDefs": [
+
+                    { "width": "600px", "targets": [0] },
+                    { "width": "300px", "targets": [1,2] },
+                ],
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+                "initComplete": function (settings, json) {
+                    // Access recordsTotal and recordFiltered
+                    var recordsTotal = json.recordsTotal;
+                    var recordFiltered = json.recordFiltered;
+                    console.log("Total records: " + recordsTotal);
+                    console.log("Filtered records: " + recordFiltered);
+                }
+               
+
+            });
+        }
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+     
+    });
+
+    $(document).ready(function () {
+        $("#CreateEmailDraftType").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+    });
+    
+    $(document).on('click','.btnUpdate',function()
+    {
+       
+        var id = $(this).data('id');
+        PageUtil.goToContent("/EmailDraft/EditEmailDraftContent?Id=" + id);
+    });
+
+
+    // Update draft type
+
+    $('#getEmailDraftType').on('click', '.btnAdd', function () {
+        
+        $("#success_EmailDraftType_Popup").modal('show');
+        var categoryname = $(this).data("categoryname");
+        var isactive = $(this).data("isactive");
+        $("#AssetDraftType").text(categoryname);
+
+        isactive == true ? $('.chkIsActive').prop('checked', true) : $('.chkIsActive').prop('checked', false);
+
+        $("#draftTypeAction").val(isactive);
+        var id = $(this).data("id");
+
+        $('#success_EmailDraftType_Popup').on('click', '#btnCreateDraftType', function () {
+
+            var draftTypeAction = $('.chkIsActive').prop('checked');
+            var draftType = {
+                Id: id,
+                Status: draftTypeAction
+            };
+            $('.loader').removeClass('d-none');
+            
+            $.ajax({
+                type: "POST",
+                url: "/EmailDraft/UpdateDraftType",
+                data: draftType,
+                success: (Result) => {
+                    $("#success_EmailDraftType_Popup").css('display', 'none !important');
+                    if (Result > 0) {
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            window.location.href = "/EmailDraft/EmailDraftType";
+                        });                       
+                    }
+                    else {
+
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            window.location.href = "/EmailDraft/EmailDraftType";
+                        });
+                    }
+                    $('.loader').addClass('d-none');
+                },
+                error: (Result) => {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        });
+
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#btnClose").click(function () {
+        $("#success_EmailDraftType_Popup").hide();
+        var urlToRedirect = '@Url.Action("EmailDraftType","EmailDraft")';
+        window.location.href = urlToRedirect;
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete draft type
+
+    $('#getEmailDraftType').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var emailDraftType = {
+                    Id: id
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/EmailDraft/DeletedEmailDraftType",
+                    data: emailDraftType,
+                    success: (result) => {
+                        if (result = true) {
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/EmailDraft/EmailDraftType";
+                            });                         
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/EmailDraft/EmailDraftType";
+                            });                          
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#DraftType").keyup(function () {
+        var isValid = true;
+        $("#errValid-DraftType").text("");
+        $("#errVerify-DraftType").hide();
+
+        if ($("#DraftType").val() == "") {
+            $("#errValid-DraftType").text("Name field is required");
+            isValid = false;
+        }
+    });
+
+
+    $("#btnCloseDraftType").click(function () {
+        $("#Create_Popup").hide();
+        var urlToRedirect = '@Url.Action("EmailDraftType","EmailDraft")';
+        window.location.href = urlToRedirect;
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // create Draft type
+
+    $("#btnCreate").click(function () {
+        debugger;
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-DraftType").text("");
+        $("#errVerify-DraftType").hide();
+
+        if ($("#DraftType").val() == "") {
+            $("#errValid-DraftType").text("Name field is required");
+            isValid = false;
+        }
+
+        var draftType = $("#DraftType").val();
+        formData.append("DraftType", draftType);      
+        if (isValid) {
+            $.ajax({
+                type: "POST",
+                url: "/EmailDraft/GetDraftTypeName",
+                contentType: false,
+                processData: false,
+                data: formData,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result == 0) {                      
+                        var url = "/EmailDraft/AddEmailDraftType";
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: function (Result) {
+                                $("#Create_Popup").css('display', 'none !important');
+                                if (Result > 0) {
+                                    swal.fire("Added Successfully", "", "success").then((result) => {
+                                        if (result.isConfirmed) {
+                                            var urlToRedirect = '@Url.Action("EmailDraftType","EmailDraft")';
+                                            window.location.href = urlToRedirect;
+                                        };
+                                    });
+                                }
+                                else {
+                                    swal.fire("Something error ", "", "error").then((result) => {
+                                        var urlToRedirect = '@Url.Action("EmailDraftType","EmailDraft")';
+                                        window.location.href = urlToRedirect;
+                                    });
+                                }
+                            },
+                            complete: function () {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    } else {
+                        $('.loader').addClass('d-none');
+                        $("#errVerify-DraftType").show();
+                        return false;
+                    }
+                },
+                complete: function () {
+                    // $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            $("#errValid-DraftType").show();
+            return false;
+        }
+    });
+    $(document).ready(function () {
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#success_EmailDraftType_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+
+</script>

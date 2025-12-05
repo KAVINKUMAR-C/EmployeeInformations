@@ -1,0 +1,421 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model List<OBEmployees>
+@{
+    ViewBag.Title = "OBEmployeesInfo";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.LeaveSummaryModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Employee Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create","CreateEmployees","OBEmployees", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm mr-2", @id="CreateDesignation" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmployeeData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col"><span class="sub-text">ID</span></th>
+                    <th class="nk-tb-col"><span class="sub-text"></span>Name</th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Designation</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Date Of Joining</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Profile Completion(%)</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Status</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Delete</span></th>
+
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col">
+                            <span class="sub-text">Action</span>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count() > 0)
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col">
+                                <div class="user-card">
+                                    @if (item.EmployeeProfileImage == "")
+                                    {
+                                        <div class="user-avatar @(item.ClassName)">
+                                            <span style="text-transform:uppercase"> @item.EmployeeSortName</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="user-avatar bg-light">
+                                            <img src="./ProfileImages/@item.EmployeeProfileImage" alt="">
+                                        </div>
+                                    }
+                                    <div class="user-info">
+                                        <span class="tb-lead text-primary">@item.UserName</span>
+                                    </div>
+                                </div>
+
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <div class="user-info">
+                                    <span class="tb-lead font-weight-bold">@item.FirstName  @item.LastName</span>
+                                </div>
+                                <span>@item.OfficeEmail</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <div class="user-info">
+                                    <span class="tb-lead font-weight-bold">@item.DesignationName</span>
+                                </div>
+                                <span>@item.DepartmentName</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <div class="user-info">
+                                    <span>@item.DateofJoin</span>
+                                </div>
+                            </td>
+
+                            <td class="nk-tb-col tb-col">
+                                <div class="project-list-progress">
+                                    <div class="progress progress-pill progress-md bg-light">
+                                        <div class="progress-bar" data-progress="@(item.ProfileCompletionPercentage)" style="width: @(item.ProfileCompletionPercentage)%;">
+                                        </div>
+                                    </div>
+                                    <div class="project-progress-percent">@item.ProfileCompletionPercentage%</div>
+                                </div>
+                            </td>
+
+                            <td class="nk-tb-col tb-col">
+                                <div class="user-info">
+
+
+                                    @if (string.IsNullOrEmpty(item.ReleaveName))
+                                    {
+                                        @if (item.IsProbationary)
+                                        {
+                                            <span class="badge badge-dim bg-primary">Active</span>
+                                        }
+                                        else
+                                        {
+                                            @if (string.IsNullOrEmpty(item.ProbationDays))
+                                            {
+                                                <span class="badge badge-dim bg-warning">Yet to confirm</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-dim bg-info">Probation</span>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-dim bg-danger">@item.ReleaveName</span>
+                                    }
+                                    @if (item.IsVerified)
+                                    {
+                                        <em class="icon text-success ni ni-check-circle" title="Documents Verified"></em>
+                                    }
+                                    else
+                                    {
+                                        <em class="icon text-warning ni ni-alert-circle" title="Documents Not Verified"></em>
+                                    }
+
+
+                                </div>
+                            </td>
+
+                            <td>
+                                @item.IsDeleted
+                            </td>
+                            @if (rolePrivileges)
+                            {
+                                <td class="nk-tb-col nk-tb-col-tools">
+                                    <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                        <ul class="nk-tb-actions gx-1 my-n1">
+                                            <li class="me-n1">
+                                                <div class="dropdown">
+                                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                    @if (loginRoleId == 1 || loginRoleId == 2)
+                                                    {
+                                                        <div class="dropdown-menu dropdown-menu-end">
+                                                            <ul class="link-list-opt no-bdr">
+                                                                <li><a href="javascript:void(0)" class="btnView" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>View</span></a></li>
+                                                                @if (!item.IsDeleted)
+                                                                {
+                                                                    <li><a href="javascript:void(0)" class="btnUpdate" data-id="@item.EmpId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                                }
+                                                               @* @if (item.IsProbationary == false)
+                                                                {
+                                                                    <li><a href="javascript:void(0)" class="btnProbationConfirm" data-id="@item.EmpId"><em class="icon ni ni-check"></em><span>Probation</span></a></li>
+                                                                }*@
+                                                                @*<li><a href="javascript:void(0)" id="btnDelete" data-id="@item.EmpId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>*@
+                                                                @if (!item.IsDeleted)
+                                                                {
+                                                                    <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.EmpId" data-empname="@item.FirstName  @item.LastName"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                                }
+                                                               @* @if (item.AllAssetId > 0)
+                                                                {
+                                                                    <li><a href="javascript:void(0)" class="btnViewAsset" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>Assets</span></a></li>
+                                                                }
+                                                                @if (item.BenefitId > 0)
+                                                                {
+                                                                    <li><a href="javascript:void(0)" class="btnViewBenefit" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>Benefits</span></a></li>
+                                                                }*@
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @if (item.EmpId == loginEmpId)
+                                                        {
+                                                            <div class="dropdown-menu dropdown-menu-end">
+                                                                <ul class="link-list-opt no-bdr">
+                                                                    <li><a href="javascript:void(0)" class="btnView" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>View</span></a></li>
+                                                                    <li><a href="javascript:void(0)" class="btnUpdate" data-id="@item.EmpId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                                   @* @if (item.AllAssetId > 0)
+                                                                    {
+                                                                        <li><a href="javascript:void(0)" class="btnViewAsset" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>Assets</span></a></li>
+                                                                    }
+                                                                    @if (item.BenefitId > 0)
+                                                                    {
+                                                                        <li><a href="javascript:void(0)" class="btnViewBenefit" data-id="@item.EmpId"><em class="icon ni ni-eye"></em><span>Benefits</span></a></li>
+                                                                    }*@
+                                                                </ul>
+                                                            </div>
+                                                        }
+                                                    }
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                        <!-- .nk-tb-item  -->
+                    }
+                }
+                @*   else
+                {
+                <tr>
+                <td class="text-danger" style="text-align:center;" colspan="8">No record found</td>
+                </tr>
+                }*@
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal" id="success_Reject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12">
+                    <label class="form-label">Employee Name</label>
+                    <div class="form-group">
+                        <label id="employeeName" class="employee-name mb-0"></label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">
+                            Relieving Type
+                        </label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.FirstOrDefault().RelieveId, new SelectList(Model.FirstOrDefault().RelievingReason, "RelievingReasonId", "RelievingReasonName"), "--Select Type--", new { @class = "form-control", id = "RelieveId" })
+                        </div>
+                        <span class="error text-danger" id="errValid-RelievingType"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Reason</label>
+                        @Html.TextArea("RejectReason" , null, new { cols = "5", rows = "5", @class="form-control" })
+                    </div>
+                    <span class="error text-danger" id="errValid-Reason"></span>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnreject" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseReject" value="Cancel" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_DeleteRejection_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteRejection">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#getEmployeeData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            "columnDefs": [
+                { targets: 6, type: '1', visible: false }
+            ],
+            order: [
+                [6, "asc"]
+            ],
+        });
+    });
+
+    // EditEmployees
+
+    $('.btnUpdate').click(function () {
+        var empId = $(this).data('id');
+        window.location.href = "/OBEmployees/EditEmployees?EmpId=" + empId;
+    });
+    // nice scroll For Releave Type
+
+    $("#RelieveId").select2().on("select2:open", function () {
+        $('.select2-results__options').niceScroll({
+            cursorcolor: "#4e5e7a",
+            cursorwidth: "5px",
+            autohidemode: false,
+            cursorborder: "1px solid #4e5e7a",
+            horizrailenabled: false,
+        });
+    });
+
+    // ViewEmployee
+
+    $('.btnView').click(function () {
+        var empId = $(this).data('id');
+        window.location.href = "/OBEmployees/OBViewEmployee?empId=" + empId;
+    });
+
+    $("#btnCloseReject").click(function () {
+        $("#success_Reject_Popup").hide();
+        window.location.href = "/OBEmployees/OBEmployeeInfo";
+    });
+
+   
+    // Delete Employee
+
+    $('#getEmployeeData').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                $("#errValid-Reason").text("");
+                $("#errValid-RelievingType").text("");
+                $("#success_Reject_Popup").modal('show');
+                var employeename = $(this).data("empname")
+                $("#employeeName").text(employeename);
+                var id = $(this).data("id")
+                $('#success_Reject_Popup').on('click', '#btnreject', function () {
+                    var isValid = true;
+                    if ($("#RejectReason").val() == "") {
+                        $("#errValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+
+                    if ($("#RelieveId").val() == "") {
+                        $("#errValid-RelievingType").text("Relieving Type field is required");
+                        isValid = false;
+                    }
+
+                    var reason = $("#RejectReason").val();
+                    var releaveType = $("#RelieveId").val();
+                    var employees = {
+                        EmpId: id,
+                        RejectReason: reason,
+                        RelieveId: releaveType
+                    };
+                    $('.loader').removeClass('d-none');
+
+                    if (isValid) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/OBEmployees/GetRejectEmployees",
+                            data: employees,
+                            success: (Result) => {
+                                if (Result = true) {
+                                    $('#success_Reject_Popup').modal('hide');
+                                    $("#success_DeleteRejection_Popup").modal('show');
+                                    $("#btnCloseDeleteRejection").click(function () {
+                                        window.location.href = "/OBEmployees/OBEmployeeInfo";
+                                    });
+                                }
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        return false;
+                    }
+
+                    $("#btnCloseReject").click(function () {
+                        window.location.href = "OBEmployees/OBEmployeeInfo";
+                    });
+
+                });
+            }
+        });
+    });
+
+    
+
+</script>

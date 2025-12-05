@@ -1,0 +1,171 @@
+﻿@using EmployeeInformations.Model.AssetViewModel;
+@model AllAssets
+@*@{
+    ViewBag.Title = "ViewAllAsset";
+}*@
+
+
+
+<div class="leave-dtl-block">
+
+    <div class="nk-block-head nk-block-head-sm view-block">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Assets View</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back","AllAssets","Asset", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Asset Type</label>
+                            <label class="view-text">@Model.AssetTypeName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Category</label>
+                            <label class="view-text">@Model.AssetCategoryName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Asset Code</label>
+                            <label class="view-text">@Model.AssetCode</label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Location</label>
+                            <label class="view-text">@Model.LocationName</label>
+                        </div>
+                    </div>                    
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Purchase Date</label>
+                            <label class="view-text">@Model.PurchaseDate</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Asset Status</label>
+                            <label class="view-text">@Model.AssetStatusName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Product Number</label>
+                            <label class="view-text">@Model.ProductNumber</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Model Number</label>
+                            <label class="view-text">@Model.ModelNumber</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Warranty Start Date</label>
+                            <label class="view-text">@Model.WarrantyStartDate</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Warranty End Date</label>
+                            <label class="view-text">@Model.WarrantyEndDate</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Return Date</label>
+                            <label class="view-text">@Model.ReturnDate</label>
+                        </div>
+                    </div>                   
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Issue Date</label>
+                            <label class="view-text">@Model.IssueDate</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Employee</label>
+                            <label class="view-text">@Model.AssetEmployeeName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Remark</label>
+                            <label class="view-text">@Model.Remark</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Asset Name</label>
+                            <label class="view-text">@Model.AssetName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Purchase Order/In:No</label>
+                            <label class="view-text">@Model.PurchaseNumberName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Purchase Order</label>
+                            <label class="view-text">@Model.PurchaseOrder</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Invoice Number</label>
+                            <label class="view-text">@Model.InvoiceNumber</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Vendor Name</label>
+                            <label class="view-text">@Model.VendorName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Description</label>
+                            <label class="view-text">@Model.Description</label>
+                        </div>
+                    </div>                                                           
+                                        
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

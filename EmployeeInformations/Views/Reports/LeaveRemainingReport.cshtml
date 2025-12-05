@@ -1,0 +1,329 @@
+﻿@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using EmployeeInformations.Business.IService;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums;
+@inject IEmployeeInformationService employeeInformationService
+@model EmployeeLeaveViewModel
+@{
+	ViewBag.Title = "LeaveRemainingReport";
+	Layout = "_Layout";
+	var roleId = Context.Session.GetInt32("RoleId");
+	var rolePrivileges = false;
+	if (roleId >= 0)
+	{
+		var id = roleId.Value;
+		int leaveSummaryModuleId = (int)EmployeesInformationsPages.LeaveRemainingDetails;
+		rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+	}
+}
+<div class="leave-dtl-block-ch">
+	<div class="nk-block-head nk-block-head-sm">
+		<div class="nk-block-between">
+			<div class="nk-block-head-content">
+				<h3 class="nk-block-title page-title"> Leave Remaining Report</h3>
+			</div><!-- .nk-block-head-content -->
+		</div><!-- .nk-block-between -->
+	</div>
+
+
+	<form autocomplete="off">
+		
+		@Html.AntiForgeryToken()
+		@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+		<div class="row">
+
+			<div class="col-lg-2  col-md-6 autocomplete">
+				<div class="form-group">
+					<label class="form-label">Employees</label>
+					<div>
+
+						@if (roleId == 1 || roleId == 2)
+						{
+							@Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.reportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId" })							
+						}
+						else
+						{
+							@Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.reportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId", disabled = "disabled" })
+						}						
+					</div>
+					@Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeId" })
+				</div>
+			</div>
+			
+			<div class="col leave-search-btn pb-1">
+				<button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+			</div>
+
+			<div class="col leave-search-btn pb-1 d-flex justify-content-end">
+				<button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="genpdfs"><img src="./images/pdf.png" /></button>
+				<button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployeeLeave"><i class="ti-download"></i></button>
+			</div>
+		</div>
+	</form>
+
+	<div class="card card-bordered card-preview">
+		<div class="card-inner table-card" id="LeaveRemaining">
+			<table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="LeaveCountData">
+				<thead>
+					<tr class="nk-tb-item table-header">
+						<th class="nk-tb-col tb-col"><span class="sub-text">Employee Name</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Employee Id</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Casual Leave </span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Sick Leave</span></th>						
+						<th class="nk-tb-col tb-col"><span class="sub-text">Earned Leave</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Maternity Leave</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Compensatory Off</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Approved LOP</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Approved Leave</span></th>
+						<th class="nk-tb-col tb-col"><span class="sub-text">Remaining Leave</span></th>						
+					</tr>
+				</thead>
+
+				<tbody>
+					@if (Model.EmployeeTotalLeaveDetails.Count() > 0)
+					{
+						@foreach (var item in Model.EmployeeTotalLeaveDetails)
+						{
+							<tr class="nk-tb-item">								
+								<td class="nk-tb-col tb-col">
+									<span>@item.EmployeeName</span>								
+								</td>
+								<td class="nk-tb-col tb-col font-weight-bold">
+									<span class="tb-sub text-primary">@item.UserName</span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.CasualLeaveRemaining</span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.SickLeaveRemaining </span>
+								</td>								
+								<td class="nk-tb-col tb-col">
+									<span>@item.EarnedLeaveRemaining </span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.MaternityLeaveRemaining </span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.CompensatoryOffRemaining </span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.ApprovedLOP </span>
+								</td>
+								<td class="nk-tb-col tb-col">
+									<span>@item.ApprovedLeave </span>
+								</td>
+								<td class="nk-tb-col tb-col font-weight-bold">
+									<span class="tb-sub text-info">@item.RemaingLeave </span>
+								</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+
+	$('#LeaveCountData').DataTable({
+
+		"bInfo": true,
+		"paging": true,
+		order: [
+			[1, "asc"]
+		],
+	});
+
+
+	var employee = $("#EmployeeId").select2();
+	$("#EmployeeId").select2().on("change", function () {
+
+		$("#errValid-EmployeeId").text("")
+	});
+
+	// Nice scroll
+
+	$("#EmployeeId").select2().on("select2:open", function () {
+		$('.select2-results__options').niceScroll({
+			cursorcolor: "#4e5e7a",
+			cursorwidth: "5px",
+			autohidemode: false,
+			cursorborder: "1px solid #4e5e7a",
+			horizrailenabled: false,
+		});
+	});
+
+	$("#btnFilterLeave").click(function () {
+		var formData = new FormData();
+		var isValid = true;
+		$("#errValid-EmployeeId").text("");
+		
+		if ($("#EmployeeId").val() == '') {
+			$("#errValid-EmployeeId").text("Employee field is required");
+			isValid = false;
+		}
+		var employeeId = $("#EmployeeId").val();
+		formData.append("EmpId", employeeId);
+
+		if (isValid) {
+			var url = "/Reports/LeaveRemainingReportByEmpId";
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: formData,
+				contentType: false,
+				processData: false,
+				beforeSend: function () {
+					$('.loader').removeClass('d-none');
+				},
+				success: function (result) {
+					$('#LeaveRemaining').empty();
+					if (result != 0) {
+						var tableHeadHtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='LeaveCountData'><thead><tr class='nk-tb-item table-header'><th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'> <span class='sub-text'>Employee Id</span></th><th class='nk-tb-col tb-col'><span class='sub-text'> Casual Leave </span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Sick Leave</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Earned Leave</span></th><th class='nk-tb-col tb-col'> <span class='sub-text'>Maternity Leave</span></th ><th class='nk-tb-col tb-col'> <span class='sub-text'> Compensatory Off </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Approved LOP </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Approved Leave </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Remaining Leave </span></th></tr></thead><tbody>";
+						$.each(result.employeeTotalLeaveDetails, function (key, value) {
+							tableHeadHtml += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'><span>" + value.employeeName + "</span></td><td class='nk-tb-col tb-col font-weight-bold'><span class='tb-sub text-primary'> " + value.userName + "</span></td><td class='nk-tb-col tb-col'><span>" + value.casualLeaveRemaining + "</span></td><td class='nk-tb-col tb-col'><span>" + value.sickLeaveRemaining + " </span></td><td class='nk-tb-col tb-col'><span>" + value.earnedLeaveRemaining + "</span></td><td class='nk-tb-col tb-col'><span>" + value.maternityLeaveRemaining + "</span></td><td class='nk-tb-col tb-col'><span>" + value.compensatoryOffRemaining + "</span></td><td class='nk-tb-col tb-col'><span>" + value.approvedLOP + "</span></td><td class='nk-tb-col tb-col'><span>" + value.approvedLeave + "</span></td><td class='nk-tb-col tb-col font-weight-bold'><span class='tb-sub text-info'> " + value.remaingLeave + "</span></td></tr>";
+						});
+						tableHeadHtml += "</tbody></table> </div></div>";
+						$("#LeaveRemaining").html(tableHeadHtml);
+
+						$('#LeaveCountData').DataTable({
+							"bInfo": true,
+							"paging": true,
+							order: [
+								[1, "asc"]
+							],
+						});
+
+					}
+					else {
+						var tableHeadHtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='LeaveCountData'><thead><tr class='nk-tb-item table-header'><th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'> <span class='sub-text'>Employee Id</span></th><th class='nk-tb-col tb-col'><span class='sub-text'> Casual Leave </span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Sick Leave</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Earned Leave</span></th><th class='nk-tb-col tb-col'> <span class='sub-text'>Maternity Leave</span></th ><th class='nk-tb-col tb-col'> <span class='sub-text'> Compensatory Off </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Approved LOP </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Approved Leave </span></th><th class='nk-tb-col tb-col'> <span class='sub-text'> Remaining Leave </span></th></tr></thead><tbody>";
+
+						tableHeadHtml += "</tbody></table> </div></div>";
+						$("#LeaveRemaining").html(tableHeadHtml);
+
+						$('#LeaveCountData').DataTable({
+							"bInfo": true,
+							"paging": true,
+							order: [
+								[1, "asc"]
+							],
+						});
+					}
+				},
+				complete: function () {
+					$('.loader').addClass('d-none');
+				}
+			});
+		}else{
+			return false;
+		}
+	});
+
+	// PDF file 
+
+	$("#genpdfs").click(function () {
+		var formData = new FormData();	
+		var isValid = true;
+		$("#errValid-EmployeeId").text("");
+		
+		if ($("#EmployeeId").val() == '') {
+			$("#errValid-EmployeeId").text("Employee field is required");
+			isValid = false;
+		}
+		var employeeId = $("#EmployeeId").val();
+		formData.append("EmpId", employeeId);
+		if (isValid) {
+			var url = "/Reports/CreatePdfLeaveRemaining";
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: formData,
+				contentType: false,
+				processData: false,
+				beforeSend: function () {
+					$('.loader').removeClass('d-none');
+				},
+				success: (data) => {
+					var response = data;
+					if (data != "") {
+						window.location.href = '/Reports/RemainingLeaveDownloadPdf?fileGuid=' + data;
+					}
+					else {
+						swal.fire({
+							title: "No Record Found",
+							text: "",
+							icon: "error",
+							allowOutsideClick: false  // This prevents closing on outside click
+						}).then((result) => {
+							if (result.isConfirmed) {
+							};
+						});
+					}
+				},
+				complete: function () {
+					$('.loader').addClass('d-none');
+				}
+			});
+		}
+		else{
+			return false;
+		}
+	});
+
+	//Download Excel file 
+
+	$('#DownloadEmployeeLeave').click(function () {
+		var formData = new FormData();
+		var isValid = true;
+		$("#errValid-EmployeeId").text("");
+		
+		if ($("#EmployeeId").val() == '') {
+			$("#errValid-EmployeeId").text("Employee field is required");
+			isValid = false;
+		}
+		var employeeId = $("#EmployeeId").val();
+		
+		formData.append("EmpId", employeeId);
+		if (isValid) {
+			var url = "/Reports/DownloadExcelRemainingLeave";
+			$.ajax({
+				type: "POST",
+				url: url,
+				data: formData,
+				contentType: false,
+				processData: false,
+				beforeSend: function () {
+					$('.loader').removeClass('d-none');
+				},
+				success: (data) => {
+					var response = data;
+					if (data != "") {
+						window.location.href = '/Reports/DownloadRemainingleave?fileGuid=' + data;
+					}
+					else {
+						swal.fire({
+							title: "No Record Found",
+							text: "",
+							icon: "error",
+							allowOutsideClick: false  // This prevents closing on outside click
+						}).then((result) => {
+							if (result.isConfirmed) {
+							};
+						});
+
+					}
+				},
+				complete: function () {
+					$('.loader').addClass('d-none');
+				}
+			});
+		}else{
+			return false;
+		}	
+			
+	});
+
+</script>

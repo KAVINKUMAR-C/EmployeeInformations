@@ -1,0 +1,587 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Common
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model List<Employees>
+@{
+    ViewBag.Title = "EmployeesInfo";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int employeeModuleId = (int)EmployeesInformationsPages.EmployeeModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(employeeModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Employee Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create", "CreateEmployee", "Employees", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm mr-2", @id = "CreateDesignation" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmployeeData">                       
+            <thead>
+                 <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="UserName"><span class="sub-text">ID</span></th>
+                    <th class="nk-tb-col" data-id="FirstName"><span class="sub-text"></span>Name</th>
+                    <th class="nk-tb-col tb-col" data-id="DesignationName"><span class="sub-text">Designation</span></th>
+                    <th class="nk-tb-col tb-col" data-id="DateOfJoining"><span class="sub-text">Date Of Joining</span></th>
+                    <th class="nk-tb-col tb-col" data-id="DateOfRelieving"><span class="sub-text">Date Of Relieving</span></th>
+                    <th class="nk-tb-col tb-col" data-id="PersonalEmail"><span class="sub-text">Profile Completion(%)</span></th>
+                    <th class="nk-tb-col tb-col" data-id="RelievingReasonName"><span class="sub-text">Status</span></th>
+                   @* <th class="nk-tb-col tb-col"><span class="sub-text">Delete</span></th>  *@
+
+                    @if (rolePrivileges)
+                    {
+                        @*<th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">*@
+                        @* <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                    </div>
+                    </li>
+                    </ul>*@
+                        @* Action
+                    </div>
+                    </th>*@
+
+                        <th class="nk-tb-col">
+                            <span class="sub-text">Action</span>
+                        </th>
+                    }
+                </tr>
+            </thead>         
+        </table>
+    </div>
+</div>
+
+
+<div class="modal" id="success_Reject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12">
+                    <label class="form-label">Employee Name</label>
+                    <div class="form-group">
+                        <label id="employeeName" class="employee-name mb-0"></label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">
+                            Relieving Type
+                            <span class="required" style="color: #FF0000">*</span>
+                        </label>
+                        @if (Model?.FirstOrDefault()?.RelievingReasons != null)
+                        {
+                            <div>
+                                @Html.DropDownListFor(m => m.FirstOrDefault().RelieveId, new SelectList(Model?.FirstOrDefault()?.RelievingReasons, "RelieveId", "ReleavingType"), "--Select Type--", new { @class = "form-control", id = "RelieveId" })
+                            </div>
+                        }
+                        <span class="error text-danger" id="errValid-RelievingType"></span>
+                    </div>
+                </div>
+                <div class="col-12">
+
+                    <div class="form-group">
+                        <label class="form-label">Relieving Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="relievingDate" placeholder="Enter From Date">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-relievingDate"></span>
+                    </div>
+
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Reason<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextArea("RejectReason", null, new { cols = "5", rows = "5", @class = "form-control" })
+                    </div>
+                    <span class="error text-danger" id="errValid-Reason"></span>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnreject" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseReject" value="Cancel" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_DeleteRejection_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteRejection">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+
+        EmployeesData();
+        function EmployeesData() {
+            var table = $("#getEmployeeData").DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 0;          
+            
+        $('#getEmployeeData').DataTable({
+                serverSide: true,
+                processing: true,
+                pageLength: entries,
+            ajax: {
+                url: "/Employees/GetAllEmployeesDetails",
+                type: 'Get',                
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getEmployeeData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var employeesEntry = document.getElementById("getEmployeeData_length"); //get entries div id
+                        var entrySelect = employeesEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        // Pass pagination parameters
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                    }
+            },
+
+            columns: [
+                {
+                    data: 'empId',
+                        render: function (data, type, row, meta) {
+                            count = 1;
+                        var className = GetClassNameForGrid(count);                       
+                        return "<div class='user-card'>" +
+                             (row.employeeProfileImage == "" ? "<div class='user-avatar" + className + "'><span style='text-transform:uppercase'>" + (row.employeename)[0] + "</span></div>" :
+                                 "<div class='user-avatar bg-light'><img src='./ProfileImages/" + (row.employeeProfileImage) + "' alt=''></div>") +
+                            "<div class='user-info'><span class='tb-lead text-primary'>" + (row.userName) + "</span></div></div>";
+                    }
+                },
+                {
+                    data: 'name',
+                    render: function (data, type, row) {
+                        return "<div class='user-info'><span class='tb-lead font-weight-bold'> " + (row.employeeName) + "</span></div><span>" + (row.officeEmail) + "</span>"
+                    }
+                },
+                {
+                    data: 'designation',
+                        render: function (data, type, row, meta) {
+                        return "<div class='user-info'><span class='tb-lead font-weight-bold'>" + (row.designationName) + "</span></div><span> " + (row.departmentName) + "</span>"
+                    }
+                },
+                {
+                    data: 'dateofjoining',
+                        render: function (data, type, row, meta) {
+                            return "<div class='user-info'><span>" + (row.dateOfJoining == null ? "" : dateFormat(row.dateOfJoining)) + "</span></div>"
+
+                    }
+                },
+                    {
+                        data: 'DateOfRelieving',
+                        render: function (data, type, row, meta) {
+                            return "<div class='user-info'><span>" + (row.dateOfRelieving == null ? "" : dateFormat(row.dateOfRelieving)) + "</span></div>"
+
+                        }
+                    },
+                {                    
+                    data: 'profileCompletion(%)',
+                        render: function (data, type, row, meta) {                            
+                            return "<div class='project-list-progress'><div class='progress progress-pill progress-md bg-light'><div class='progress-bar' data-progress='" + row.profileCompletionPercentage + "' style ='width: " + row.profileCompletionPercentage + "%'></div></div><div class='project-progress-percent'> " + row.profileCompletionPercentage + "%</div></div>"
+                    }
+                },
+                {
+                    data: 'status',
+                        render: function (data, type, row, meta) {
+                        return "<div class='user-info'>" +
+                            (row.releaveName == null ? (row.isProbationary == true ? "<span class='badge badge-dim bg-primary'>Active</span>" : ((row.probationDays == "" ? "<span class='badge badge-dim bg-warning'>Yet to confirm</span>" : "<span class='badge badge-dim bg-info'>Probation</span>"))) : "<span class='badge badge-dim bg-danger'>" + row.releaveName + "</span>") +
+                            (row.isVerified == true ? "<em class='icon text-success ni ni-check-circle' title='Documents Verified'></em>" : "<em class='icon text-warning ni ni-alert-circle' title='Documents Not Verified'></em>") + "</div>"
+                    }
+                },               
+                {
+                    data: 'null',
+                     "orderable": false,
+                        render: function (data, type, row, meta) {
+                        var html = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnView' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>View</span></a></li>";                       
+                        if (@loginRoleId == 1 || @loginRoleId == 2) {                           
+                            if (row.isDeleted == false) {
+                                html += "<li><a href='javascript:void(0)' class='btnUpdate' data-id=" + row.empId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id="+row.empId+" data-empname="+row.employeeName+"><em class='icon ni ni-delete'></em><span>Delete</span></a></li>";
+                            }
+                            if (row.isProbationary == false) {
+                                html += "<li><a href='javascript:void(0)' class='btnProbationConfirm' data-id=" + row.empId + "><em class='icon ni ni-check'></em><span>Probation</span></a></li>";
+                            }
+                            if (row.allAssetId > 0) {
+                                html += "<li><a href='javascript:void(0)' class='btnViewAsset' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>Assets</span></a></li>";
+                            }
+                            if (row.benefitId > 0) {
+                                html += "<li><a href='javascript:void(0)' class='btnViewBenefit' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>Benefits</span></a></li>";
+                            }
+                        }
+                        else {
+                            if (row.empId == @loginEmpId) {
+                                html += "<li><a href='javascript:void(0)' class='btnView' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>View</span></a></li><li><a href='javascript:void(0)' class='btnUpdate' data-id=" + row.empId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li>";
+                                if (row.allAssetId > 0) {
+                                    html += "<li><a href='javascript:void(0)' class='btnViewAsset' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>Assets</span></a></li>";
+                                }
+                                if (row.benefitId > 0) {
+                                    html += "<li><a href='javascript:void(0)' class='btnViewBenefit' data-id=" + row.empId + "><em class='icon ni ni-eye'></em><span>Benefits</span></a></li>";
+                                }
+                            }
+                        }
+                        html +="</ul></div></div></li></ul></div>";
+                        return html;
+                    }
+                }
+            ],            
+            "columnDefs": [
+                { "width": "300px", "targets": [0, 1, 2, 3, 4] },
+            ],
+            
+            "createdRow": function (row, data, dataIndex, settings) {
+                // Add custom class to the row
+                $(row).addClass('nk-tb-item');
+                // Add custom classes to each cell in the row if necessary
+                $(row).find('td').addClass('nk-tb-col tb-col');
+            },
+                
+        });
+            
+        @*  $('#getEmployeeData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            "columnDefs": [
+            { targets: 6, type: '1', visible: false }
+            ],
+            order: [
+            [6, "asc"]
+            ],
+            }); *@
+            $("#leaveFromDatedatepicker").datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                endDate: "today",
+            });
+      }
+        
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+    });
+
+
+    function GetClassNameForGrid(input)
+    {
+                var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+
+    // Dateofjoining
+
+    function dateFormat(dateOfJoining) {
+       
+        var dateObject = new Date(dateOfJoining);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+
+    }
+
+
+    // nice scroll For Releave Type
+
+    $("#RelieveId").select2().on("select2:open", function () {
+        $('.select2-results__options').niceScroll({
+            cursorcolor: "#4e5e7a",
+            cursorwidth: "5px",
+            autohidemode: false,
+            cursorborder: "1px solid #4e5e7a",
+            horizrailenabled: false,
+        });
+    });
+
+    // ViewEmployee
+    $('#getEmployeeData').on('click', '.btnView', function () {         
+        var empId = $(this).data('id');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+
+    // EditEmployees
+    $('#getEmployeeData').on('click', '.btnUpdate', function () {          
+        var empId = $(this).data('id');
+        window.location.href = "/Employees/EditEmployees?EmpId=" + empId;
+    });
+
+    // EmployeesInfo
+
+    $("#btnCloseReject").click(function () {
+        $("#success_Reject_Popup").hide();
+        window.location.href = "/Employees/EmployeesInfo";
+    });
+
+    // Update Probation
+
+    $('#getEmployeeData').on('click', '.btnProbationConfirm', function () {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to Confirm this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            allowOutsideClick: false,
+            confirmButtonText: 'Yes, Confirm it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var employees = {
+                    EmpId: id
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/AcceptProbation",
+                    data: employees,
+                    success: (Result) => {
+                        $('.loader').addClass('d-none');
+                        if (Result == true) {
+                            Swal.fire({
+                                title: 'Probation Accepted',
+                                text: "",
+                                icon: 'Success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Employees/EmployeesInfo";
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Employees/EmployeesInfo";
+                            });
+                        }
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        });
+    });
+
+    // Delete Employee
+
+    $('#getEmployeeData').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                $("#errValid-Reason").text("");
+                $("#errValid-RelievingType").text("");
+                $("#success_Reject_Popup").modal('show');
+                var employeename = $(this).data("empname")
+                $("#employeeName").text(employeename);
+                var id = $(this).data("id")
+                $('#success_Reject_Popup').on('click', '#btnreject', function () {
+                    var isValid = true;
+                    if ($("#RejectReason").val() == "") {
+                        $("#errValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+
+                    if ($("#RelieveId").val() == "") {
+                        $("#errValid-RelievingType").text("Relieving Type field is required");
+                        isValid = false;
+                    }
+                    if ($("#relievingDate").val() == "") {
+                        $("#errValid-relievingDate").text("Relieving Date  field is required");
+                        isValid = false;
+                    }
+                    var reason = $("#RejectReason").val();
+                    var releaveType = $("#RelieveId").val();
+                    var releavedDate = $("#relievingDate").val();
+                    var employees = {
+                        EmpId: id,
+                        RejectReason: reason,
+                        RelieveId: releaveType,
+                        ReleavedDate: releavedDate
+                    };
+                    $('.loader').removeClass('d-none');
+
+                    if (isValid) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/Employees/GetRejectEmployees",
+                            data: employees,
+                            success: (Result) => {
+                                if (Result = true) {
+                                    $('#success_Reject_Popup').modal('hide');
+                                    Swal.fire({
+                                        title: 'Deleted Successfully!',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Employees/EmployeesInfo";
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Employees/EmployeesInfo";
+                                    });
+                                }
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        return false;
+                    }
+
+                    $("#btnCloseReject").click(function () {
+                        window.location.href = "Employees/EmployeesInfo";
+                    });
+
+                });
+            }
+        });
+    });
+
+    //ViewAsset
+    $('#getEmployeeData').on('click', '.btnViewAsset', function () {      
+        var empId = $(this).data("id")
+        window.location.href = "Employees/ViewAssets?empId=" + empId;
+    });
+    //ViewBenefit
+    $('#getEmployeeData').on('click', '.btnViewBenefit', function () {       
+        var empId = $(this).data("id")
+        window.location.href = "Employees/ViewBenefits?empId=" + empId;
+    });
+    $("#RelieveId").change(function () {
+        $("#errValid-RelievingType").text("");
+        if ($("#RelieveId").val() == "") {
+            $("#errValid-RelievingType").text("Relieving Type field  required");
+        }
+    });
+  
+    $("#relievingDate").change(function () {
+        $("#errValid-relievingDate").text("");
+        if ($("#relievingDate").val() == "") {
+            $("#errValid-relievingDate").text("Relieving Date field  required");
+        }
+    });
+    $("#RejectReason").keyup(function (event) {
+       
+        $("#errValid-Reason").text("");
+        if ($("#RejectReason").val() == "") {
+            $("#errValid-Reason").text("Reason field  required");
+        }
+       
+    });
+</script>

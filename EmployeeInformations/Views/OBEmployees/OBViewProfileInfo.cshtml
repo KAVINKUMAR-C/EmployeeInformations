@@ -1,0 +1,127 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBViewProfile
+
+<form>
+    <div class="card-title mb-4">
+        <h6 class="title">Profile Information</h6>
+    </div>
+    <div class="row p-3">
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Gender</label>
+                <div>
+                    <label class="form">@Model.Gender</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Marital Status</label>
+                <div>
+                    <label class="form">@Model.MaritalStatus</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Date of Birth</label>
+                <div>
+                    <label class="form">@Model.DateOfBirth</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Blood Group</label>
+                <div>
+                    <label class="form">@Model.BloodGroup</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Date Of Joining</label>
+                <div>
+                    <label class="form">@Model.DateOfJoining</label>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <div>
+
+                    <label class="form">
+                        @if (!string.IsNullOrEmpty(Model.CountryCode))
+                        {
+                            <span class="flag-img">
+                                <img src="/images/flags/@(Model.CountryCode).png">
+                            </span>
+                        }
+                        @Model.PhoneNumber
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-title mb-4">
+        <h6 class="title">Emergency Contact Person</h6>
+    </div>
+    <div class="row p-3">
+
+
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Name</label>
+                <div>
+                    <label class="form">@Model.ContactPersonName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Relationship</label>
+                <div>
+                    <label class="form">@Model.Relationshipname</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Contact Number</label>
+                <div>
+
+                    <label class="form">
+                        @if (!string.IsNullOrEmpty(Model.CountryCodeNumber))
+                        {
+                            <span class="flag-img">
+                                <img src="/images/flags/@(Model.CountryCodeNumber).png">
+                            </span>
+                        }
+                        @Model.ContactNumber
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+
+<script>
+
+    $('.viewActive li').removeClass('active');
+    $(".empProfileInfo").addClass('active');
+</script>

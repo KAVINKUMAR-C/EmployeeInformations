@@ -1,0 +1,117 @@
+﻿@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums;
+@model ViewEmployeeLeave
+@{
+    var lastViewPage = Context.Session.GetString("LastView");
+}   
+
+<div class="leave-dtl-block">
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">View Leave Details</h3>
+        </div><!-- .nk-block-head-content -->          
+        <div class="d-flex mb-1">
+                @Html.ActionLink("Back",lastViewPage,"LeaveSummary", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+        </div>
+
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview view-block">
+    <div class="card-inner">
+        <form>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Leave Type</label>
+                        <label class="view-text">@Model.LeaveTypeName</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">From Date</label>
+                        <label class="view-text">@Model.LeaveFromDate</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">To Date</label>
+                        <label class="view-text">@Model.LeaveToDate</label>
+                    </div>
+                </div>
+
+                @if (((int)LeavetypeStatus.Permission) == Model.AppliedLeaveTypeId)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">From Time</label>
+                            <label class="view-text">@Model.FromTime</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">To Time</label>
+                            <label class="view-text">@Model.ToTime</label>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Days</label>
+                        <label class="view-text">@Model.AppliedDayCount</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Leave Reason</label>
+                        <label class="view-text">@Model.Reason</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Status</label>
+                        <label class="view-text">@Model.Status</label>
+                    </div>
+                </div>
+                @if (Model.RejectReason != null)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            @if (Model.IsApprove == 0)
+                            {
+                                <label class="form-label w-100">Reason</label> 
+                            }
+                            else if (Model.IsApprove == 1)
+                            {
+                                <label class="form-label w-100">Approved Reason</label>
+                            }
+                            else
+                            {
+                                <label class="form-label w-100">Reject Reason</label>
+                            }
+                            <label class="view-text">@Model.RejectReason</label>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Applied Date</label>
+                        <label class="view-text">@Model.LeaveAppliedDate</label>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+</div>

@@ -1,0 +1,1020 @@
+﻿@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Model.AttendanceViewModel;
+@model AttendaceListViewModels
+@{
+    ViewBag.Title = "Attendace List";
+    Layout = "_Layout";
+}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Attendance Details</h3>
+        </div><!-- .nk-block-head-content -->
+       
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="row">
+
+    <div class="col-lg-3  col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Employees<span class="required" style="color: #FF0000">*</span></label>
+            <div>
+                @Html.DropDownListFor(m => m.EmployeeId,new SelectList(Model.reportingPeople,"EmployeeId","EmployeeIdWithName"),"--Select Employees--",new{@class="form-control",id="EmployeeId"})
+            </div>
+            <span class="error text-danger" id="errValid-EmployeeName"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Month<span class="required" style="color: #FF0000">*</span></label>
+            <div>
+                @Html.DropDownListFor(m => m.Month,Html.GetEnumSelectList<Months>(),"--Select Month--",new{@class="form-control",id="month"})
+            </div>
+            <span class="error text-danger" id="errValid-Month"></span>
+        </div>
+    </div>
+   
+
+    <div class="col-lg-2 col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Year<span class="required" style="color: #FF0000">*</span></label>
+            <div>
+                @Html.DropDownListFor(m => m.Year,new SelectList(Model.Years,"Year","StrYear"),"--Select Year--",new{@class="form-control",id="year"})
+            </div>
+            <span class="error text-danger" id="errValid-Year"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Active / In Active<span class="required" style="color: #FF0000">*</span></label>
+            <div>
+                @Html.DropDownListFor(m => m.EmployeeStatus,Html.GetEnumSelectList<EmployeeStatus>(),"--Select Active / In Active--",new{@class="form-control",id="status"})
+            </div>
+            <span class="error text-danger" id="errValid-Status"></span>
+        </div>
+    </div>
+   
+    <div class="col list-search-btn">
+        <button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+    </div>
+
+    <div class="col d-flex justify-content-end download-send-btn">
+        <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="generatepfs"><img src="./images/pdf.png" /></button>
+        <button type="button" class="mr-3 btn btn-secondary icon-ch" id="DownloadEmployeeAttendance"><i class="ti-download"></i></button>
+        <button type="button" class="btn btn-secondary icon-ch" title="Send Mail" id="SendEmployeeAttendance"><em class="ni ni-send"></em></button>
+    </div>
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="attendanceDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting-all attendance-table" style="width:100%" data-auto-responsive="false" id="getAttendanceData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th style="display:none;"></th>
+                    <th class="nk-tb-col attandance-e-name"><span class="sub-text">Employee Name</span></th>
+
+                    @foreach (var item in Model.ListOfDate)
+                    {
+                        @if (item.Holidays == true)
+                        {
+                            <th class="nk-tb-col tb-col"><span class="sub-text text-pink-light">@item.Dates</span></th>
+                        }
+                        else
+                        {
+                             <th class="nk-tb-col tb-col"><span class="sub-text">@item.Dates</span></th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ListOfDate.Count() > 0)
+                {
+                    @foreach (var item in Model.AttendanceStatuses)
+                    {
+                        <tr class="nk-tb-item">
+                            <td style="display:none;">
+                                <b style="display:none;">@item.EmployeeId</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <div class="user-card">
+                                    @if (item.EmployeeProfileImage == "")
+                                    {
+                                        <div class="user-avatar @(item.ClassName)">
+                                            <span style="text-transform:uppercase"> @item.EmployeeShortName</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="user-avatar bg-light">
+                                            <img src="./ProfileImages/@item.EmployeeProfileImage" alt="">
+                                        </div>
+                                    }
+                                    <div class="user-info">
+                                        <div class="user-info">
+                                            @if (item.Status == true)
+                                            {
+                                                <a href="javascript:void(0)" class="viewEmployee" data-empid="@item.EmployeeId"><span class="tb-lead text-danger">@item.EmployeeName</span></a>
+                                            }
+                                            else
+                                            {
+                                                <a href="javascript:void(0)" class="viewEmployee" data-empid="@item.EmployeeId"><span class="tb-lead font-weight-bold">@item.EmployeeName</span></a>
+                                            }                                           
+                                        </div>
+                                        <span class="tb-sub text-primary">@item.EmployeeUserName</span>
+                                        <span class="tb-sub text-info">@item.PresentCount</span> 
+                                    </div>
+                                                                      
+                                </div>
+                            </td>
+
+                            @foreach (var items in item.EntryStatusDate)
+                            {
+
+                                @if (items.EntryStatus == true)
+                                {
+                                    <td class="nk-tb-col tb-col icon-ch attandance-check">
+                                        <em class="icon ni ni-check text-success getData" data-id="@item.EmployeeId" data-date="@items.Date"></em>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="nk-tb-col tb-col icon-ch attandance-cross">
+                                        <em class="icon ni ni-cross-sm text-danger"></em>
+                                    </td>
+                                }
+                            }
+
+                        </tr>
+                    }
+
+                    <!-- .nk-tb-item  -->
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="log_Popup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header assign-header">
+                <h5 class="modal-title" id="exampleModalLabel">Attendance Info</h5>
+                 <span class="assign-close-btn"> <i class="ti-close"></i></span>
+            </div>
+            <div class="mt-3 ml-3">
+                <div class="row mb-2">
+                    <div class="col-lg-3">
+                        <label class="form-label my-auto">Employee Id</label>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group m-0">
+                            <label class="badge badge-sm bg-outline-primary" id="userId"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <label class="form-label my-auto">Employee Name</label>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group m-0">
+                            <label class="badge badge-sm bg-outline-primary" id="employeename"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                         
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 timesheet-popup">
+
+                        <h5 class="popup-table-head">Time sheet <span class="text-muted" id="date"></span></h5>
+                        <div class="p-2">
+                            <p class="alert alert-success p-2">
+                                Punch In at<br /> <label id="entryTime"></label>
+                            </p>
+                        </div>
+                        
+                      @* <div class="progress-block-count blue my-2">
+                            <p class="text-center" id="actualHours">Hrs</p>
+                        </div>
+                       <div class="progress progress-md mt-4">
+                            <div class="progress-bar" id="workingHours" style="width: 0%;">
+                            </div>
+                        </div>*@
+
+                                             
+
+                        <div class="progress progress-admin" data-percentage="" id="workingHoursPercentage">
+                            <span class="progress-left">
+                                <span class="progress-bar"></span>
+                            </span>
+                            <span class="progress-right">
+                                <span class="progress-bar"></span>
+                            </span>
+                            <div class="progress-value">
+                                <div>
+                                    <p class="text-center" id="actualHours"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-2">
+                            <p class="alert alert-danger p-2">
+                                Punch Out at<br /> <label id="exitTime"></label>
+                            </p>
+                        </div>
+
+                        <div class="d-flex justify-content-around p-3 mt-1 timesheet-popup-footer">
+                            <span>
+                                Break <br /> <b id="breakHours"></b>
+                            </span>
+                            <span class="me-0 pe-0">
+                                TimeSheet <br /> <b id="timeSheetHours"></b>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 activity-popup">
+                        <div class="main-card" >
+                            <h5 class="card-title text-center popup-table-head">Activity</h5>
+
+                            <div class="card-body p-0 text-center" data-simplebar>
+                                <div class="vertical-timeline vertical-timeline--animate vertical-timeline--one-column mt-3" id="inout">
+                                    @* <div class="vertical-timeline-item vertical-timeline-element">
+                                    <div>
+                                    <span class="vertical-timeline-element-icon bounce-in">
+                                    <i class="badge badge-dot badge-dot-xl badge-success"></i>
+                                    </span>
+                                    <div class="vertical-timeline-element-content bounce-in">
+                                    <h4 class="timeline-title text-success">Punch In</h4>
+                                    <span class="vertical-timeline-element-date">10:00 AM</span>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <div class="vertical-timeline-item vertical-timeline-element">
+                                    <div>
+                                    <span class="vertical-timeline-element-icon bounce-in">
+                                    <i class="badge badge-dot badge-dot-xl badge-primary"> </i>
+                                    </span>
+                                    <div class="vertical-timeline-element-content bounce-in">
+                                    <h4 class="timeline-title">Punch Out</h4>
+
+                                    <span class="vertical-timeline-element-date">7:30 PM</span>
+                                    </div>
+                                    </div>
+                                    </div>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*    <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="successEmailSending_Msg_Popup" style="display:none;" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Email Sent Successfully! </h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseChangePassword">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="filterMandatory_Msg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtValidationMeg">
+                <h4 class="nk-modal-title"> Select Mandatory Fields! </h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseFilterValidation">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#getAttendanceData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [[0, 'asc']],
+
+        });
+    });
+
+    $(document).ready(function () {
+       
+        var employee = $("#EmpId").select2();
+        $("#EmpId").select2().on("change", function () {
+
+            $("#errValid-ReporingPerson").text("")
+        });
+
+        FullAttendanceData();
+
+        // Nice scroll
+
+        $("#EmployeeId,#year,#month,#status").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+    });
+
+    //Change Summary
+
+    $("#month").change(function () {
+
+        $("#errValid-Month").text("");
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+        }
+        else {
+            $("#errValid-Month").text("");
+        }
+    });
+
+    $("#year").change(function () {
+
+        $("#errValid-Year").text("");
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+        }
+        else {
+            $("#errValid-Year").text("");
+        }
+    });
+
+    $("#EmployeeId").change(function () {
+        $("#errValid-EmployeeName").text("");
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employee field is required");
+        }
+        else {
+            $("#errValid-EmployeeName").text("");
+        }
+    });
+
+    $("#status").change(function () {
+        $("#errValid-Status").text("");
+        if ($("#status :selected").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+        }
+        else {
+            $("#errValid-Status").text("");
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Filter Employee by attendance data
+
+    $("#btnFilterLeave").click(function () {
+       
+        var isValid = true;        
+        $("#errValid-Month").text("");
+        $("#errValid-Year").text("");
+        $("#errVerify-endDate").hide();
+        $("#errValid-Status").text("");
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            isValid = false;
+        }
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            isValid = false;
+        }
+
+        if ($("#status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            isValid = false;
+        }
+
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employees field is required");
+            isValid = false;
+        }
+
+        var employeeId = $("#EmployeeId").val();
+        var month = $("#month").val();
+        var year = $("#year").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        var attendaceListViewModel = {
+            EmployeeId: employeeId,
+            Month: month,
+            Year: year,
+            EmployeeStatus: validStatus,
+        };
+        
+        if (isValid) {
+            var isValidDate = true;
+            if (isValidDate) {
+                var url = "/Attendance/FilterEmployeeByAttendanceData";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: attendaceListViewModel,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                       
+                        if (result.attendanceStatuses.length > 0) {                            
+                            $('#attendanceDiv').empty();
+                            var tableHeadHtml = "<table class='display employee-holiday-table mb-3 no-sorting-all attendance-table' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th style='display:none;'></th> <th class='nk-tb-col'><span class='sub-text'>Employee Name</span></th>";
+
+
+                            var datas = result.listOfDate.map(function (value) {
+                          @*   $.each(result.listOfDate, function (key, value) { *@
+                                if (value.holidays == true)
+                                {
+                                    tableHeadHtml += "<th class='nk-tb-col tb-col'><span class='sub-text text-pink-light'>" + value.dates + "</span></th>";
+                                }
+                                else
+                                {
+                                     tableHeadHtml += "<th class='nk-tb-col tb-col'><span class='sub-text'>" + value.dates + "</span></th>";
+                                }                                           
+                            });
+                                tableHeadHtml += "</tr></thead><tbody>";
+
+                            var status = result.attendanceStatuses.map(function (value) {
+                         @*    $.each(result.attendanceStatuses, function (key, value) { *@
+                                var empId = value.employeeId;                                
+                                tableHeadHtml += "<tr class='nk-tb-item'><td style='display:none;'><b style='display:none;'>"+value.employeeId+"</b></td><td class='nk-tb-col tb-col'><div class='user-card'>";
+                                if (value.employeeProfileImage == '')
+                                {
+                                    tableHeadHtml += "<div class='user-avatar (" + value.className + ")'><span style='text-transform:uppercase'>" + value.employeeShortName + "</span></div>";
+                                }
+                                else
+                                {
+                                    tableHeadHtml += "<div class='user-avatar bg-light'><img src='./ProfileImages/"+value.employeeProfileImage+"' alt=''></div>";
+                                }
+                                tableHeadHtml += "<div class='user-info'><div class='user-info'>";
+                                    if (value.status == true)
+                                    {
+                                       tableHeadHtml += "<a href='javascript:void(0)' class='viewEmployee' data-empid=" + value.employeeId + "><span class='tb-lead text-danger'>"+ value.employeeName + "</span></a>";
+                                    }
+                                    else
+                                    {
+                                      tableHeadHtml += "<a href='javascript:void(0)' class='viewEmployee' data-empid=" + value.employeeId + "><span class='tb-lead font-weight-bold'>" + value.employeeName + "</span></a>";
+                                    }
+                                tableHeadHtml += "</div><span class='tb-sub text-primary'>" + value.employeeUserName + "</span><span class='tb-sub text-info'> " + value.presentCount + "</span></div></div></td>";
+                                $.each(value.entryStatusDate, function (key, value) {
+                                    if(value.entryStatus == true)
+                                    {
+                                        tableHeadHtml += "<td class='nk-tb-col tb-col icon-ch attandance-check'><em class='icon ni ni-check text-success getData' data-id='" + empId +"' data-date='"+ value.date +"'></em></td>";
+                                    }
+                                    else{
+                                        tableHeadHtml += "<td class='nk-tb-col tb-col icon-ch attandance-cross'> <em class='icon ni ni-cross-sm text-danger'></em> </td>";
+                                    }
+                                   
+                                });                              
+                                tableHeadHtml += "</tr>";
+    
+                            
+                            });
+                            tableHeadHtml += "</tbody> </table> </div></div>";
+                            $("#attendanceDiv").html(tableHeadHtml);
+                            $('#getAttendanceData').DataTable({
+                                "bInfo": true,
+                                "paging": true,
+                                order: [[0, 'asc']],
+
+                            });
+
+                            FullAttendanceData();
+                        }
+                        else {
+                            $('#attendanceDiv').empty();
+
+                             var tableHeadHtml = "<table class='display employee-holiday-table mb-3 no-sorting-all attendance-table' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th style='display:none;'></th> <th class='nk-tb-col'><span class='sub-text'>Employee Name</span></th>";
+
+                            var date = result.dates.map(function (value) {
+                              @*  $.each(result.dates, function (key, value) { *@
+                                tableHeadHtml += "<th class='nk-tb-col tb-col'><span class='sub-text'>" + value + "</span></th>";
+                            });
+                                tableHeadHtml += "</tr></thead><tbody>";
+                                     tableHeadHtml += "</tbody> </table> </div></div>";
+
+                          
+
+                            $("#attendanceDiv").html(tableHeadHtml);
+
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            $('#getAttendanceData').DataTable({
+
+                                "bInfo": true,
+                                "paging": true,
+                                order: [
+                                    [0, "asc"]
+                                ],
+                            });
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-endDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Download 
+
+    $('#DownloadEmployeeAttendance').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Month").text("");
+        $("#errValid-Year").text("");
+        $("#errVerify-endDate").hide();
+        $("#errValid-Status").text("");
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employees field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+
+        var employeeId = $("#EmployeeId").val();
+        var month = $("#month").val();
+        var year = $("#year").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        
+        formData.append("EmployeeId", employeeId);
+        formData.append("Month", month);
+        formData.append("Year", year);
+        formData.append("EmployeeStatus", validStatus);
+
+        if (isValid) {                       
+            var url = "/Attendance/DownloadExcel";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (data) => {
+                    var response = data;
+                    if (data != "") {
+                        window.location.href = '/Attendance/Download?fileGuid=' + data;
+                    }
+                    else {                        
+                        swal.fire({
+                            title: "No Record Found!",
+                            icon: "error",
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#attendanceDiv').empty();
+                                var tableHeadHtml = "<table class='display employee-holiday-table mb-3 ' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th class='nk-tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Date</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Entry Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Exit Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Total Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Break Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Actual Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Timesheet Hours</span></th> </tr> </thead> <tbody>";
+                                tableHeadHtml += "</tbody> </table> </div></div>";
+
+                                $("#attendanceDiv").html(tableHeadHtml);
+
+                                $.fn.dataTable.moment('DD/MM/YYYY');
+
+                                $('#getAttendanceData').DataTable({
+
+                                    "bInfo": true,
+                                    "paging": true,
+                                    order: [
+                                        [0, "asc"]
+                                    ],
+                                });
+                                $("#successEmailSending_Msg_Popup").modal('hide');
+                            };
+                        });
+
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+            $('.loader').addClass('d-none');           
+        }
+        else {
+            return false;
+        }
+
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Email sent to the employees
+
+    $('#SendEmployeeAttendance').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Month").text("");
+        $("#errValid-Year").text("");
+        $("#errVerify-endDate").hide();
+        $("#errValid-Status").text("");
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employees field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+       
+        var employeeId = $("#EmployeeId").val();
+        var month = $("#month").val();
+        var year = $("#year").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("Month", month);
+        formData.append("Year", year);
+        formData.append("EmployeeStatus", validStatus);
+
+        if (isValid) {                     
+            var url = "/Attendance/SendEmployeeAttendance";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (result) => {
+                    if (result == true) {
+                        $("#successEmailSending_Msg_Popup").modal('show');
+                        $("#btnCloseChangePassword").click(function () {
+                            $("#successEmailSending_Msg_Popup").modal('hide');
+                        });
+                    }
+                    else {
+                        swal.fire({
+                            title: "No Record Found!",
+                            icon: "error",
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $("#successEmailSending_Msg_Popup").modal('hide');
+                            };
+                        });
+                    }
+
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+            $('.loader').addClass('d-none');           
+        }
+        else {
+            return false;
+        }
+
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+    // Get attandance
+
+    function FullAttendanceData() {
+        $('#getAttendanceData tbody').on('click', '.getData', function () {
+           
+            var formData = new FormData();
+            var isValid = true;
+            var employeeId = $(this).data("id")
+            var date = $(this).data("date")
+
+            formData.append("EmployeeId", employeeId);
+            formData.append("StartDate", date);
+            formData.append("EndDate", date);
+            if (isValid) {
+                var url = "/Attendance/FilterEmployeeLogData";
+                $.ajax({
+                    type: "Post",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {                    
+                        $("#log_Popup").modal('show');
+                        $('#employeename').val("");
+                        $('#date').val("");
+                        $('#userId').val("");
+                        $('#entryTime').val("");
+                        $('#exitTime').val("");
+                        $('#actualHours').val("");
+                        $('#breakHours').val("");
+                        $('#timeSheetHours').val("");
+                        $('#workingHours').val("");
+                        $('#workingHoursPercentage').html("");
+                        $('#inout').html("");
+                        if (Result.viewAttendanceLog.length != 0) {
+
+                            
+                            var time = Result.viewAttendanceLog[0].insideOffice;
+                            var hours = Number(time.match(/^(\d+)/)[1]);
+                            var minutes = Number(time.match(/:(\d+)/)[1]);                           
+                            var sHours = hours.toString();
+                            var sMinutes = minutes.toString();
+                            if (hours < 10) sHours = "0" + sHours;
+                            if (minutes < 10) sMinutes = "0" + sMinutes;
+                            var timeform = sHours + ":" + sMinutes;
+                         
+                            var Hm = "";
+                            Hm = sHours == "00" ? Hm = "Mins" :  Hm = "Hrs";
+                         
+                            $('#employeename').text(Result.viewAttendanceLog[0].employeeName); 
+                            $('#userId').text(Result.viewAttendanceLog[0].employeeId);
+                            $('#entryTime').text(Result.viewAttendanceLog[0].entryTime);
+                            $('#exitTime').text(Result.viewAttendanceLog[0].exitTime);
+                            $('#actualHours').text(timeform);
+                            $('#breakHours').text(Result.viewAttendanceLog[0].breakHours);
+                            $('#timeSheetHours').text(Result.viewAttendanceLog[0].burningHours);   
+                                                                          
+                            var dataPercentage = Result.viewAttendanceLog[0].workingHours;
+
+                            if (dataPercentage == null || dataPercentage == "-") {
+                                dataPercentage = "0";
+                            }
+                            else if(dataPercentage >= 100)
+                            {
+                                dataPercentage = "100";
+                            }
+                            $('#workingHoursPercentage').append("<div class='progress progress-admin' data-percentage=" + dataPercentage + "><span class='progress-left'><span class='progress-bar'></span></span><span class='progress-right'><span class='progress-bar'></span></span><div class='progress-value'><div><p class='text-center'>" + timeform + Hm + "</p></div></div></div>");
+
+                            var log = Result.viewAttendanceLog.map(function (value) {
+                          @*   $.each(Result.viewAttendanceLog, function (key, value) { *@
+                                if (value.logTime != "" && value.direction == "in") {
+                                    $('#inout').append("<div class='vertical-timeline-item vertical-timeline-element'><div><span class='vertical-timeline-element-icon bounce-in'><i class='badge-dot badge-dot-xl badge-success'></i></span><div class='vertical-timeline-element-content bounce-in'> <h4 class='timeline-title text-success'> Punch In </h4><span class='vertical-timeline-element-date'>" + value.logTime + "</span></div></div></div>");
+                                    // $('#displayLog').append("<tr><td><span calss='text-info id='logTime'>" + value.logTime + "</span></td><td><div><span id='direction'> " + value.direction + "</span></div></td></tr>");
+                                }
+                                else {
+                                    $('#inout').append("<div class='vertical-timeline-item vertical-timeline-element'><div><span class='vertical-timeline-element-icon bounce-in'><i class='badge-dot badge-dot-xl badge-primary'></i></span><div class='vertical-timeline-element-content bounce-in'> <h4 class='timeline-title'>Punch Out</h4><span class='vertical-timeline-element-date'>" + value.logTime + "</span></div></div></div>");
+                                }
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $('.loader').addClass('d-none');
+
+            }
+            else {
+                return false;
+            }
+
+        });
+    }
+
+    $("#status").change(function () {       
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        $("#EmployeeId").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/Attendance/GetByStatusId?StatusId=" + validStatus,
+            success: (Result) => {
+
+                if (Result.length == 0) {
+                    $("#EmployeeId").prop('disabled', false);
+                    $('#EmployeeId').val('');
+                    $('#EmployeeId').append($('<option> ' + "--All Employees--" + ' </option>').val("0").html("--All Employees--"));
+                    $("#EmployeeId").prop('disabled', true);                  
+                }
+                else {
+                    $('#EmployeeId').html('')
+                    $("#errValid-State").text(" ");
+                    @*$('#EmployeeId').append($('<option> ' + "--All Employee--" + ' </option>').val("0").html("--All Employee--"));*@
+
+                    var attendanceStatus = Result.map(function (option) {
+                  @*   $.each(Result, function(id, option) { *@
+                        $('#EmployeeId').append($('<option> ' + option.employeeIdWithName + ' </option>').val(option.employeeId).html(option.employeeIdWithName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    $("#btnCancel").click(function () {
+        $("#log_Popup").modal('hide');
+    });
+
+    // PDf Generate
+
+    $("#generatepfs").click(function () {
+       
+        var isValid = true;
+        $("#errValid-Month").text("");
+        $("#errValid-Year").text("");
+        $("#errVerify-endDate").hide();
+        $("#errValid-Status").text("");
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employees field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+
+        var employeeId = $("#EmployeeId").val();
+        var month = $("#month").val();
+        var year = $("#year").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        var attendaceListViewModel = {
+            EmployeeId: employeeId,
+            Month: month,
+            Year: year,
+            EmployeeStatus: validStatus,
+        };
+
+        if (isValid) {
+            var isValidDate = true;
+
+            if (isValidDate) {                
+                var url = "/Attendance/CreatePdf";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: attendaceListViewModel,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {                        
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Attendance/DownloadPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found!",
+                                icon: "error",
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+                        }
+                        
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+
+        }
+        else {
+
+            return false;
+        }
+
+
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    $(".assign-close-btn").click(function () {
+        $("#log_Popup").modal('hide');
+    });
+   
+    $('#attendanceDiv').on('click', '.viewEmployee', function () {
+        var empId = $(this).data('empid');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+    $(document).ready(function () {
+        $('#log_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+</script>

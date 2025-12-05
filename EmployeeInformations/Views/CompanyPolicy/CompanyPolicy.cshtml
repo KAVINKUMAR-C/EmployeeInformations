@@ -1,0 +1,442 @@
+﻿@using EmployeeInformations.Model.CompanyPolicyViewModel;
+@model GetPolicy
+@{
+    ViewBag.Title = "CompanyPolicy";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Policy Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreatePolicy" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col"><span class="sub-text">Policy Name</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                   @* <th class="nk-tb-col">
+                        <div class="nk-tb-col py-0 border-0">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown" aria-expanded="true">
+                                            <em class="icon ni ni-more-h"></em>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                            Action
+                        </div>
+                    </th>*@
+                </tr>
+            </thead>
+            <tbody id="displayPolicy">                 
+                @if (Model.CompanyPolicy.Count() > 0 && Model.CompanyPolicy != null)
+                {
+                    foreach (var item in Model.CompanyPolicy)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col tb-col">
+                                 <b class="tb-sub text-primary">@item.PolicyName</b>
+                            </td>                            
+                            <td class="nk-tb-col tb-col">
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="ViewBtn" data-id="@item.PolicyId"><em class="icon ni ni-eye"></em><span>View</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.PolicyId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.PolicyId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+    
+
+    <div class="modal" id="Create_Popup" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Policy</h5>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body" id="txtSuccessMeg">
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="PolicyName" />
+                            @Html.ValidationMessageFor(m => m.PolicyName,"",new { @class = "error text-danger",id = "errValid-PolicyName"})
+                            <span id="errVerify-PolicyName" style="display:none;" class="error text-danger"> PolicyName Name already exists! </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-PolicyName"></span>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-label">Document<span class="required" style="color: #FF0000">*</span></label>
+                            <div class="input-group custom-file-button">                           
+                                @Html.TextBoxFor(m => m.DocumentFilePath, new { type = "file", name="file",multiple="multiple", @class="form-control"})
+                            </div>
+                            @Html.ValidationMessageFor(m => m.DocumentFilePath,"",new{@class="error text-danger",id="errValid-DocumentFilePath"})
+                            <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                        </div>                        
+                    </div>
+
+                    <div class="col-lg-12 d-flex mt-3 p-0">
+                        <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                        <input type="button" class="btn btn-danger" id="btnCloseDepartment" value="Cancel" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="View_Popup" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">View Policy</h5>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body" id="txtSuccessMeg">
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <div class="form-group">
+                                <lable class="badge badge-sm bg-outline-primary" id="Policyname"> </lable>
+                            </div>                                                                                                        
+                        </div>             
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-label">Document</label>                                                   
+                            <div id="hide_documentName" style="display:none;" class="text-primary mt-1">
+                                <ul class="displayExpenseDoc d-flex flex-wrap"></ul>                                                  
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12 d-flex mt-3 p-0">                      
+                        <input type="button" class="btn btn-danger ml-auto mr-3" id="btnCloseViewcompanyPolicy" value="Close" />
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<div class="modal" id="success_DeleteCompanyPolicy_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteCompanyPolicy">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('#getdata').DataTable({
+            "bInfo": true,
+            "paging": true,           
+        });
+    });
+
+    $(document).ready(function () {
+        $("#CreatePolicy").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+
+        $("#DocumentFilePath").change(function () {
+            $("#errValid-DocumentFilePath").text("");
+            $("#displayDocumentName").text('');
+            //$("#errValid-Document").hide();
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+            }
+        });       
+
+        $(".displayExpenseDoc").on('click', 'li', function () {            
+            var imgName = $(this).text().trim();
+            var urlName = window.location.origin;
+            window.open(urlName + '/Management/CompanyPolicy/' + imgName + '');
+        });
+
+        $('#getdata').on('click', '#btnDownload', function () {         
+            var policyId = $(this).data("id");
+            window.location.href = "/CompanyPolicy/DownloadPolicyFile?policyId=" + policyId;
+            $('.loader').addClass('d-none');
+        });
+    });
+
+    $("#btnCloseDepartment").click(function () {
+        $("#Create_Popup").hide();
+        var urlToRedirect = '@Url.Action("CompanyPolicy","CompanyPolicy")';
+        window.location.href = urlToRedirect;
+    });
+
+    $("#btnCloseViewcompanyPolicy").click(function () {              
+        $("#View_Popup").modal('hide');       
+    });
+
+    $("#PolicyName").keyup(function () {
+        var isValid = true;
+        $("#errValid-PolicyName").text("");
+        $("#errVerify-PolicyName").hide();
+
+        if ($("#PolicyName").val() == "") {
+            $("#errValid-PolicyName").text("Name field is required");
+            isValid = false;
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Create company policy
+
+    $("#btnCreate").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-PolicyName").text("");
+        $("#errValid-DocumentFilePath").text("");
+        $("#errVerify-PolicyName").hide();
+        if ($("#PolicyName").val() == "") {
+            $("#errValid-PolicyName").text("Name field is required");
+            isValid = false;
+        }
+       
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        if (attachmentFilePath == "") {
+            $("#errValid-DocumentFilePath").text("Attachment field is required");
+            isValid = false;
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var policyName = $("#PolicyName").val();
+        formData.append("PolicyName", policyName);
+        
+        if (isValid) {
+
+            $.ajax({
+                type: "POST",
+                url: "/CompanyPolicy/CreateCompanyPolicy",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    $("#Create_Popup").css('display', 'none !important');
+                    if (result == true) {
+                        Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                window.location.href = "/CompanyPolicy/CompanyPolicy";
+                            };
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            window.location.href = "/CompanyPolicy/CompanyPolicy";
+                        });                        
+                    }
+                    
+                    $('#DocumentFilePath').val('');
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            $("#errValid-PolicyName").show();
+            return false;
+        }
+    });
+    //----------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete policy
+   
+    $('#getdata').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var id = $(this).data("id");
+                var companyPolicy = {
+                    PolicyId: id,                    
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/CompanyPolicy/DeleteCompanyPolicy",
+                    data: companyPolicy,
+                    success: (Result) => {
+                        $('#displayPolicy').html('')
+                        $("#success_DeleteCompanyPolicy_Popup").css('display', 'none !important');
+                        if (Result > 0) {
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultvalue) => {
+                                window.location.href = "/CompanyPolicy/CompanyPolicy";
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultvalue) => {
+                                window.location.href = "/CompanyPolicy/CompanyPolicy";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });               
+                $('#DocumentFilePath').val('');
+                $("#hide_documentName").val('');
+                $("#displayDocumentName").text('')
+
+            }
+        })
+    });
+    //----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // View policy details
+
+    $('#getdata').on('click', '#ViewBtn', function () {
+        var id = $(this).data("id");
+        var companyPolicy = {
+            PolicyId: id,
+        };
+
+      
+        $('.loader').removeClass('d-none');       
+        $.ajax({
+            type: "POST",
+            url: "/CompanyPolicy/ViewCompanyPolicy",
+            data: companyPolicy,
+            success: (Result) => {               
+                if (Result.companyPolicy != null) {
+                    $("#View_Popup").modal('show');
+                    $("#Policyname").text(Result.companyPolicy.policyName);
+                    $('.displayExpenseDoc').html("");
+
+                    var datas = Result.policyAttachmentsViewModel.map(function (value) {
+                    // $.each(Result.policyAttachmentsViewModel, function (key, value) {
+                        var img = "";
+                        var ext = value.attachmentName.split('.').pop();
+                        if (ext == "pdf") {
+                            img = "/images/Pdf-Icon.png";
+                        }
+                        else if (ext == "doc" || ext == "docx") {
+                            img = "/images/Doc-Icon.png";
+                        }
+                        else if (ext == "xlsx") {
+                            img = "/images/Excel-Icon.png";
+                        }
+                        else {
+                            img = "/images/Image-Icon.png";
+                        }
+                        $('.displayExpenseDoc').append("<li><img class='mt-1' src='" + img + "' style='height: 40px;'><div style='display:none;'>" + value.attachmentName + "</div></li>");
+                    });
+                    $("#hide_documentName").show();
+                }
+                else {
+                    swal.fire("Something error", "", "error").then((resultvalue) => {
+                        window.location.href = "/CompanyPolicy/CompanyPolicy";
+                    });
+                }
+            },
+            complete: function () {
+                $('.loader').addClass('d-none');
+            }
+        });             
+    });  
+    $(document).ready(function () {
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#View_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+</script>

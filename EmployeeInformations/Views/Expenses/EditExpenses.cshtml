@@ -1,0 +1,21 @@
+﻿@using EmployeeInformations.Model.ExpensesViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ExpenseDetailViews
+@{
+    var roleId = Context.Session.GetInt32("id");
+
+}
+
+<div id="bind-Expensesmodal-content">
+</div>
+
+<input type="hidden" id="txt-ExpenseId" value="@Model.ExpenseId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var expenseId = $("#txt-ExpenseId").val();
+        PageUtil.goToAllExpenses("/Expenses/UpdateExpenses?expenseId=" + expenseId);
+    });
+
+</script>

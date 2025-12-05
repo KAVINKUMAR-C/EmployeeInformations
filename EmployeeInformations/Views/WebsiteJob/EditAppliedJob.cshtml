@@ -1,0 +1,20 @@
+﻿@using EmployeeInformations.Model.APIModel;
+@model WebsiteJobApplyModel
+@{
+
+}
+
+<div id="bind-websiteappliedjob-content">
+</div>
+
+<input type="hidden" id="txt-jobApplyId" value="@Model.JobApplyId" />
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var jobApplyId = $("#txt-jobApplyId").val();
+        PageUtil.goToWebsiteAppliedJobContent("/WebsiteJob/UpdateAppliedJob?jobApplyId=" + jobApplyId);
+    });
+
+</script>

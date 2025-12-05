@@ -1,0 +1,655 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBEmployees
+@{
+    var sessionRoleId = Context.Session.GetInt32("RoleId");
+}
+
+<form>
+    <div class="d-flex mb-1 title data-head">
+        <h6>Employees</h6>
+    </div>
+
+    <div class="row p-3">
+        @Html.HiddenFor(m => m.EmpId)
+        @Html.HiddenFor(m => m.RoleId)
+        @Html.HiddenFor(m => m.CompanyId)
+        
+        <input type="hidden" id="strReportingPersonEmpId" value="@Model.StrFmtReportingPersonEmpId" />
+        <input type="hidden" id="strFmtSkill" value="@Model.StrFmtSkillId" />
+
+        @if (sessionRoleId == 1 || sessionRoleId == 2)
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">First Name<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control"})
+                    @Html.ValidationMessageFor(x=>x.FirstName ,"" , new { @class = "error text-danger",@id="errValid-FirstName"})
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Last Name<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control"})
+                    @Html.ValidationMessageFor(x=>x.LastName ,"" , new { @class = "error text-danger",@id="errValid-LastName"})
+                </div>
+            </div>
+        }
+        else
+        {
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">First Name<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @disabled = true })
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Last Name<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @disabled = true })
+                    @Html.ValidationMessageFor(x=>x.LastName ,"" , new { @class = "text-danger"})
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Father Name<span class="required" style="color: #FF0000">*</span></label>
+                @Html.TextBoxFor(m => m.FatherName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(x => x.FatherName ,"" , new { @class = "error text-danger" , @id="errValid-FatherName"})
+            </div>
+        </div>
+
+
+        @if (sessionRoleId == 1 || sessionRoleId == 2)
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Office Email<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.OfficeEmail, new { @class = "form-control",@type="email"})
+                    @Html.ValidationMessageFor(x=>x.OfficeEmail ,"" , new { @class = "error text-danger" , @id="errValid-OfficeEmail"})
+                    <span id="errVerify-EmailExists" style="display:none;" class="error text-danger"> Office Email already exists! </span>
+                    <span id="errVerifyEmailFormat-OfficeEmail" style="display:none;" class="error text-danger"> Office Email is invalid </span>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Office Email<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.OfficeEmail, new { @class = "form-control",@type="email",@disabled=true })
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Personal Email<span class="required" style="color: #FF0000">*</span></label>
+                @Html.TextBoxFor(m => m.PersonalEmail, new { @class = "form-control",@type="email"  })
+                @Html.ValidationMessageFor(x=>x.PersonalEmail ,"" , new { @class = "error text-danger" , @id="errValid-PersonalEmail"})
+                <span id="errVerify-ExistEmail" style="display:none;" class="error text-danger"> Personal Email already exists! </span>
+                <span id="errVerifyEmailFormat-PersonalEmail" style="display:none;" class="error text-danger"> Personal Email is invalid </span>
+
+            </div>
+        </div>
+
+        @if (sessionRoleId == 1 || sessionRoleId == 2)
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Designation<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.DesignationId, new SelectList(Model.Designations,"DesignationId","DesignationName"), "--Select Designation--",new{@class="form-control",id="DesignationId"})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DesignationId,"",new{@class="error text-danger" , id="errValid-Designation"})
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Department<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments,"DepartmentId","DepartmentName"), "--Select Department--",new{@class="form-control",id="DepartmentId"})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DepartmentId,"",new{@class="error text-danger" , id="errValid-Department"})
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Designation<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.DesignationId, new SelectList(Model.Designations,"DesignationId","DesignationName"), "--Select Designation--",new{@class="form-control",id="DesignationId",@disabled=true})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DesignationId,"",new{@class="error text-danger" , id="errValid-Designation"})
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Department<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.DepartmentId, new SelectList(Model.Departments,"DepartmentId","DepartmentName"), "--Select Department--",new{@class="form-control",id="DepartmentId",@disabled=true})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DepartmentId,"",new{@class="error text-danger" , id="errValid-Department"})
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-4 autocomplete">
+            <div class="form-group emp-hol-yr">
+                <label class="form-label">Skill Sets<span class="required" style="color: #FF0000">*</span></label>
+                @*@Html.TextBoxFor(m => m.reportingPeople, new { @class = "form-control"})
+                @Html.DropDownList("Reporter", Model.reportingPeople , new { @multiple = "multiple" })*@
+                <div class="selectbox">
+                    @Html.DropDownListFor(m => m.SkillId,new SelectList(Model.SkillSet,"SkillId","SkillName"),"--Select Skill Sets--",new{@class="form-control",id="skills",multiple=true})
+                </div>
+                @Html.ValidationMessageFor(m => m.SkillId,"",new{@class="error text-danger", id="errValid-Skills"})
+            </div>
+        </div>
+
+
+        @if (sessionRoleId == 5)
+        {
+            <div class="col-lg-4 autocomplete">
+                <div class="form-group emp-hol-yr">
+                    <label class="form-label">Reporting Person</label>
+                    <div class="selectbox">
+                        @Html.DropDownListFor(m => m.ReportingPerson,new SelectList(Model.reportingPeople,"EmpId","EmployeeName"),new{@class="form-control",id="Reporter",multiple=true,@disabled=true})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.reportingPeople,"",new{@class="error text-danger", id="errValid-ReportingPerson"})
+                </div>
+            </div>
+
+            @Html.HiddenFor(m => m.EsslId)
+        }
+        else
+        {
+            <div class="col-lg-4 autocomplete">
+                <div class="form-group emp-hol-yr">
+                    <label class="form-label">Reporting Person<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="selectbox">
+                        @Html.DropDownListFor(m => m.ReportingPerson,new SelectList(Model.reportingPeople,"EmpId","EmployeeName"),"--Select Reporter--",new{@class="form-control",id="Reporter",multiple=true})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.reportingPeople,"",new{@class="error text-danger", id="errValid-ReportingPerson"})
+                </div>
+            </div>
+        }
+
+        @if (sessionRoleId == 1 || sessionRoleId == 2)
+        {
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Essl Id@*<span class="required" style="color: #FF0000">*</span>*@</label>
+                    @Html.TextBoxFor(m => m.EsslId, new { @class = "form-control",@type = "number" })
+                    @Html.ValidationMessageFor(m => m.EsslId,"",new{@class="error text-danger" , id="errValid-EsslId"})
+                </div>
+            </div>
+        }
+
+        <div class="col-lg-12 d-flex mt-3">
+            <input type="button" class="btn btn-secondary" id="btnBackEmployee" value="Back" />
+            <input type="button" class="btn btn-primary ml-auto" id="btnUpdateEmployee" value="Next" />
+        </div>
+
+    </div>
+
+</form>
+
+<div class="modal" id="success_Msg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Employee Updated Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseEmployee">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+ 
+
+    $(document).ready(function () {
+
+        var report = $("#Reporter").select2();
+        $("#Reporter").select2().on("change", function () {
+
+            $("#errValid-ReportingPerson").text("")
+        });
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // nice scroll Reporter,skills,Designation,Department
+        $("#Reporter,#skills,#DesignationId,#DepartmentId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        var reportingPersonId = $("#strReportingPersonEmpId").val();
+
+        var report = $("#Reporter").select2();
+
+        if (typeof (reportingPersonId) != 'undefined') {
+            if (reportingPersonId != null && reportingPersonId != '') {
+                var lengthReportingPersonId = reportingPersonId.split(',').length;
+                var splitReportingPersonId = reportingPersonId.split(',');
+
+                for (var i = 0; i < lengthReportingPersonId; i++) {
+                    $("#Reporter option[value=" + splitReportingPersonId[i] + "]").attr('selected', 'selected').trigger("change");
+                }
+            }
+        }
+
+        var skillSets = $("#skills").select2();
+        $("#skills").select2().on("change", function () {
+            $("#errValid-Skills").text("")
+        });
+
+        var strFmtSkill = $("#strFmtSkill").val();
+        if (typeof (strFmtSkill) != 'undefined') {
+            if (strFmtSkill != "") {
+                var lengthSkill = strFmtSkill.split(',').length;
+                var splitSkill = strFmtSkill.split(',');
+                for (var i = 0; i < lengthSkill; i++) {
+                    var valueSkills = $("#skills option:contains(" + splitSkill[i] + ")").val();
+
+                    $("#skills option[value=" + valueSkills + "]").attr('selected', 'selected').trigger("change");
+                }
+            }
+        }
+        $('.selectedwizard li').removeClass('current');
+        $("#step1").addClass('current');
+
+        //Change Summary
+        $("#Reporter").change(function () {
+            $("#errValid-ReportingPerson").text("")
+
+            if ($("#Reporter option:selected").text() == '') {
+                $("#errValid-ReportingPerson").text("Reporting Person field is required");
+            }
+            else {
+                $("#errValid-ReportingPerson").text("")
+            }
+
+        });
+
+        $("#skills").change(function () {
+            $("#errValid-Skills").text("");
+            if ($("#skills option:selected").text() == '') {
+                $("#errValid-Skills").text("Skill Sets field is required");
+            }
+            else {
+                $("#errValid-Skills").text("");
+            }
+        });
+
+        $("#DesignationId").change(function () {
+            $("#errValid-Designation").text("");
+
+            if ($("#DesignationId").val() == "") {
+                $("#errValid-Designation").text("Designation field is required");
+            }
+            else {
+                $("#errValid-Designation").text("");
+            }
+
+        });
+
+        $("#DepartmentId").change(function () {
+            $("#errValid-Department").text("");
+            if ($("#DepartmentId").val() == "") {
+                $("#errValid-Department").text("Department field is required");
+            }
+            else {
+                $("#errValid-Department").text("");
+            }
+        });
+
+    });
+
+    //keyup Summary
+
+    $("#FatherName").keyup(function () {
+
+        $("#errValid-FatherName").text("");
+
+        if ($("#FatherName").val() == "") {
+            $("#errValid-FatherName").text("Father Name field is required");
+        }
+    });
+
+    //$("#EsslId").keyup(function () {
+    //    $("#errValid-EsslId").text("");
+
+    //    if ($("#EsslId").val() == "") {
+    //        $("#errValid-EsslId").text("EsslId field is required");
+    //    }
+    //});
+
+    $("#PersonalEmail").keyup(function () {
+
+        $("#errValid-PersonalEmail").text("");
+        $("#errVerifyEmailFormat-PersonalEmail").hide();
+        $("#errVerify-ExistEmail").hide();
+
+        if ($("#PersonalEmail").val() == "") {
+            $("#errValid-PersonalEmail").text("Personal Email field is required");
+        }
+    });
+
+    $("#FirstName").keyup(function () {
+        $("#errValid-FirstName").text("");
+
+        if ($("#FirstName").val() == "") {
+            $("#errValid-FirstName").text("First Name field is required");
+        }
+    });
+
+    $("#LastName").keyup(function () {
+        $("#errValid-LastName").text("");
+
+        if ($("#LastName").val() == "") {
+            $("#errValid-LastName").text("Last Name field is required");
+        }
+    });
+
+    $("#OfficeEmail").keyup(function () {
+        $("#errValid-OfficeEmail").text("");
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        $("#errVerify-EmailExists").hide();
+
+        if ($("#OfficeEmail").val() == "") {
+            $("#errValid-OfficeEmail").text("Office Email field is required");
+        }
+    });
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Update Employee
+    $("#btnUpdateEmployee").click(function () {
+     
+        var formData = new FormData();
+
+        var isValid = true;
+        $("#errValid-FirstName").text("");
+        $("#errValid-PersonalEmail").text("");
+        $("#errValid-FatherName").text("");
+        $("#errVerify-PersonalEmail").hide();
+        $("#errVerifyEmailFormat-PersonalEmail").hide();
+        $("#errValid-ReportingPerson").text("");
+        $("#errValid-Skills").text("");
+        $("#errValid-EsslId").text("");
+
+        $("#errValid-LastName").text("");
+        $("#errValid-Designation").text();
+        $("#errValid-Department").text();
+
+        $("#errValid-OfficeEmail").text("");
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        //  $("#errVerify-ExistEmails").hide();
+
+
+        //var skill = $('#skills').find(':selected').length;
+        //if (skill == 0) {
+        //    $("#errValid-Skills").text("Skills field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#FirstName").val() == "") {
+            $("#errValid-FirstName").text("First Name field is required");
+            isValid = false;
+        }
+
+        if ($("#LastName").val() == "") {
+            $("#errValid-LastName").text("Last Name field is required");
+            isValid = false;
+        }
+
+        if ($("#FatherName").val() == "") {
+            $("#errValid-FatherName").text("Father Name field is required");
+            $("#errVerifyEmailFormat-PersonalEmail").hide();
+            isValid = false;
+        }
+
+        if ($("#PersonalEmail").val() == "") {
+            $("#errValid-PersonalEmail").text("Personal Email field is required");
+            isValid = false;
+        }
+
+        if ($("#Reporter").val() == "") {
+            $("#errValid-ReportingPerson").text("Reporting Person field is required");
+            isValid = false;
+        }
+
+        if ($("#skills").val() == "") {
+            $("#errValid-Skills").text("Skill Sets field is required");
+            isValid = false;
+        }
+
+        if ($("#DepartmentId").val() == "") {
+            $("#errValid-Department").text("Department field is required");
+            isValid = false;
+        }
+
+        if ($("#DesignationId").val() == "") {
+            $("#errValid-Designation").text("Designation field is required");
+            isValid = false;
+        }
+
+        if ($("#OfficeEmail").val() == "") {
+            $("#errValid-OfficeEmail").text("Office Email field is required");
+            isValid = false;
+        }
+
+        //if ($("#EsslId").val() == "") {
+        //    $("#errValid-EsslId").text("EsslId field is required");
+        //    isValid = false;
+        //}
+
+        var employeeId = $("#EmpId").val();
+        var firstName = $("#FirstName").val();
+        var lastName = $("#LastName").val();
+        var officeEmail = $("#OfficeEmail").val();
+        var roleId = $("#RoleId").val();
+        var fatherName = $("#FatherName").val();
+        var personalEmail = $("#PersonalEmail").val();
+        var designationId = $("#DesignationId").val();
+        var departmentId = $("#DepartmentId").val();
+        var reportingPersons = $("#Reporter").val();
+        var stringSkills = "";
+        var esslId = $("#EsslId").val();
+
+        var skills = $('#skills').select2('data');
+        var selectedSkills = skills.length;
+        for (var i = 0; i < selectedSkills; i++) {
+            var sel = skills[i].text + ",";
+            stringSkills += sel;
+        }
+
+        var employees = {
+            EmpId: employeeId,
+            FirstName: firstName,
+            LastName: lastName,
+            FatherName: fatherName,
+            OfficeEmail: officeEmail,
+            DesignationId: designationId,
+            DepartmentId: departmentId,
+            PersonalEmail: personalEmail,
+            RoleId: roleId,
+            ReportingPersonEmpId: reportingPersons,
+            SkillNames: stringSkills,
+            esslId: esslId
+        };
+        formData.append("OfficeEmail", officeEmail)
+        formData.append("PersonalEmail", personalEmail)
+        formData.append("EmpId", employeeId)
+        if (isValid) {
+            var isEmailVerify = emailCheck(officeEmail, personalEmail);
+            if (isEmailVerify) {
+                $.ajax({
+                    type: "POST",
+                    url: "/OBEmployees/GetEmailCount",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                     
+                        if (result <= 1) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/OBEmployees/GetPersonalCount",
+                                contentType: false,
+                                processData: false,
+                                data: formData,
+                                beforeSend: function () {
+                                    $('.loader').removeClass('d-none');
+                                },
+                                success: function (result) {
+                                    if (result <= 1) {
+                                 
+                                        var url = "/OBEmployees/UpdateEmployee";
+
+                                        $.ajax({
+                                            type: "POST",
+                                            url: url,
+                                            data: employees,
+                                            beforeSend: function () {
+                                                $('.loader').removeClass('d-none');
+                                            },
+                                            success: function (result) {
+
+                                                if (result > 0) {
+
+                                                    PageUtil.goTo("/OBEmployees/CreateProfile?empId=" + result);
+                                                }
+                                            },
+                                            complete: function () {
+                                                $('.loader').addClass('d-none');
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        $('.loader').addClass('d-none');
+                                        $("#errVerify-ExistEmail").show();
+                                        return false;
+                                    }
+                                },
+                                complete: function () {
+                                    // $('.loader').addClass('d-none');
+                                }
+                            });
+
+                        }
+                        else {
+                            $('.loader').addClass('d-none');
+                            $("#errVerify-EmailExists").show();
+                            return false;
+                        }
+                    },
+                    complete: function () {
+                        // $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+
+    //Email Validation
+    function emailCheck(officeEmail, personalEmail) {
+        var isEmailValid = true;
+
+        var mailformat = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        if (!mailformat.test(officeEmail)) {
+            $("#errVerifyEmailFormat-OfficeEmail").show();
+            isEmailValid = false;
+        }
+
+        $("#errVerifyEmailFormat-PersonalEmail").hide();
+        if (!mailformat.test(personalEmail)) {
+            $("#errVerifyEmailFormat-PersonalEmail").show();
+            isEmailValid = false;
+        }
+
+        return isEmailValid
+    }
+
+    if (@sessionRoleId == 1) {
+        $('#btnBackEmployee').show();
+    }
+    else {
+        $('#btnBackEmployee').hide();
+    }
+
+    if (@sessionRoleId == 1) {
+        $('#btnBackEmployee').click(function () {
+            var urlToRedirect = '@Url.Action("OBEmployeeInfo","OBEmployees")';
+            window.location.href = urlToRedirect;
+        });
+    }
+
+   
+
+    $('#step1').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/UpdateEmployee?empId=" + empId);
+    });
+
+    $('#step2').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateProfile?empId=" + empId);
+    });
+
+    $('#step3').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateAddress?empId=" + empId);
+    });
+    $('#step4').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateOtherDetails?empId=" + empId);
+    });
+    $('#step5').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateQualification?empId=" + empId);
+    });
+    $('#step6').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/Createexperience?empId=" + empId);
+    });
+    $('#step7').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateBankDetails?empId=" + empId);
+    });
+
+</script>
+

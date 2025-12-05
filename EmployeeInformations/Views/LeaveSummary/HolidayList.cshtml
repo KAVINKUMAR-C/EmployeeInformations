@@ -1,0 +1,83 @@
+﻿@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model EmployeeHolidaysViewModel
+@{
+    ViewBag.Title = "HolidayList";
+    Layout = "_Layout";
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+
+<!DOCTYPE html>
+<div class="row">
+    <div class="col-sm-12" style="padding-bottom:20px">
+        <div class="col-sm-2">
+            <span>Choose File : </span>
+        </div>
+        <div class="col-sm-3">
+            <input class="form-control" type="file" name="importFile" id="importFile" />
+        </div>
+        <div class="col-sm-3">
+            <input class="btn btn-primary" id="btnUpload" type="button" value="Upload" />
+        </div>
+    </div>
+</div>
+
+@*<html>
+<head>
+<meta name="viewport" content="width=device-width" />
+<title>Index</title>
+</head>
+<body>
+<h4>Customers</h4>
+<hr />
+<table cellpadding="0" cellspacing="0">
+    <tr>
+        <th>Title</th>
+        <th>HolidayDate</th>
+        <th>HolidayName</th>
+           
+    </tr>
+    @foreach (var customer in Model.EmployeeHolidays)
+    {
+        <tr>
+            <td>@customer.Title</td>
+            <td>@customer.HolidayDate</td>
+            <td>@customer.HolidayName</td>               
+        </tr>
+    }
+</table>
+<br />
+<br />
+@using (Html.BeginForm("Excel", "LeaveSummary", FormMethod.Post))
+{
+    <input type="submit" value="Export" />
+}
+</body>
+</html>
+*@
+<script type="text/javascript" src="~/js/jquery-3.4.1.js" asp-append-version="true"></script>
+<script>
+
+    $(document).on("click", "#btnUpload", function () {
+        var files = $("#importFile").get(0).files;
+
+        var formData = new FormData();
+        formData.append('importFile', files[0]);
+        $('.loader').removeClass('d-none');
+        $.ajax({
+            url: '/Employee/ImportFile',
+            data: formData,
+            type: 'POST',
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                if (data.Status === 1) {
+                    alert(data.Message);
+                } else {
+                    alert("Failed to Import");
+                }
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+</script>  

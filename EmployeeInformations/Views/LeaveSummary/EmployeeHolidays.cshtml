@@ -1,0 +1,644 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model EmployeeHolidaysViewModel
+@{
+    ViewBag.Title = "Holiday";
+    Layout = "_Layout";
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.HolidayModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+@if (loginRoleId == (int)Role.Admin || loginRoleId == (int)Role.HR)
+{
+    <div class="row">
+        <div class="col-lg-2 col-md-6 autocomplete">
+            <div class="form-group emp-hol-yr">
+                <label class="form-label">Year<span class="required" style="color: #FF0000">*</span></label>
+                <div class="selectbox">
+                    @Html.DropDownListFor(m => m.Year, new SelectList(Model.Years, "Year", "StrYear"), "--Select Year--", new { @class = "form-control", id = "year" })
+                </div>
+                <span class="error text-danger" id="errValid-Year"></span>
+            </div>
+        </div>
+        <div class="col list-search-btn">
+            <button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterHoliday" value=""><i class="ti-search"></i></button>
+        </div>
+    </div>
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Holiday Details</h3>
+        </div><!-- .nk-block-head-content -->
+        @if (rolePrivileges)
+        {
+            <div class="d-flex">
+                @*@Html.ActionLink("Download","Excel","LeaveSummary", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm mr-3" })*@
+                <button type="button" class="mr-3 btn btn-primary icon-ch" id="CreateHoliday">Create</button>
+                <button type="button" class="mr-3 btn btn-secondary icon-ch" id="DownloadHoliday"><i class="ti-download"></i></button>
+            </div>
+        }
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="holiday">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getHolidaysData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Title</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">Holiday Date</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Holiday Name</span></th>
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col"><span class="sub-text">Action</span></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model?.EmployeeHolidays?.Count() > 0)
+                {
+                    @foreach (var item in Model.EmployeeHolidays)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary">@item.Title</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.HolidayDate.ToString(Constant.DateFormat)</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span class="badge badge-dim bg-primary">@item.HolidayName</span>
+                            </td>
+                            @if (rolePrivileges)
+                            {
+                                <td class="nk-tb-col nk-tb-col-tools">
+                                    <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                        <ul class="nk-tb-actions gx-1 my-n1">
+                                            <li class="me-n1">
+                                                <div class="dropdown">
+                                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <ul class="link-list-opt no-bdr">
+                                                            <li><a href="javascript:void(0)" class="btnUpdatePopup" data-id="@item.HolidayId" data-title="@item.Title" data-holidaydate="@item.HolidayDate.ToString(Constant.DateFormat)"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                            <li><a href="javascript:void(0)" id="btnHolidayDelete" data-id="@item.HolidayId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            }
+                        </tr>
+                        <!-- .nk-tb-item  -->
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Holiday</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label>Title<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="title" />
+                            <span class="error text-danger" id="errValid-HolidayTitle"></span>
+                            <span id="errVerify-HolidayTitle" style="display:none;" class="error text-danger"> Title already exists! </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="holidayDate">
+                            <span class="input-group-addon">
+                                <i class="icon ni ni-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errVerify-holidaydate"></span>
+                        <span id="errVerify-holidaydateCount" style="display:none;" class="error text-danger">Date already exists! </span>
+                    </div>
+                </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseModule" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="Update_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Holiday</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label>Title<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="Title" />
+                            <span id="errVerify-ModuleName" style="display:none; color: #dc3545!important;">Title already exists! </span>
+                            <span class="error text-danger" id="errValid-HolidaysTitle"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label>Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="HolidayDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="holidaydate">
+                            <span class="input-group-addon">
+                                <i class="icon ni ni-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errVerify-holidaydates"></span>
+                        <span id="errVerify-holidaydateCounts" style="display:none; color: #dc3545!important;">Date already exists! </span>
+                    </div>
+                </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnUpdateHoliday" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseUpdate" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (rolePrivileges == true)
+{
+    <input type="hidden" id="roleAccess" name="roleAccess" value="1" />
+}
+else
+{
+    <input type="hidden" id="roleAccess" name="roleAccess" value="2" />
+}
+<script src="~/js/site.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#getHolidaysData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [
+                [1, "asc"]
+            ],
+        });
+    });
+
+    $(document).ready(function () {
+        var date = new Date();
+        date.setDate(date.getDate() - 1);
+
+        $("#leaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            startDate: date
+        });
+
+        $("#HolidayDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+        $("#CreateHoliday").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+    })
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+    //KeyUp Summary
+
+    $("#title").keyup(function () {
+        $("#errValid-HolidayTitle").text("");
+
+        if ($("#title").val() == "") {
+            $("#errValid-HolidayTitle").text("Title field is required");
+        }
+    });
+
+    $("#Title").keyup(function () {
+        $("#errValid-HolidaysTitle").text("");
+
+        if ($("#Title").val() == "") {
+            $("#errValid-HolidaysTitle").text("Title field is required");
+        }
+    });
+
+    //Change Summary
+
+    $("#holidayDate").change(function () {
+        $("#errVerify-holidaydate").text("");
+
+        if ($("#holidayDate").val() == "") {
+            $("#errVerify-holidaydate").text("Date field is required");
+        }
+        else {
+            $("#errVerify-holidaydate").text("");
+        }
+    });
+
+    $("#holidaydate").change(function () {
+        $("#errVerify-holidaydates").text("");
+
+        if ($("#holidaydate").val() == "") {
+            $("#errVerify-holidaydates").text("Date field is required");
+        }
+        else {
+            $("#errVerify-holidaydates").text("");
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#leaveFromDate").val('');
+    // Create Holiday
+
+    $("#btnCreate").click(function () {
+        var isValid = true;
+        var formData = new FormData();
+        $("#errVerify-HolidayTitle").hide();
+        $("#errVerify-holidaydateCount").hide();
+        $("#errVerify-holidaydate").text("");
+        $("#errValid-HolidayTitle").text("");
+
+        if ($("#title").val() == '') {
+            $("#errValid-HolidayTitle").text("Title field is required");
+            isValid = false;
+        }
+
+        if ($("#holidayDate").val() == '') {
+            $("#errVerify-holidaydate").text("Date field is required");
+            isValid = false;
+        }
+
+        var title = $("#title").val();
+        var holidayDate = $("#holidayDate").val();
+        formData.append("Title", title);
+        formData.append("HolidayDates", holidayDate);
+        var year = $("#year").val();
+        if (isValid) {
+            $.ajax({
+                type: "POST",
+                url: "/LeaveSummary/GetHolidayDate",
+                contentType: false,
+                processData: false,
+                data: formData,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result == 0) {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/LeaveSummary/CreateHoliday",
+                            contentType: false,
+                            processData: false,
+                            data: formData,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: function (result) {
+
+                                // $("#Create_Popup").css('display', 'none !important');
+                                Swal.fire({
+                                    title: 'Added Successfully',
+                                    text: "",
+                                    icon: 'success',
+                                    allowOutsideClick: false
+                                }).then((resultValue) => {
+                                    if (resultValue.isConfirmed) {
+                                        var urlToRedirect = "/LeaveSummary/EmployeeHolidays?year=" + year;
+                                        window.location.href = urlToRedirect;
+                                    };
+                                });
+                            },
+                            complete: function () {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        $("#errVerify-holidaydateCount").show();
+                        return false;
+                    }
+                },
+                complete: function () {
+                    // $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            $('.loader').addClass('d-none');
+            $("#errValid-HolidayTitle").show();
+            $("#errValid-LeaveFromDate").show();
+            return false;
+        }
+    });
+
+    // Update Holiday
+
+    $('#holiday').on('click', '.btnUpdatePopup', function () {
+        var holidayid = $(this).data("id");
+        Swal.fire({
+            title: 'Are you sure want to Change?',
+            //  text: "You are Change this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                debugger;
+                var isValid = true;
+                $("#Update_Popup").modal('show');
+                var year = $("#year").val();
+                var holidayTitle = $(this).data("title");
+                var holidayDate = $(this).data("holidaydate");
+                $("#Title").val(holidayTitle);
+                $("#holidaydate").val(holidayDate);
+                $("#holidaydate").prop('disabled', false);
+                $("#HolidayDatedatepicker").datepicker('setDate', holidayDate);
+                $("#holidaydate").prop('disabled', true);
+                $('#Update_Popup').on('click', '#btnUpdateHoliday', function () {
+                    var id = holidayid;
+                    var formData = new FormData();
+                    $("#errValid-HolidaysTitle").text("");
+                    $("#errVerify-holidaydates").text("");
+                    $("#errVerify-holidaydateCounts").hide();
+
+                    if ($("#Title").val() == '') {
+                        $("#errValid-HolidaysTitle").text("Title field is required");
+                        isValid = false;
+                    }
+
+                    if ($("#holidaydate").val() == '') {
+                        $("#errVerify-holidaydates").text("Date field is required");
+                        isValid = false;
+                    }
+                    var holidayTitle = $("#Title").val();
+                    var holidaydate = $("#holidaydate").val();
+                    formData.append("HolidayDate", holidaydate);
+                    formData.append("holidayid", id)
+
+                    var employeeHolidays = {
+                        HolidayId: id,
+                        Title: holidayTitle,
+                        HolidayDate: holidaydate
+                    };
+                    if (isValid) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/LeaveSummary/UpdateHoliday",
+                            data: employeeHolidays,
+                            success: (Result) => {
+                                $('.loader').addClass('d-none');
+                                Swal.fire({
+                                    title: 'Updated Successfully',
+                                    text: "",
+                                    icon: 'success',
+                                    allowOutsideClick: false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        var urlToRedirect = "/LeaveSummary/EmployeeHolidays?year=" + year;
+                                        window.location.href = urlToRedirect;
+                                    };
+                                });
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        $("#errValid-HolidaysTitle").show();
+                        $("#errVerify-holidaydates").show();
+                        return false;
+                    }
+
+                });
+            }
+        })
+    });
+
+    // Delete Holiday
+
+    $('#holiday').on('click', '#btnHolidayDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id");
+                var year = $("#year").val();
+                var employeeHolidays = {
+                    HolidayId: id,                   
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/LeaveSummary/DeleteHoliday",
+                    data: employeeHolidays,
+                    success: (Result) => {
+                        Swal.fire({
+                            title: 'Deleted Successfully!',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                var urlToRedirect = "/LeaveSummary/EmployeeHolidays?year=" + year;
+                                window.location.href = urlToRedirect;
+                            };
+                        });
+
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        })
+    });
+
+    $("#btnCloseModule").click(function () {
+        $("#Create_Popup").hide();
+        var year = $("#year").val();
+        window.location.href = "/LeaveSummary/EmployeeHolidays?year=" + year;
+    });
+
+    $("#btnCloseUpdate").click(function () {
+        $("#Update_Popup").hide();
+        var year = $("#year").val();
+        window.location.href = "/LeaveSummary/EmployeeHolidays?year=" + year;
+    });
+
+    $('#DownloadHoliday').click(function () {
+        var year = $("#year").val();
+        window.location.href = "/LeaveSummary/Excel?year=" + year;
+        $('.loader').addClass('d-none');
+    });
+
+    $(document).ready(function () {
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#Update_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+
+    $("#btnFilterHoliday").click(function () {
+        var isValid = true;
+        $("#errValid-Year").text("");
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            isValid = false;
+        }
+
+        var year = $("#year").val();
+        var employeeHolidays = {
+            Year: year
+        };
+
+        if (isValid) {
+            var isValidDate = true;
+            if (isValidDate) {
+                var url = "/LeaveSummary/FilterHolidays";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: employeeHolidays,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        $("#holiday").empty();
+                        var tableData = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getHolidaysData'><thead><tr class='nk-tb-item table-header'> <th class='nk-tb-col tb-col'><span class='sub-text'>Title</span></th><th class='nk-tb-col'><span class='sub-text'>Holiday Date</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Holiday Name</span></th>";
+                        if ($("#roleAccess").val() == 1) {
+                            tableData += "<th class='nk-tb-col'><span class='sub-text'>Action</span></th>";
+                        }
+                        tableData += "</tr></thead><tbody>";
+                        if (result.employeeHolidays.length > 0) {
+                          
+                           @*  $.each(result.employeeHolidays, function (key, value) {
+                                tableData += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'><b class='tb-sub text-primary'>" + value.title + "</b></td><td class='nk-tb-col tb-col'><span>" + value.holiday + "</span></td><td class='nk-tb-col tb-col'><span class='badge badge-dim bg-primary'>" + value.holidayName + "</span></td>";
+
+                                if ($("#roleAccess").val() == 1) {
+                                    tableData += " <td class='nk-tb-col nk-tb-col-tools'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'> <ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnUpdatePopup' data-id='" + value.holidayId + "' data-title='" + value.title + "' data-holidaydate='" + value.holiday + "'><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnHolidayDelete' data-id='" + value.holidayId + "'><em class='icon ni ni-delete'></em><span>Delete</span></a></li></ul></div></div></li></ul></div></td>";
+                                }
+                                tableData += "</tr>";
+                            }); *@
+                                var row = result.employeeHolidays.map(function (value) {
+                                    tableData += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'><b class='tb-sub text-primary'>" + value.title + "</b></td><td class='nk-tb-col tb-col'><span>" + value.holiday + "</span></td><td class='nk-tb-col tb-col'><span class='badge badge-dim bg-primary'>" + value.holidayName + "</span></td>";
+
+                                    if ($("#roleAccess").val() == 1) {
+                                        tableData += " <td class='nk-tb-col nk-tb-col-tools'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'> <ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnUpdatePopup' data-id='" + value.holidayId + "' data-title='" + value.title + "' data-holidaydate='" + value.holiday + "'><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnHolidayDelete' data-id='" + value.holidayId + "'><em class='icon ni ni-delete'></em><span>Delete</span></a></li></ul></div></div></li></ul></div></td>";
+                                    }
+
+                                    tableData += "</tr>";
+                                    return tableData;
+                                }).join("");
+
+                            // Append tableData to your table
+
+
+                            tableData += "</tbody></table></div></div>";
+
+                            $("#holiday").html(tableData);
+
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            $('#getHolidaysData').DataTable({
+                                "bInfo": true,
+                                "paging": true,
+                                order: [
+                                    [1, "asc"]
+                                ],
+                            });
+                        }
+                        else {
+                            tableData += "</tr></thead><tbody>";
+                            tableData += "</tbody></table></div></div>";
+                            $("#holiday").html(tableData);
+
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            $('#getHolidaysData').DataTable({
+                                "bInfo": true,
+                                "paging": true,
+                                order: [
+                                    [1, "asc"]
+                                ],
+                            });
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-endDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+</script>
+
+
+

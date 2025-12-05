@@ -1,0 +1,299 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.APIModel;
+@model List<WebsiteJobApplyModel>
+@{
+    ViewBag.Title = "WebsiteJobApply";
+    Layout = "_Layout";
+    int count = 0;
+}
+ 
+<div class="nk-block-head nk-block-head-sm">
+<div class="nk-block-between">
+<div class="nk-block-head-content">
+<h3 class="nk-block-title page-title">Job Applied Information</h3>
+</div><!-- .nk-block-head-content -->
+<div class="d-flex mb-1">
+            @Html.ActionLink("Create", "CreateSiteJopApply", "WebsiteJob", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm" })
+</div>
+</div><!-- .nk-block-between -->
+</div><!-- .nk-block-head -->
+ 
+ 
+<div class="card card-bordered card-preview">
+<div class="card-inner table-card">
+<table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getJobApplyData">
+<thead>
+<tr class="nk-tb-item table-header">
+<th class="nk-tb-col tb-col col-w" data-id="FullName"><span class="sub-text">Name</span></th>
+<th class="nk-tb-col" data-id="JobName"><span class="sub-text">Role</span></th>
+<th class="nk-tb-col tb-col" data-id="Experience"><span class="sub-text">Experience</span></th>
+                    @* <th class="nk-tb-col tb-col-lg"><span class="sub-text">Skill Set</span></th>*@
+<th class="nk-tb-col tb-col" data-id="RelevantExperience"><span class="sub-text">Relevant Experience</span></th>
+<th class="nk-tb-col tb-col" data-id="ApplyDate"><span class="sub-text">Applied Date</span></th>
+<th class="nk-tb-col tb-col" data-id="IsActive"><span class="sub-text">IsActive</span></th> 
+<th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+ 
+                </tr>
+</thead>
+</table>
+</div>
+</div>
+<script>
+    // Download
+ 
+    $(document).ready(function () {
+ 
+    @*  $('#getJobApplyData').on('click', '.btnDownload', function() {
+            var filePath = $(this).data("job-path")
+            window.location.href = "/WebsiteJob/DownloadFile?FilePath=" + filePath;
+            $('.loader').addClass('d-none');
+            }); *@
+ 
+            @* $('#getJobApplyData').on('click', '#btnDownload', function () {
+                var jobApplyId = $(this).data("id");
+                window.location.href = "/WebsiteJob/DownloadFiles?jobApplyId=" + jobApplyId;
+                $('.loader').addClass('d-none');
+            }); *@
+ 
+        $('#getJobApplyData').on('click', '#btnDownload', function () {          
+            var subject = $(this).data("file");
+            var urlName = window.location.origin;           
+            window.open(urlName + '/Management/' + subject +'');
+        });
+ 
+    });
+ 
+ 
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindPendingCaseReportData();
+        function BindPendingCaseReportData() {
+            var table = $("#getJobApplyData").DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 0;
+            var checkCount = 0;
+            $('#getJobApplyData').DataTable({
+                serverSide: true,
+ 
+                ajax: {
+                    url: "/WebsiteJob/GetAllWebsiteJobApplyDetails",
+                    type: 'Get',
+                    data: function (d) {
+ 
+                        var searchFilter = document.getElementById("getJobApplyData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var websiteEntry = document.getElementById("getJobApplyData_length"); //get entries div id
+                        var entrySelect = websiteEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        // Pass pagination parameters
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                    }
+                },
+ 
+                 columns: [
+                    {
+                        data: 'name',
+                        render: function (data, type, row) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+ 
+                            return "<div class='user-card'><div class='user-avatar" + className + "'><span style='text-transform:uppercase'> " + row.fullName[0] + "</span></div><div class='user-info'><div class='user-info'> <span class='tb-lead font-weight-bold'>" + row.fullName + "</span></div><span> " + row.email + "</span></div></div> ";                                                                                      
+                        }
+ 
+                    },
+ 
+                    {
+                        data: 'role',
+                        render: function (data, type, row) {
+                            return "<span class='badge badge-dim bg-primary'> " +  (row.jobName == null ? "" : (row.jobName))  + "</span>";
+                        }
+                    },
+ 
+                     {
+                        data: 'experience',
+                        render: function (data, type, row) {
+                            return "<span>" + row.experience + "</span>";
+                        }
+                     },
+                     {
+                        data: 'relevantExperience',
+                         render: function (data, type, row) {
+                            return "<span class='tb-lead font-weight-bold'>" + row.relevantExperience + "</span><span> "+row.skillSet+"</span>";
+                         }
+                     },
+                     {
+                        data:'applyDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateFormat(row.applyDate) + "</span>";
+                        }
+                     },
+                     {
+                        data: 'isActive',
+                         render: function (data, type, row) {
+                             var activehtml = "<div class='custom-control custom-control-sm custom-checkbox'>";
+                             if (row.isActive == true) {
+                                 activehtml += "<input type='checkbox' name='chkIsEnabledModule' checked class='custom-control-input chkIsEnabledModule' data-id='" + row.jobApplyId + "' id='chkIsEnabledModule" + checkCount + "' value = '1'><label class='custom-control-label' for='chkIsEnabledModule" + checkCount + "'></label>";
+                             }
+                             else {
+                                 activehtml += "<input type='checkbox' name='chkIsEnabledModule' class='custom-control-input chkIsEnabledModule' data-id='" + row.jobApplyId + "' id='chkIsEnabledModule" + checkCount + "' value ='0'><label class='custom-control-label' for='chkIsEnabledModule" + checkCount + "'></label>";
+                             }
+                             activehtml += "</div>";
+                             checkCount++;
+                             return activehtml;
+                         }
+                     },    
+                     {
+                         data:'',
+                         "orderable": false,
+                         render: function (data, type, row) {
+                            var html = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a > <div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id ='btnUpdate' data-id=" + row.jobApplyId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li>";
+ 
+                                if (row.filePath != null)
+                                {
+                                    html += "<li><a href='javascript:void(0)' id='btnDownload' data-file="+row.filePath+" data-id="+row.jobApplyId+"><em class='icon ni ni-download'></em><span>Download</span></a></li>";
+                                }
+                            html += "</ul></div></div></li></ul></div>";
+                            return html;                            
+                         }
+                     }
+                ],
+                // "columnDefs": [
+                //     { "width": "300px", "targets": [0, 1, 2, 3, 4, 5] },
+                // ], 
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+            });
+        }
+ 
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+ 
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+            columnIndex = $(this).data('id');
+        });
+ 
+        // check box active 
+            $('#getJobApplyData').on('click', 'input[type=checkbox][name=chkIsEnabledModule]', function () {
+           
+            if ($(this).is(':checked')) {
+ 
+                $(this).val("1");
+            }
+            else {
+                $(this).val("0");
+            }
+ 
+            var active = $(this).is(':checked');
+            var jobId = $(this).data("id");
+ 
+            var job = {
+                IsActive: active,
+                JobApplyId: jobId
+            }
+ 
+            $.ajax({
+                type: "post",
+                url: "/WebsiteJob/WebSiteJobApplyIsActive",
+                data: job,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result > 0) {
+                        window.location.href = "/WebsiteJob/WebsiteJobApply";
+                    }
+ 
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+ 
+        });
+ 
+    });
+ 
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+ 
+ 
+    function dateFormat(applyDate) {
+ 
+        var dateObject = new Date(applyDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+
+ 
+    //--------------------------------------------------------------------------------------------------------------------------------------
+ 
+    // Sent id for update
+ 
+    $('#getJobApplyData').on('click', '#btnUpdate', function () {
+        var jobApplyId = $(this).data('id');
+        PageUtil.goToContent("/WebsiteJob/EditAppliedJob?jobApplyId=" + jobApplyId);
+    });
+ 
+
+    //----------------------------------------------------------------------------------------------------
+    @* $(document).ready(function () {
+ 
+        $.fn.dataTable.moment('DD/MM/YYYY');
+ 
+        $('#getJobApplyData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [
+                [4, "desc"]
+            ],
+        });
+    }); *@
+</script>

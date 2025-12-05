@@ -1,0 +1,87 @@
+﻿using EmployeeInformations.CoreModels.DataViewModel;
+using EmployeeInformations.Model.MasterViewModel;
+using EmployeeInformations.Model.PagerViewModel;
+using System.Threading.Tasks;
+
+namespace EmployeeInformations.Business.IService
+{
+    public interface IMasterService
+    {
+        Task<int> UpdateModule(Modules modules);
+        Task<int> GetModuleName(string moduleName);
+        Task<int> GetDepartmentName(string departmentName, int companyId);
+        Task<SubModulesViewModel> GetAllSubModules(int companyId);       
+        Task<int> GetSubModulesName(string name,int companyId);
+        Task<List<ModuleName>> GetAllModuleName(int companyId);
+        Task<bool> DeleteSubModuleId(int subModuleId);
+        Task<int> UpdateSubModule(SubModules subModules);   
+        Task<bool> DeleteModule(int id);
+        Task<bool> DeletedDesignation(int designationId, int sessionCompanyId);
+        Task<DepartmentViewModel> GetAllDepartment(int companyId);
+        Task<int> UpdateDesignation(Designation designation, int sessionCompanyId);      
+        Task<LeaveTypeViewModel> GetAllLeaveTypes(int companyId);      
+        Task<int> GetLeaveType(string leaveType,int companyId);
+        Task<bool> DeleteLeaveType(int leaveTypeId,int companyId);
+        Task<int> UpadateLeave(LeaveTypeMaster leaveTypeMaster,int companyId);        
+        Task<int> UpdateDashboardMenus(DashboardMenus dashboardMenus);
+        Task<bool> DeleteDashboardMenus(int menuId);
+        Task<int> UpdateRelievingReasonststus(RelievingReason relievingReason);
+        Task<bool> DeleteRelievingReason(int relievingReasonId);
+        Task<int> UpdateRelievingReason(RelievingReason relievingReason);
+        Task<int> UpdateAnnouncement(Announcement announcement);
+        Task<List<AnnouncementAttachmentsViewModel>> GetAnnouncementDocumentAndFilePath(int announcementId);
+        Task<DesignationViewModel> GetAllDesignation(int sessionCompanyId);
+        Task<Announcement> CreateAnnouncements(Announcement announcement, int sessionEmployeeId,int companyId);
+        Task<LeaveTypeMaster> CreateLeaveType(LeaveTypeMaster leaveTypeMaster,int companyId);
+        Task<Modules> CreateModule(Modules modules);
+        Task<SubModules> CreateSubModules(SubModules subModules);
+        Task<RelievingReason> CreateRelievingReasonNames(RelievingReason RelievingReason);
+        Task<DashboardMenus> CreateDashboardMenu(DashboardMenus dashboardMenus);
+        Task<TicketTypesViewModel> GetAllTicketTypes(int companyId);
+        Task<TicketTypes> CreateTicketType(TicketTypes ticketType);
+        Task<TicketTypes> UpdateTicketType(TicketTypes ticketType);
+        Task<int> AnnouncementFilterCount(int companyId, SysDataTablePager pager);
+        Task<List<AnnouncementFilterViewModel>> AnnouncementFilter(int companyId, SysDataTablePager pager, string columnName, string columnDirection);
+        Task<Designation> Create(Designation designation, int sessionCompanyId);
+        Task<bool> DeleteDepartment(int departmentId, int companyId);
+        Task<int> UpdateDepartment(Department department, int companyId);
+        Task<Department> CreateDepartment(Department department, int companyId);
+        Task<int> GetDesignationName(string designationName, int sessionCompanyId);
+        Task<RoleTableViewModel> GetAllRole(int companyId);
+        Task<RoleTableMaster> CreateRole(RoleTableMaster roleTableMaster, int companyId);
+        Task<bool> DeleteRole(int roleId, int companyId);
+        Task<int> DeleteIsActive(RoleTableMaster roleTableMaster, int companyId);
+        Task<int> GetRoleName(string roleName, int companyId);
+        Task<ModuleViewModel> GetAllModules(int companyId);
+        Task<ProjectTypeViewModule> GetAllProjectTypes(int sessionCompanyId);
+        Task<ProjectTypeMaster> CreateProjectType(ProjectTypeMaster projectTypeMaster, int CompanyId);
+        Task<int> GetProjectTypes(string projectTypeName, int companyId);
+        Task<bool> DeleteProjectTypeId(int projectTypeId, int companyId);
+        Task<DocumentTypesViewModel> GetAllDocumentTypes(int companyId);
+        Task DeletedDocumentTypeId(int documentTypeId, int companyId);
+        Task<DocumentType> CreateDocumentTypes(DocumentType documentType, int companyId);
+        Task<int> GetDocumentTypes(string documentName, int companyId);
+        Task<int> UpdateDocumentTypes(DocumentType documentType, int companyId);
+        Task<SkillSets> CreateskillSets(SkillSets skillSets, int companyId);
+        Task<SkillSetViewModel> GetAllSkillSet(int companyId);
+        Task<int> GetSkillSet(string skillName, int companyId);
+        Task<int> UpdateSkillSet(SkillSets skillSets, int companyId);
+        Task<EmailSettingsViewModel> GetAllEmailSettings(int companyId);
+        Task<int> CreateEmailSettings(EmailSettings emailSettings, int companyId);
+        Task<int> AddSendEmails(SendEmails sendEmails, int companyId);
+        Task<bool> DeleteSendEmail(int emailListId, int companyId);
+        Task<int> GetEmailCount(string fromEmail, int companyId);
+        Task<int> GetSendEmailCount(string emailId, int companyId);
+        Task<AnnouncementViewModel> GetAllAnnouncement(int companyId);
+        Task<AnnouncementViewModel> GetAnnouncement(int companyId);
+        Task<int> GetAnnouncementName(string announcementName, int companyId);
+        Task<bool> DeleteAnnouncement(int announcementId, int companyId);
+        Task<bool> DeletedSkillSetId(int skillId, int companyId);
+        Task<DashboardMenusViewModel> GetAllDashboardMenus(int sessionCompanyId);
+        Task<int> GetMenuName(string menuName, int companyId);
+        Task<RelievingReasonViewModel> GetAllRelievingReason(int companyId);
+        Task<int> GetRelievingReasonName(string relievingReasonName, int companyId);
+        Task<bool> DeleteTicketType(int ticketTypeId, int companyId);
+        Task<TicketTypes> GetByTicketTypeId(int ticketTypeId, int companyId);
+    }
+}

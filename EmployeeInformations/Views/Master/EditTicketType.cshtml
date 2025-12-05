@@ -1,0 +1,21 @@
+﻿@using EmployeeInformations.Model.MasterViewModel
+@using Microsoft.AspNetCore.Http;
+@model TicketTypes
+@{
+    var ticketTypeId = Context.Session.GetInt32("ticketTypeId");
+
+}
+<div id="bind-clientmodal-content">
+</div>
+
+<input type="hidden" id="txt-TicketTypeId" value="@Model.TicketTypeId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        var ticketTypeId = $("#txt-TicketTypeId").val();
+        PageUtil.goToClient("/Master/UpdateTicketType?TicketTypeId=" + ticketTypeId);
+    });
+
+</script>

@@ -1,0 +1,99 @@
+﻿@using EmployeeInformations.Model.ClientSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ClientViewModel
+@{
+    ViewBag.Title = "ViewClient";    
+}
+<div class="leave-dtl-block">
+
+<div class="nk-block-head nk-block-head-sm view-block">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">View Client</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Back","Client","Client", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview view-block">
+    <div class="card-inner">
+        <form>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Name</label>
+                        <label class="view-text">@Model.ClientName</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Company</label>                                               
+                        <label class="view-text">@Model.ClientCompany</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Customer Details</label>                        
+                        <label class="view-text">@Model.ClientDetails</label>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Email</label>                       
+                        <label class="view-text">@Model.Email</label>
+                    </div>
+                </div>
+
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label w-100">Address </label>
+                            <div>
+                                <label class="view-text">@Model.Address</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label w-100">Country</label>
+                            <div>
+                                <label class="view-text">@Model.CountryName</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-label w-100">ZipCode</label>
+                            <div>
+                                <label class="view-text">@Model.ZipCode</label>
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label w-100">Phone Number</label>
+                        <div>
+                          
+                            <label class="view-text">  
+                                <span class="flag-img"> 
+                                <img src="/images/flags/@(Model.CountryCode).png">
+                            </span>
+                            @Model.PhoneNumber
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</div>

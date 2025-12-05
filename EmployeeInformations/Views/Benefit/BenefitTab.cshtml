@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Model.DashboardViewModel
+@model DashboardViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+    var empId = Context.Session.GetInt32("EmpId");
+    Layout = "_Layout";
+}
+
+<div class="nk-content-body">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Benefits</h3>
+            </div><!-- .nk-block-head-content -->
+
+        </div><!-- .nk-block-between -->
+    </div><!-- .nk-block-head -->
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item active tabItem1" id="tabItem1"> <a class="nav-link" data-toggle="tab" href="javascript:void(0)">Benefit</a> </li>
+        <li class="nav-item tabItem2" id="tabItem2">  <a class="nav-link" data-toggle="tab" href="javascript:void(0)">Medical Benefit</a> </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab-modal-content">   </div>        
+    </div>
+
+
+</div>
+@* <script type="text/javascript" src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+ *@
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        //var companyId = $("#txt-CompanyId").val();
+        PageUtil.goToTab("/Benefit/GetBenefitTab");
+    });
+
+    $("#tabItem1").click(function() {         
+        PageUtil.goToTab("/Benefit/GetBenefitTab");
+    })
+
+    $("#tabItem2").click(function() {   
+        PageUtil.goToTab("/Benefit/GetMedicalBenefitTab");
+    })
+   
+</script>
+       

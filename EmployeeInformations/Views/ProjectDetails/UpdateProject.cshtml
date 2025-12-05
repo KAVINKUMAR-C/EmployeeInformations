@@ -1,0 +1,730 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.ProjectSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums;
+@model ProjectDetails
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Project</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+            <form>
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @Html.HiddenFor(m => m.EmpId)
+                    @Html.HiddenFor(m => m.ProjectId)
+                    <input type="hidden" id="strTechnology" value="@Model.Technology" />
+                    <div class="col-lg-3 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Customer Name<span class="required" style="color: #FF0000">*</span></label>
+                            <div>
+                                @Html.DropDownListFor(m => m.ClientCompanyId, new SelectList(Model.ClientCompany, "ClientId", "ClientCompany"), "--Select Customer Name--", new { @class = "form-control", id = "ClientCompanyId" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ClientCompanyId, "", new { @class = "error text-danger", id = "errValid-ClientCompanyId" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.ProjectName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ProjectName, "", new { @class = "error text-danger", id = "errValid-ProjectName" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Project Type<span class="required" style="color: #FF0000">*</span></label>
+                            <div>
+                                @Html.DropDownListFor(m => m.ProjectTypeId, new SelectList(Model.ProjectTypes, "ProjectTypeId", "ProjectTypeName"), "--Select Project Type--", new { @class = "form-control", id = "ProjectTypeId" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ProjectTypeId, "", new { @class = "error text-danger", id = "errValid-ProjectTypeId" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="form-group emp-hol-yr">
+                            <label class="form-label">Technology<span class="required" style="color: #FF0000">*</span></label>
+                            @*@Html.TextBoxFor(m => m.Technology, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Technology,"",new{@class="error text-danger" , id="errValid-Technology"})*@
+                            <div class="selectbox">
+                                @Html.DropDownListFor(m => m.Technology, new SelectList(Model.SkillSets, "SkillId", "SkillName"), new { @class = "form-control", id = "Technology", multiple = true })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Technology, "", new { @class = "error text-danger", id = "errValid-Technology" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6" id="hoursDiv" style="display:none">
+                        <div class="form-group">
+                            <label class="form-label">Hours<span class="required" style="color: #FF0000">*</span></label>
+                            @if (Model.Hours == 0)
+                            {
+                                <input type="text" id="Hours" class="form-control" value="">
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(m => m.Hours, new { @class = "form-control" })
+                            }
+                            @*@Html.TextBoxFor(m => m.Hours, new { @class = "form-control" })*@
+                            @Html.ValidationMessageFor(m => m.Hours, "", new { @class = "error text-danger", id = "errValid-Hours" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6" id="startdateDiv" style="display:none">
+                        <div class="form-group">
+                            <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+                            <div id="datepicker14" class="input-group date" data-date-format="dd/mm/yyyy">
+                                @Html.TextBoxFor(m => m.Startdate, "{0:dd/MM/yyyy}", new { @class = "form-control", @value = Model.Startdate?.ToString(Constant.DateFormat) })
+                                <span class="input-group-addon">
+                                    <i class="icon ti-calendar"></i>
+                                </span>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Startdate, "", new { @class = "error text-danger", id = "errValid-Startdate" })
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-3 col-md-6" id="enddateDiv" style="display:none">
+                        <div class="form-group">
+                            <label class="form-label">End Date<span class="required" style="color: #FF0000">*</span></label>
+                            <div id="datepicker15" class="input-group date" data-date-format="dd/mm/yyyy">
+                                @Html.TextBoxFor(m => m.Enddate, "{0:dd/MM/yyyy}", new { @class = "form-control", @value = Model.Enddate?.ToString(Constant.DateFormat) })
+                                <span class="input-group-addon">
+                                    <i class="icon ti-calendar"></i>
+                                </span>
+                            </div>
+                            <span id="errVerify-Enddate" style="display:none;" class="error text-danger"> Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+
+                            @Html.ValidationMessageFor(m => m.Enddate, "", new { @class = "error text-danger", id = "errValid-Enddate" })
+
+                        </div>
+                    </div>
+
+                    @*<div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                    <label class="form-label">CurrencyCode<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="selectbox">
+                    @Html.DropDownListFor(m => m.CurrencyId,new SelectList(Model.Currency,"Id","Code" ),"--Select Currency Code--",new{@class="form-control",id="CurrencyCode"})
+                    </div>
+                    @Html.ValidationMessageFor(m => m.CurrencyId,"",new{@class="error text-danger" , id="errValid-CurrencyCode"})
+                    </div>
+
+                    </div>*@
+                    <div class="col-lg-3 col-md-6" id="projectCostDiv" style="display:none">
+                        <div class="form-group emp-hol-yr">
+                            <div class="wrapper">
+                                <form class="form-inline">
+                                    <label class="sr-only form-label" for="inlineFormInputGroup">Amount<span class="required" style="color: #FF0000">*</span></label>
+                                    <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                                        <div class="input-group-addon currency-symbol">@Model.Symbol</div>
+                                        <input type="text" class="form-control currency-amount" id="ProjectCost" value="@Model.ProjectCost" placeholder="0.00" size="8">
+                                        <div class="selectbox">
+                                            <select class="currency-selector form-control" style="width:72px;">
+                                                @foreach (var item in Model.Currency)
+                                                {
+                                                    if (item.Code == Model.CurrencyCode)
+                                                    {
+                                                        <option data-symbol="@item.Symbol" selected>@item.Code </option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option data-symbol="@item.Symbol">@item.Code </option>
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </form>
+                                @Html.ValidationMessageFor(m => m.ProjectCost, "", new { @class = "error text-danger", id = "errValid-ProjectCost" })
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    @* <div class="col-lg-3 col-md-6" id="projectCostDiv" style="display:none">
+                    <div class="form-group">
+                    <label class="form-label">Project Cost<span class="required" style="color: #FF0000">*</span></label>
+                    @if (Model.ProjectCost == 0)
+                    {
+                    <input type="text" id="ProjectCost" class="form-control"  value="">
+                    }
+                    else
+                    {
+                    @Html.TextBoxFor(m => m.ProjectCost, new { @class = "form-control" })
+                    }
+                    @*
+                    @Html.TextBoxFor(m => m.ProjectCost, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ProjectCost,"",new{@class="error text-danger" , id="errValid-ProjectCost"})
+                    </div>
+                    </div>*@
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Description<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextAreaFor(m => m.ProjectDescription, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ProjectDescription, "", new { @class = "error text-danger", id = "errValid-ProjectDescription" })
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12 d-flex mt-3 p-0">
+                        <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnProjectBack" value="Back" />
+                        <input type="button" class="btn btn-primary" id="btnUpdateProject" value="Save" />
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="modal" id="success_UpdateProject_Popup" style="display:none;">
+        <div class="modal-dialog">
+            <div class="modal-content p-3 text-center">
+
+                <!-- Modal body -->
+                <div class="modal-body" id="txtSuccessMeg">
+                    Project Updated Successfully!
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer" id="btnCloseUpdateProject">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var Technology = $("#Technology").select2();
+            $("#Technology").select2().on("change", function () {
+                $("#errValid-Technology").text("");
+            });
+
+            var strTechnology = $("#strTechnology").val();
+            if (strTechnology != "") {
+                var lengthTechnology = strTechnology.split(',').length;
+                var splitTechnology = strTechnology.split(',');
+                for (var i = 0; i < lengthTechnology; i++) {
+                    $("#Technology option[value=" + splitTechnology[i] + "]").attr('selected', 'selected').trigger("change");
+                }
+            }
+
+            $("#datepicker14").datepicker({
+                autoclose: true,
+                todayHighlight: true
+            });
+
+            $("#datepicker15").datepicker({
+                autoclose: true,
+                todayHighlight: true
+            });
+
+
+
+            function updateSymbol(e) {
+
+                var selected = $(".currency-selector option:selected");
+                $(".currency-symbol").text(selected.data("symbol"))
+                $(".currency-amount").prop("placeholder", selected.data("placeholder"))
+                $('.currency-addon-fixed').text(selected.text())
+
+                var currency = $(".currency-selector option:selected").text();
+                var symbol = $(".currency-symbol").text();
+            }
+
+            $(".currency-selector").on("change", updateSymbol)
+
+            updateSymbol()
+
+            //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            // Nice Scroll ClientCompany, Technology,ProjectType
+
+            $("#ClientCompanyId,#Technology,#ProjectTypeId").select2().on("select2:open", function () {
+                $('.select2-results__options').niceScroll({
+                    cursorcolor: "#4e5e7a",
+                    cursorwidth: "5px",
+                    autohidemode: false,
+                    cursorborder: "1px solid #4e5e7a",
+                    horizrailenabled: false,
+                });
+            });
+
+            //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            //Change Summary
+
+            $("#Technology").change(function () {
+                $("#errValid-Technology").text("");
+                if ($("#Technology").val() == "") {
+                    $("#errValid-Technology").text("Technology field is required");
+                }
+            });
+
+
+            $("#ProjectTypeId").change(function () {
+                var selectedText = $(this).find("option:selected").text();
+                var selectedValue = $(this).val();
+                $("#hoursDiv").hide();
+                $("#startdateDiv").hide();
+                $("#enddateDiv").hide();
+                $("#projectCostDiv").hide();
+                if (selectedText == 'Fixed bid') {
+                    $("#hoursDiv").show();
+                    $("#startdateDiv").show();
+                    $("#enddateDiv").show();
+                    $("#projectCostDiv").show();
+                }
+                else if (selectedText == 'Retainer') {
+                    $("#startdateDiv").show();
+                }
+                else if (selectedText == 'Internal') {
+                    $("#startdateDiv").show();
+                }
+
+            });
+
+
+            if ($("#ProjectTypeId").val() == 1) {
+                $('#hoursDiv').css('display', 'block');
+                $('#startdateDiv').css('display', 'block');
+                $('#enddateDiv').css('display', 'block');
+                $('#projectCostDiv').css('display', 'block');
+            }
+            else if ($("#ProjectTypeId").val() == 2) {
+                $('#startdateDiv').css('display', 'block');
+            }
+            else if ($("#ProjectTypeId").val() == 3) {
+                $('#startdateDiv').css('display', 'block');
+            }
+        });
+
+        $('#btnProjectBack').click(function () {
+            var urlToRedirect = '@Url.Action("Project", "ProjectDetails")';
+            window.location.href = urlToRedirect;
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Only Allow Numbers
+
+        $("#Hours").on("input", function (evt) {
+            var self = $(this);
+            self.val(self.val().replace(/\D/g, ""));
+            if ((evt.which < 48 || evt.which > 57)) {
+                evt.preventDefault();
+            }
+        });
+
+        $("#ProjectCost").on("input", function (evt) {
+            var self = $(this);
+            self.val(self.val().replace(/\D/g, ""));
+            if ((evt.which < 48 || evt.which > 57)) {
+                evt.preventDefault();
+            }
+        });
+
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // KeyUp Summary
+
+        $("#ProjectName").keyup(function () {
+            $("#errValid-ProjectName").text("");
+            if ($("#ProjectName").val() == "") {
+                $("#errValid-ProjectName").text("Name field is required");
+            }
+        });
+
+        $("#ProjectDescription").keyup(function () {
+            $("#errValid-ProjectDescription").text("");
+            if ($("#ProjectDescription").val() == "") {
+                $("#errValid-ProjectDescription").text("Description field is required");
+            }
+        });
+
+        $("#Hours").keyup(function () {
+            $("#errValid-Hours").text("");
+            if ($("#Hours").val() == "") {
+                $("#errValid-Hours").text("Hours field is required");
+            }
+        });
+
+        $("#ProjectCost").keyup(function () {
+            $("#errValid-ProjectCost").text("");
+
+            if ($("#ProjectCost").val() == "") {
+                $("#errValid-ProjectCost").text("Ammount field is required");
+            }
+        });
+
+        $("#CurrencyCode").keyup(function () {
+            $("#errValid-CurrencyCode").text("");
+            if ($("#CurrencyCode").val() == "") {
+                $("#errValid-CurrencyCode").text("Currency Code field is required");
+            }
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        // Change Summary
+
+        $("#ProjectTypeId").change(function () {
+            $("#errValid-ProjectTypeId").text("");
+            if ($("#ProjectTypeId :selected").val() == "") {
+                $("#errValid-ProjectTypeId").text("Project Type field is required");
+            }
+            else {
+                $("#errValid-Hours").text("");
+                $("#errValid-Startdate").text("");
+                $("#errValid-Enddate").text("");
+                $("#errValid-ProjectCost").text("");
+            }
+        });
+
+        $("#ClientCompanyId").change(function () {
+            $("#errValid-ClientCompanyId").text("");
+            if ($("#ClientCompanyId").val() == "") {
+                $("#errValid-ClientCompanyId").text("Customer Name field is required");
+            }
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Click Summary
+
+        $("#Startdate").change(function () {
+            $("#errValid-Startdate").text("");
+
+            if ($("#Startdate").val() == "") {
+                $("#errValid-Startdate").text("Start Date field is required");
+            }
+        });
+
+        $("#Enddate").change(function () {
+            $("#errValid-Enddate").text("");
+
+            if ($("#Enddate").val() == "") {
+                $("#errValid-Enddate").text("End Date field is required");
+            }
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Update Project
+
+        $("#btnUpdateProject").click(function () {
+            var formData = new FormData();
+
+            var isValid = true;
+
+            $("#errValid-ProjectName").text("");
+            $("#errValid-ProjectTypeId").text("");
+            $("#errValid-ProjectDescription").text("");
+            $("#errValid-Technology").text("");
+            $("#errValid-Hours").text("");
+            $("#errValid-Startdate").text("");
+            $("#errValid-Enddate").text("");
+            $("#errValid-ProjectCost").text("");
+            $("#errValid-ClientCompanyId").text("");
+            $("#errVerify-Enddate").hide();
+            $("#errValid-CurrencyCode").text("");
+
+
+
+            var selectedText = $("#ProjectTypeId option:selected").text();
+            if (selectedText == 'Fixed bid') {
+                if ($("#ProjectName").val() == "") {
+                    $("#errValid-ProjectName").text("Name field is required");
+                    isValid = false;
+                }
+
+                if ($("#ProjectTypeId").val() == "") {
+                    $("#errValid-ProjectTypeId").text("Project Type field is required");
+                    isValid = false;
+                }
+
+                if ($("#ProjectDescription").val() == "") {
+                    $("#errValid-ProjectDescription").text("Description field is required");
+                    isValid = false;
+                }
+
+                if ($("#Technology").val() == "") {
+                    $("#errValid-Technology").text("Technology field is required");
+                    isValid = false;
+                }
+
+                if ($("#Hours").val() == "") {
+                    $("#errValid-Hours").text("Hours field is required");
+                    isValid = false;
+                }
+
+                if ($("#Startdate").val() == "") {
+                    $("#errValid-Startdate").text("Start Date field is required");
+                    isValid = false;
+                }
+
+                if ($("#Enddate").val() == "") {
+                    $("#errValid-Enddate").text("End Date field is required");
+                    isValid = false;
+                }
+
+                if ($("#ProjectCost").val() == "") {
+                    $("#errValid-ProjectCost").text("Ammount field is required");
+                    isValid = false;
+                }
+
+                if ($("#ClientCompanyId").val() == "") {
+                    $("#errValid-ClientCompanyId").text("Customer Name field is required");
+                    isValid = false;
+                }
+
+                if ($("#CurrencyCode").val() == "") {
+                    $("#errValid-CurrencyCode").text("Currency Code field is required");
+                    isValid = false;
+                }
+
+            }
+            else if (selectedText == "Retainer" || selectedText == 'Internal') {
+                if ($("#ProjectName").val() == "") {
+                    $("#errValid-ProjectName").text("Name field is required");
+                    isValid = false;
+                }
+
+                if ($("#ProjectTypeId").val() == "") {
+                    $("#errValid-ProjectTypeId").text("Project Type field is required");
+                    isValid = false;
+                }
+
+                if ($("#ProjectDescription").val() == "") {
+                    $("#errValid-ProjectDescription").text("Description field is required");
+                    isValid = false;
+                }
+
+                if ($("#Technology").val() == "") {
+                    $("#errValid-Technology").text("Technology field is required");
+                    isValid = false;
+                }
+
+                if ($("#ClientCompanyId").val() == "") {
+                    $("#errValid-ClientCompanyId").text("Customer Name field is required");
+                    isValid = false;
+                }
+
+                if ($("#Startdate").val() == "") {
+                    $("#errValid-Startdate").text("Start Date field is required");
+                    isValid = false;
+                }
+            }
+
+            if ($("#ProjectName").val() == "") {
+                $("#errValid-ProjectName").text("Name field is required");
+                isValid = false;
+            }
+
+            if ($("#ProjectTypeId").val() == "") {
+                $("#errValid-ProjectTypeId").text("Project Type field is required");
+                isValid = false;
+            }
+
+            if ($("#ProjectDescription").val() == "") {
+                $("#errValid-ProjectDescription").text("Description field is required");
+                isValid = false;
+            }
+
+            if ($("#Technology").val() == "") {
+                $("#errValid-Technology").text("Technology field is required");
+                isValid = false;
+            }
+
+            if ($("#ClientCompanyId").val() == "") {
+                $("#errValid-ClientCompanyId").text("Customer Name field is required");
+                isValid = false;
+            }
+
+            var empId = $("#EmpId").val();
+            var projectId = $("#ProjectId").val();
+            var projectName = $("#ProjectName").val();
+            var projectTypeId = $("#ProjectTypeId").val();
+            var technology = $("#Technology").val();
+            var projectDescription = $("#ProjectDescription").val();
+            var clientCompanyId = $("#ClientCompanyId").val();
+            var currency = $(".currency-selector option:selected").text().trim();
+            var symbol = $(".currency-symbol").text();
+            var projectCost = $("#ProjectCost").val();
+
+            if (selectedText == 'Fixed bid') {
+                var hours = $("#Hours").val();
+                var startdate = $("#Startdate").val();
+                var enddate = $("#Enddate").val();
+                var projectCost = $("#ProjectCost").val();
+                var currency = $(".currency-selector option:selected").text().trim();
+                var symbol = $(".currency-symbol").text();
+            }
+            else if (selectedText == "Retainer" || selectedText == 'Internal') {
+                var startdate = $("#Startdate").val();
+            }
+            else {
+                var hours = $("#Hours").val('');
+                var startdate = $("#Startdate").val('');
+                var enddate = $("#Enddate").val('');
+                var projectCost = $("#ProjectCost").val('');
+                var clientCompanyId = $("#ClientCompanyId").val();
+            }
+            formData.append("EmpId", empId);
+            formData.append("ProjectId", projectId);
+            formData.append("ProjectName", projectName);
+            formData.append("ProjectTypeId", projectTypeId);
+            formData.append("ProjectDescription", projectDescription);
+            formData.append("Technology", technology);
+            formData.append("Hours", hours);
+            formData.append("Startdate", startdate);
+            formData.append("Enddate", enddate);
+            formData.append("ProjectCost", projectCost);
+            formData.append("ClientCompanyId", clientCompanyId);
+
+            formData.append("CurrencyCode", currency)
+            formData.append("Symbol", symbol);
+
+            formData.append("StrStartdate", startdate);
+            formData.append("StrEnddate", enddate);
+            if (isValid) {
+                if (selectedText == 'Fixed bid') {
+                    var isValidDate = dateDifference(startdate, enddate);
+                    if (isValidDate) {
+                        var url = "/ProjectDetails/UpdateProject";
+
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: function (result) {
+                                $("#success_CreateProject_Popup").css('display', 'none !important');
+                                if (result > 0) {
+                                    swal.fire({
+                                        title: "Updated Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                        if (resultValue.isConfirmed > 0) {
+                                            window.location.href = "/ProjectDetails/Project";
+                                        };
+                                    });
+
+                                }
+                                else {
+                                    swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                        window.location.href = "/ProjectDetails/Project";
+                                    });
+
+                                }
+                            },
+                            complete: function () {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        $("#errVerify-Enddate").show();
+                        return false;
+                    }
+                }
+                else {
+                    var url = "/ProjectDetails/UpdateProject";
+
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: function (result) {
+                            $("#success_CreateProject_Popup").css('display', 'none !important');
+                            if (result > 0) {
+                                swal.fire({
+                                    title: "Updated Successfully",
+                                    text: "",
+                                    icon: "success",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    if (resultValue.isConfirmed > 0) {
+                                        window.location.href = "/ProjectDetails/Project";
+                                    };
+                                });
+
+                            }
+                            else {
+                                swal.fire({
+                                    title: "Something error",
+                                    text: "",
+                                    icon: "error",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    window.location.href = "/ProjectDetails/Project";
+                                });
+
+                            }
+                        },
+                        complete: function () {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                }
+
+            }
+            else {
+                return false;
+            }
+
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Date validation
+
+        function dateDifference(validFrom, validTo) {
+            var result = false;
+            var splitFrom = validFrom.split('/');
+            var monthF = parseInt(splitFrom[1]);
+            var dayF = parseInt(splitFrom[0]);
+            var yearF = parseInt(splitFrom[2]);
+            var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+            var splitTo = validTo.split('/');
+            var monthT = parseInt(splitTo[1]);
+            var dayT = parseInt(splitTo[0]);
+            var yearT = parseInt(splitTo[2]);
+            var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+            if (toDate >= fromDate) {
+                result = true;
+            }
+            return result;
+        }
+
+
+    </script>

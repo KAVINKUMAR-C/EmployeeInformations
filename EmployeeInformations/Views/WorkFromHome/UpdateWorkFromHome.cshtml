@@ -1,0 +1,545 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model EmployeeLeaveViewModel
+@{
+    ViewBag.Title = "UpdateWorkFromHome";
+    var empId = Context.Session.GetInt32("EmpId");
+}
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Work From Home</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+    <div class="card card-bordered card-preview">
+        <div class="card-inner leave-datatable">
+            <form>
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group emp-hol-yr">
+                            <label class="form-label">Type</label>
+                            @Html.HiddenFor(m => m.EmpId)
+                            @Html.HiddenFor(m => m.AppliedLeaveId)
+                            <div class="selectbox">
+                                @Html.DropDownListFor(m => m.AppliedLeaveTypeId,new SelectList(Model.LeaveType,"LeaveTypeId","LeaveType"),"--Select Type--",new{@class="form-control",@disabled="true"})
+                            </div>
+                            @Html.ValidationMessageFor(m => m.AppliedLeaveTypeId,"",new{@class="error text-danger", id="errValid-LeaveTypes"})
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">From Date<span class="required" style="color: #FF0000">*</span></label>
+                            <div id="updateleaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                <input type="text" class="form-control" id="updateleaveFromDate" value="@Model.LeaveFromDate.ToString(Constant.DateFormat)" placeholder="Enter From Date">
+                                <span class="input-group-addon">
+                                    <i class="icon ti-calendar"></i>
+                                </span>
+                            </div>
+                            <span class="error text-danger" id="errValid-LeaveFromDate"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6" id="updateleaveToDatedatepickerblock">
+                        <div class="form-group">
+                            <label class="form-label" id="leaveToLabel">To Date<span class="required" style="color: #FF0000">*</span></label>
+                            <div id="updateleaveToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                <input type="text" class="form-control" id="updateleaveToDate" value="@Model.LeaveToDate.ToString(Constant.DateFormat)" placeholder="Enter To Date">
+                                <span class="input-group-addon">
+                                    <i class="icon ti-calendar"></i>
+                                </span>
+                            </div>
+                            <span class="error text-danger" id="errValid-LeaveToDate"></span>
+                            <span id="errVerify-leaveToDate" style="display:none;" class="error text-danger"> Please select <b>Leave To Date</b> Should Not be Less than <b>Leave From Date!</b> </span>
+                            <span id="errVerify-leaveCountDate" style="display:none;" class="error text-danger"> <b>Your Not Eligible For Take Leave!</b> </span>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-label">Attachment</label>
+                            <div class="input-group custom-file-button">
+                                @*<label class="input-group-text form-label" for="inputGroupFile2">Upload</label>*@
+                                @Html.TextBoxFor(m => m.LeaveFilePath, "", new { type= "file",@class = "form-control",name="file"})
+                            </div>
+                            <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                            @if (Model.LeaveName != null)
+                            {
+                                @if (Model.splitLeaveName == "pdf")
+                                {
+                                    <div class="mt-1 docLeaveFile">
+                                        <img src="/images/Pdf-Icon.png" style="height: 40px;">
+                                        <span style="display:none;">@Model.LeaveName</span>
+                                    </div>
+                                }
+                                else if (Model.splitLeaveName == "doc" || Model.splitLeaveName == "docx")
+                                {
+                                    <div class="mt-1 docLeaveFile">
+                                        <img src="/images/Doc-Icon.png" style="height: 40px;">
+                                        <span style="display:none;">@Model.LeaveName</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mt-1 docLeaveFile">
+                                        <img src="/images/Image-Icon.png" style="height: 40px;">
+                                        <span style="display:none;">@Model.LeaveName</span>
+                                    </div>
+                                }
+                            }
+                            <span id="errValid-Image" style="display:none;" class="error text-danger"> Please upload the image in any of the following formats (.png, .jpeg, .jpg ,.doc ,.pdf) </span>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-label">Reason<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextArea("Reason" , null, new { cols = "5", rows = "5",@class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Reason,"",new{@class="error text-danger" , id="errValid-Reason"})
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnLeaveBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnUpdateLeave" value="Save" />
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_UpdateLeave_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Update successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateLeave">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $("#btnLeaveBack").click(function () {
+        var urlToRedirect = '@Url.Action("WorkFromHome","WorkFromHome")';
+        window.location.href = urlToRedirect;
+    });
+
+    $(".docLeaveFile").on('click', function () {
+        var imgName = $(this).text().trim();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/LeaveAttachments/' + imgName + '');
+    });
+
+    $(document).ready(function () {
+
+        $("#LeaveCountData_filter").hide();
+        $("#LeaveCountData_length").hide();
+        $("#LeaveCountData_paginate").hide();
+        $("#LeaveCountData_next").hide();
+        $("#LeaveCountData_info").hide();
+
+        $("#updateleaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+        $("#updateleaveToDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+
+        //$('#drp_FromTime').click(function(e) {
+        //    $('#fromTime').timepicker('open')
+        //    e.preventDefault();
+        //    $("#drp_FromTime").focus();
+        //    e.stopPropagation();
+        //});
+
+        //$('#drp_ToTime').click(function(e) {
+        //    $('#toTime').timepicker('open')
+        //    e.preventDefault();
+        //    $("#drp_ToTime").focus();
+        //    e.stopPropagation();
+        //});
+
+        $('#fromTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function (time) {
+                $("#errValid-StartTime").text("");
+                if ($("#fromTime").val() == "") {
+                    $("#errValid-StartTime").text("From Time field is required");
+                }
+            }
+        });
+
+        $('#toTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function (time) {
+                $("#errValid-EndTime").text("");
+                if ($("#toTime").val() == "") {
+                    $("#errValid-EndTime").text("To Time field is required");
+                    $("#errVerify-leaveToTime").hide();
+                }
+            }
+        });
+
+        if ($("#AppliedLeaveTypeId").val() == 5) {
+            $('#hidden_fromTime').css('display', 'block');
+            $('#hidden_toTime').css('display', 'block');
+        }
+        else {
+            $('#hidden_fromTime').css('display', 'none');
+            $('#hidden_toTime').css('display', 'none');
+        }
+
+        //Change Summary
+
+        $("#updateleaveFromDate").change(function () {
+
+            $("#errValid-LeaveFromDate").text("");
+            if ($("#updateleaveFromDate").val() == "") {
+                $("#errValid-LeaveFromDate").text("From Date field is required");
+            }
+            else {
+                $("#errValid-LeaveFromDate").text("");
+            }
+        });
+
+        //$("#fromTime").val('');
+        //$("#toTime").val('');
+        //$("#leaveFromDate").val('');
+        //$("#leaveToDate").val('');
+
+        $("#updateleaveToDate").change(function () {
+
+            $("#errValid-LeaveToDate").text("");
+            if ($("#updateleaveToDate").val() == "") {
+                $("#errValid-LeaveToDate").text("To Date field is required");
+                $("#errVerify-leaveToDate").hide();
+                $("#errVerify-leaveCountDate").hide();
+            }
+            else {
+                $("#errValid-LeaveToDate").text("");
+            }
+        });
+
+    });
+
+    // Keyup Summary
+
+    $("#AppliedLeaveTypeId").change(function () {
+        $("#errValid-LeaveTypes").text("");
+        if ($("#AppliedLeaveTypeId :selected").val() == "") {
+            $("#errValid-LeaveTypes").text("Type field is required");
+        }
+    });
+
+    $("#Reason").keyup(function () {
+        $("#errValid-Reason").text("");
+        if ($("#Reason").val() == "") {
+            $("#errValid-Reason").text("Reason field is required");
+        }
+    });
+
+    $('#btnUpdateLeave').click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-LeaveTypes").text("");
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+        $("#errValid-Reason").text("");
+        $("#errVerify-leaveToDate").hide();
+        $("#errValid-Enddate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errVerify-leaveCountDate").hide();
+        $("#errValid-ErrorFileSize").text('');
+        if ($("#AppliedLeaveTypeId").val() == 5) {
+            if ($("#AppliedLeaveTypeId").val() == "") {
+                $("#errValid-LeaveTypes").text("Type field is required");
+                isValid = false;
+            }
+
+            if ($("#updateleaveFromDate").val() == "") {
+                $("#errValid-LeaveFromDate").text("From Date field is required");
+                isValid = false;
+            }
+
+            //if ($("#leaveToDate").val() == "") {
+            //    $("#errValid-LeaveToDate").text("LeaveToDate field is required");
+            //    isValid = false;
+            //}
+
+            if ($("#Reason").val() == "") {
+                $("#errValid-Reason").text("Reason field is required");
+                isValid = false;
+            }
+
+            if ($("#fromTime").val() == "") {
+                $("#errValid-StartTime").text("Start Time field is required");
+                isValid = false;
+            }
+
+            if ($("#toTime").val() == "") {
+                $("#errValid-EndTime").text("End Time field is required");
+                isValid = false;
+            }
+
+        }
+        else {
+            if ($("#AppliedLeaveTypeId").val() == "") {
+                $("#errValid-LeaveTypes").text("Type field is required");
+                isValid = false;
+            }
+
+            if ($("#updateleaveFromDate").val() == "") {
+                $("#errValid-LeaveFromDate").text("From Date field is required");
+                isValid = false;
+            }
+
+            if ($("#updateleaveToDate").val() == "") {
+                $("#errValid-LeaveToDate").text("To Date field is required");
+                isValid = false;
+            }
+
+            if ($("#Reason").val() == "") {
+                $("#errValid-Reason").text("Reason field is required");
+                isValid = false;
+            }
+
+        }
+
+        //var leaveFilePath = $("#LeaveFilePath").val();
+        //if (leaveFilePath != "") {
+        //    var ext = leaveFilePath.split('.').pop();
+        //    if (ext == "jpeg" || ext == "png" || ext == "jpg" || ext == "pdf" || ext == "doc") {
+
+        //    } else {
+        //        $("#errValid-Image").show();
+        //        isValid = false;
+        //    }
+        //}
+
+        var attachmentLength = $('#LeaveFilePath').prop("files").length;
+        if (attachmentLength > 0) {
+            if ($('#LeaveFilePath').prop("files")[0].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                $(".docLeaveFile").hide();
+                return false;
+            }
+            else {
+                formData.append("file", $('#LeaveFilePath').prop("files")[0]);
+            }
+        }
+        var aplliedLeaveId = $("#AppliedLeaveId").val();
+        var empId = $("#EmpId").val();
+        var appliedLeaveTypeId = $("#AppliedLeaveTypeId").val();
+        var leaveFromDate = $("#updateleaveFromDate").val();
+        var leaveToDate = $("#updateleaveToDate").val();
+        var reason = $("#Reason").val();
+        var start = $('#updateleaveFromDate').val();
+        var end = $('#updateleaveToDate').val();
+        var dateSplit1 = start.split('/');
+        var date1 = new Date(dateSplit1[2] + "," + dateSplit1[1] + "," + dateSplit1[0]);
+        var dateSplit2 = end.split('/');
+        var date2 = new Date(dateSplit2[2] + "," + dateSplit2[1] + "," + dateSplit2[0]);
+        var diffTime = Math.abs(date2 - date1);
+        var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        var leaveDate = (diffDays + 1)
+
+
+        formData.append("AppliedLeaveId", aplliedLeaveId);
+        formData.append("EmpId", empId);
+        formData.append("AppliedLeaveTypeId", appliedLeaveTypeId);
+        formData.append("LeaveFromDate", leaveFromDate);
+        formData.append("LeaveToDate", leaveToDate);
+        formData.append("Reason", reason);
+        formData.append("StrLeaveFromDate", leaveFromDate);
+        formData.append("StrLeaveToDate", leaveToDate);
+
+        if (isValid) {
+            if (appliedLeaveTypeId == 5) {
+                var isTimeValid = getTimeValid(leaveFromDate, fromTime, toTime);
+                if (isTimeValid) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/WorkFromHome/UpdateWorkFromHome",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: (Result) => {
+
+                            if (Result != null) {
+                                //  $("#success_UpdateLeave_Popup").show();
+                                $("#success_UpdateLeave_Popup").hide();
+                            }
+
+                            // $("#btnCloseUpdateLeave").css('display', 'none !important');
+                            swal.fire({
+                                title: "Update successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("WorkFromHome", "WorkFromHome")';
+                                    window.location.href = urlToRedirect;
+                                };
+                            });
+                            
+                            $('.loader').addClass('d-none');
+                        },
+                        error: (Result) => {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-leaveToTime").show();
+                    return false;
+                }
+
+            }
+            else {
+                var isValidDate = dateDifference(leaveFromDate, leaveToDate);
+                if (isValidDate) {                   
+                    if (appliedLeaveTypeId == 7 || appliedLeaveTypeId == 6 || appliedLeaveTypeId == 1 && leaveDate <= casualLeaveRemaining || appliedLeaveTypeId == 2 && leaveDate <= sickLeaveRemaining || appliedLeaveTypeId == 3 && leaveDate <= earnedLeaveRemaining || appliedLeaveTypeId == 4 && leaveDate <= maternityLeaveRemaining || appliedLeaveTypeId == 7) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/WorkFromHome/UpdateWorkFromHome",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: (Result) => {
+                                if (Result = true) {
+                                    // $("#success_UpdateLeave_Popup").show();
+                                    $("#success_UpdateLeave_Popup").hide();
+                                }
+
+                                // $("#btnCloseUpdateLeave").css('display', 'none !important');
+                                swal.fire({
+                                    title: "Update successfully",
+                                    text: "",
+                                    icon: "success",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    if (resultValue.isConfirmed) {
+                                        var urlToRedirect = '@Url.Action("WorkFromHome", "WorkFromHome")';
+                                        window.location.href = urlToRedirect;
+                                    };
+                                });
+                               
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        $('.loader').addClass('d-none');
+                        $("#errVerify-leaveCountDate").show();
+                        return false;
+                    }
+
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-leaveToDate").show();
+                    return false;
+                }
+            }
+
+        }
+        else {
+            return false;
+        }
+
+    });
+
+    $("#AppliedLeaveTypeId").change(function () {
+        var selectedText = $(this).find("option:selected").text();
+        var selectedValue = $(this).val();
+        if (selectedText == 'Permission') {
+            $("#updateleaveToDatedatepickerblock").hide();
+            $("#updateleaveToDatedatepicker").hide();
+
+            $("#leaveToLabel").hide();
+            $('#hidden_fromTime').css('display', 'block');
+            $('#hidden_toTime').css('display', 'block');
+            $("#updateleaveToDate").val('');
+            $("#updateleaveToDate").hide();
+        }
+        else {
+            $("#updateleaveToDatedatepickerblock").show();
+            $("#updateleaveToDatedatepicker").show();
+            $("#leaveToLabel").show();
+            $("#updateleaveToDate").show();
+            $('#hidden_fromTime').css('display', 'none');
+            $('#hidden_toTime').css('display', 'none');
+        }
+    });
+
+    function getTimeValid(leaveFromDate, fromTime, toTime) {
+        var result = false;
+        var splitDate = leaveFromDate.split('/');
+        var formatDate = splitDate[2] + "/" + splitDate[1] + "/" + splitDate[0];
+        var fromDateTime = new Date(formatDate + ' ' + fromTime);
+        var toDateTime = new Date(formatDate + ' ' + toTime);
+        if (fromDateTime < toDateTime) {
+            result = true;
+        }
+        return result;
+    }
+
+    function dateDifference(leaveFromDate, leaveToDate) {
+        var result = false;
+        var splitFrom = leaveFromDate.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = leaveToDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+</script>

@@ -1,0 +1,1609 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Common.Enums
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Model.DashboardViewModel;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model DashboardViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+    var empId = Context.Session.GetInt32("EmpId");
+    var companyId = Context.Session.GetInt32("CompanyId");
+    Layout = "_Layout";
+
+    var RolePrivileges = new List<int>();
+
+    if (roleId >= 0)
+    {
+        var id = roleId.Value;
+        RolePrivileges = await employeeInformationService.DashboardRolePermissionByRoleId(id);
+    }
+}
+
+<div class="nk-content-body">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Dashboard</h3>
+            </div><!-- .nk-block-head-content -->
+            @*<div class="nk-block-head-content">
+            <div class="toggle-wrap nk-block-tools-toggle">
+            <a href="#" class="btn btn-icon btn-trigger toggle-expand me-n1" data-target="pageMenu"><em class="icon ni ni-more-v"></em></a>
+            <div class="toggle-expand-content" data-content="pageMenu">
+            <ul class="nk-block-tools g-3">
+            <li>
+            <div class="drodown">
+            <a href="#" class="dropdown-toggle btn btn-white btn-dim btn-outline-light" data-bs-toggle="dropdown"><em class="d-none d-sm-inline icon ni ni-calender-date"></em><span><span class="d-none d-md-inline">Last</span> 30 Days</span><em class="dd-indc icon ni ni-chevron-right"></em></a>
+            <div class="dropdown-menu dropdown-menu-end">
+            <ul class="link-list-opt no-bdr">
+            <li><a href="#"><span>Last 30 Days</span></a></li>
+            <li><a href="#"><span>Last 6 Months</span></a></li>
+            <li><a href="#"><span>Last 1 Years</span></a></li>
+            </ul>
+            </div>
+            </div>
+            </li>
+            <li class="nk-block-tools-opt"><a href="#" class="btn btn-primary"><em class="icon ni ni-reports"></em><span>Reports</span></a></li>
+            </ul>
+            </div>
+            </div>
+            </div><!-- .nk-block-head-content -->*@
+        </div><!-- .nk-block-between -->
+    </div><!-- .nk-block-head -->
+    <div class="nk-block">
+        <div class="row g-gs">
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.TotalEmployee))
+            {
+                <div class="col-xxl-3 col-md-4 col-sm-6">
+                    <div class="card">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner pb-0">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Total Employees</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount fw-normal">@Model.TotalEmployeeView.TotalEmployeeCount</div>
+                                        <div class="info text-end"><span class="change up text-danger" style="color:#816bff !important;"><em class="icon ni ni-arrow-long-up"></em>@Model.TotalEmployeeView.TotalEmployeeCountPercentage </span><br><span>Active Employees</span></div>
+                                        <input type="hidden" id="strEmpMonthCount" value="@Model.TotalEmployeeView.Months" />
+                                    </div>
+
+                                </div>
+                            </div><!-- .card-inner -->
+                            <div class="nk-ecwg3-ck">
+                                @*  <canvas class="ecommerce-line-chart-s3" id="todayOrders"></canvas>*@
+                                <canvas class="courseSells chartjs-render-monitor" id="todayOrders" width="368" height="66" style="display: block; width: 368px; height: 66px;"></canvas>
+                            </div>
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->                
+            }
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.TotalProjects))
+            {
+                <div class="col-xxl-3 col-md-4 col-sm-6">
+                    <div class="card">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner pb-0">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Total Projects</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount fw-normal">@Model.TotalProjectView.TotalProjectCount</div>
+                                        <div class="info text-end"><span class="change up text-danger" style="color:#33d895 !important;"><em class="icon ni ni-arrow-long-up"></em>@Model.TotalProjectView.TotalProjectCountPercentage</span><br><span>Active Projects</span></div>
+                                        <input type="hidden" id="strProjectMonthCount" value="@Model.TotalProjectView.ProjectMonths" />
+                                    </div>
+
+                                </div>
+                            </div><!-- .card-inner -->
+                            <div class="nk-ecwg3-ck">
+                                @*  <canvas class="ecommerce-line-chart-s3" id="todayOrders"></canvas>*@
+                                <canvas class="courseSells chartjs-render-monitor" id="todayRevenue" width="368" height="66" style="display: block; width: 368px; height: 66px;"></canvas>
+                            </div>
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+               
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.TotalClients))
+            {
+                <div class="col-xxl-3 col-md-4 col-sm-6">
+                    <div class="card">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner pb-0">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Total Clients</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount fw-normal">@Model.TotalClientView.TotalClientCount</div>
+                                        <div class="info text-end"><span class="change up text-danger" style="color:#ff63a5 !important;"><em class="icon ni ni-arrow-long-up"></em>@Model.TotalClientView.TotalClientCountPercentage</span><br><span>Active Clients</span></div>
+                                        <input type="hidden" id="strClientMonthCount" value="@Model.TotalClientView.ClientMonths" />
+                                    </div>
+
+                                </div>
+                            </div><!-- .card-inner -->
+                            <div class="nk-ecwg3-ck">
+                                @*  <canvas class="ecommerce-line-chart-s3" id="todayOrders"></canvas>*@
+                                <canvas class="courseSells chartjs-render-monitor" id="todayCustomers" width="368" height="66" style="display: block; width: 368px; height: 66px;"></canvas>
+                            </div>
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+                <!-- .col -->
+               
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.RemainingLeave))
+            {
+                <div class="col-xxl-3 col-sm-6">
+                    <div class="card h-100">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Remaining Leave</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount">@Model.EmployeeLeaveCount.RemaingLeave</div>
+                                    </div>
+                                </div>
+                            </div><!-- .card-inner -->
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.TodayPresentEmployees))
+            {
+                <div class="col-xxl-3 col-sm-6">
+                    <div class="card h-100">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Today Present Employees</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount">@Model.TotalEmployeeLeaveView.TodayPresentEmployeeCount / @Model.TotalEmployeeLeaveView.TotalEmployeeCount</div>
+                                        @* <div class="nk-ecwg6-ck">
+                                    <canvas class="ecommerce-line-chart-s3" id="todayCustomers"></canvas>
+                                    </div>
+                                    <input type="hidden" id="strClientMonthCount" value="@Model.TotalClientView.ClientMonths" />*@
+                                    </div>
+                                    @* <div class="info"><span class="text-danger" style="color:#ff63a5!important;"><em class="icon ni ni-arrow-long-up"></em>@Model.TotalClientView.TotalClientCountPercentage</span><span> %vs. last month</span></div>*@
+                                </div>
+                            </div><!-- .card-inner -->
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.WorkingHours))
+            {
+                <div class="col-xxl-3 col-sm-6">
+                    <div class="card h-100">
+                        <div class="nk-ecwg nk-ecwg6">
+                            <div class="card-inner">
+                                <div class="card-title-group">
+                                    <div class="card-title">
+                                        <h6 class="title">Working Hours (Weekly)</h6>
+                                    </div>
+                                </div>
+                                <div class="data">
+                                    <div class="data-group">
+                                        <div class="amount">@Model.EmployeeWorkingHoursView.TotalHours / @Model.EmployeeWorkingHoursView.TotalDayHours Hrs</div>
+                                        @* <div class="nk-ecwg6-ck">
+                                    <canvas class="ecommerce-line-chart-s3" id="todayCustomers"></canvas>
+                                    </div>
+                                    <input type="hidden" id="strClientMonthCount" value="@Model.TotalClientView.ClientMonths" />*@
+                                    </div>
+                                    @* <div class="info"><span class="text-danger" style="color:#ff63a5!important;"><em class="icon ni ni-arrow-long-up"></em>@Model.TotalClientView.TotalClientCountPercentage</span><span> %vs. last month</span></div>*@
+                                </div>
+                            </div><!-- .card-inner -->
+                        </div><!-- .nk-ecwg -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.TodayLockTime))
+            {
+                @if (@Model.TimeLogViewModel.TodayClockIn == true)
+                {
+                    <div class="col-xxl-3 col-sm-6">
+                        <div class="card h-100">
+                            <div class="nk-ecwg nk-ecwg6">
+                                <div class="card-inner">
+                                    <div class="card-title-group">
+                                        <div class="card-title">
+                                            <h6 class="title">Today Lock Time</h6>
+                                        </div>
+                                    </div>
+                                    <div class="progress progress-md mt-4">
+                                        <div class="progress-bar" data-progress="@Model.TimeLogViewModel.TimeClockPercentage" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex mt-3">
+
+                                        <div class="mr-auto">
+                                            <span>@DateTime.Now.ToString("dddd, MMMM dd yyyy")</span>
+                                            <span class="font-weight-bold" id="txt-Ongoing-time">@Model.TimeLogViewModel.TimeOngoingTime hrs</span>
+                                        </div>
+
+                                        <div>
+                                            @if (Model.TimeLogViewModel.EntryStatus == "in")
+                                        {
+                                            <input type="button" class="btn btn-danger ml-auto" id="txtLockClock" value="Clock Out" />
+                                        }
+                                        else if (Model.TimeLogViewModel.EntryStatus == "out")
+                                        {
+                                            <input type="button" class="btn btn-success ml-auto" id="txtLockClock" value="Clock In" />
+                                        }
+                                        else
+                                        {
+                                            <input type="button" class="btn btn-success ml-auto" id="txtLockClock" value="Clock In" />
+                                        }
+                                    </div>
+                                </div>
+                            </div><!-- .card-inner -->
+                        </div>
+                    </div><!-- .card -->
+                </div>
+              }
+            }
+</div>
+
+
+ <div class="row g-gs mt-1">
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.Employee))
+            {
+                <div class="col-xxl-6">
+                    <div class="card card-full">
+                        <div class="nk-ecwg nk-ecwg8 h-100">
+                            <div class="card-inner">
+                                <div class="card-title-group mb-3">
+                                    <div class="card-title">
+                                        <h6 class="title">Employees</h6>
+                                    </div>
+                                    <div class="card-tools">
+                                        @*<div class="dropdown">
+                                    <a href="#" class="dropdown-toggle link link-light link-sm dropdown-indicator" data-bs-toggle="dropdown">Weekly</a>
+                                    <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
+                                    <ul class="link-list-opt no-bdr">
+                                    <li><a href="#"><span>Daily</span></a></li>
+                                    <li><a href="#" class="active"><span>Weekly</span></a></li>
+                                    <li><a href="#"><span>Monthly</span></a></li>
+                                    </ul>
+                                    </div>
+                                    </div>*@
+                                    </div>
+                                </div>
+                                <ul class="nk-ecwg8-legends">
+                                    <li>
+                                        <div class="title">
+                                            <span class="dot dot-lg sq" data-bg="#1a76d1"></span>
+                                            <span>Present Employees</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="title">
+                                            <span class="dot dot-lg sq" data-bg="#fb559b"></span>
+                                            <span>Absent  Employees</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="nk-ecwg8-ck">
+                                    <canvas class="ecommerce-line-chart-s4" id="salesStatistics"></canvas>
+                                    <input type="hidden" id="strLeaveDayCount" value="@Model.TotalEmployeeLeaveView.Months" />
+                                    <input type="hidden" id="strTotalEmployeePresentCount" value="@Model.TotalEmployeeLeaveView.TotalEmployeePresentCount" />
+                                    <input type="hidden" id="strTotalEmployeeAbsentCount" value="@Model.TotalEmployeeLeaveView.TotalEmployeeAbsentCount" />
+                                </div>
+                                <div class="chart-label-group ps-5">
+                                    <div class="chart-label">@Model.TotalEmployeeLeaveView.StartDate.ToString(Constant.DateFormatMonthHyphen)</div>
+                                    <div class="chart-label">@Model.TotalEmployeeLeaveView.EndDate.ToString(Constant.DateFormatMonthHyphen)</div>
+                                </div>
+                            </div><!-- .card-inner -->
+                        </div>
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.Project) && Model.TopFiveProjectsView.ProjectLists.Count() > 0)
+            {
+                <div class="col-xxl-3 col-md-6">
+                    <div class="card card-full overflow-hidden">
+                        <div class="nk-ecwg nk-ecwg7 h-100">
+                            <div class="card-inner flex-grow-1">
+                                <div class="card-title-group mb-4">
+                                    <div class="card-title">
+                                        <h6 class="title">Project</h6>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="topFiveProject" value="@Model.TopFiveProjectsView.StringProjectName" />
+                                <div class="nk-ecwg7-ck">
+                                    <canvas class="ecommerce-doughnut-s1" id="orderStatistics"></canvas>
+                                </div>
+                                <ul class="nk-ecwg7-legends">
+                                    @foreach (var pct in Model.TopFiveProjectsView.ProjectLists)
+                                    {
+                                        <li>
+                                            <div class="title">
+                                                <span class="dot dot-lg sq" data-bg=@pct.ProjectColor></span>
+                                                <span>@pct.ProjectName </span>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div><!-- .card-inner -->
+                        </div>
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.Department) && Model.TopFiveDepartmentsView.DepartmentLists.Count() > 0)
+            {
+                <div class="col-xxl-3 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Departments</h6>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @foreach (var department in Model.TopFiveDepartmentsView.DepartmentLists)
+                                {
+                                    <li class="user-card">
+                                        <div class="nk-tb-col">
+                                            <div class="user-card">
+                                                <div class="user-avatar sq bg-@(@department.DepartmentColor)">
+                                                    @if (@department.DepartmentName != "")
+                                                    {
+                                                        <span style="text-transform:uppercase;"> @department.DepartmentName?.Substring(0,1)</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span style="text-transform:uppercase;"></span>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="title font-weight-bold">@department.DepartmentName</div>
+                                        </div>
+                                        <div class="total">
+                                            <div class="text-purple font-weight-bold">@department.DepartmentCount</div>
+                                            @*<div class="price">$99.00</div>*@
+                                        </div>
+                                    </li>
+                                }
+                                @*<li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/a.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Pink Fitness Tracker</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/b.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Purple Smartwatch</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/c.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Black Smartwatch</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/d.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Black Headphones</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/e.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">iPhone 7 Headphones</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>*@
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.RecentJoiners))
+            {
+                <div class="col-xxl-8">
+                    <div class="card card-full">
+                        <div class="card-inner">
+                            <div class="card-title-group">
+                                <div class="card-title">
+                                    <h6 class="title">Recent Joiners</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <div class="nk-tb-list mt-n2">
+                                <div class="nk-tb-item nk-tb-head">
+                                    <div class="nk-tb-col tb-col"><span>Employee Name</span></div>
+                                    <div class="nk-tb-col"><span>Date Of Joining</span></div>
+                                    <div class="nk-tb-col"><span>Department</span></div>
+                                    <div class="nk-tb-col"><span class="d-none d-sm-inline">Designation</span></div>
+                                </div>
+
+                                @foreach (var employee in Model.EmployeesList)
+                                {
+                                    <div class="nk-tb-item">
+
+                                        <div class="nk-tb-col tb-col">
+                                            <div class="user-card">
+                                                <div class="user-card">
+                                                    @if (employee.EmployeeProfileImage == "")
+                                                    {
+                                                        <div class="user-avatar @(employee.ClassName)">
+                                                            <span style="text-transform:uppercase"> @employee.EmployeeSortName</span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="user-avatar bg-light">
+                                                            <img src="./ProfileImages/@employee.EmployeeProfileImage" alt="">
+                                                        </div>
+                                                    }
+
+                                                    <div class="user-info">
+                                                        <span class="tb-lead font-weight-bold">@employee.FirstName  @employee.LastName</span>
+                                                        <span>@employee.OfficeEmail</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <span class="tb-sub">
+                                                @(
+                                                    (employee.JoingDate == DateTime.MinValue) ? "" : employee.JoingDate?.ToString(Constant.DateFormat)
+                                                    )
+                                            </span>
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <span class="tb-sub tb-amount">@employee.DepartmentName</span>
+                                        </div>
+                                        <div class="nk-tb-col">
+                                            <span class="badge badge-dot badge-dot-xs bg-success">@employee.DesignationName</span>
+                                        </div>
+                                    </div>
+
+                                }
+
+                                @* <div class="nk-tb-item">
+                            <div class="nk-tb-col">
+                            <span class="tb-lead"><a href="#">#95850</a></span>
+                            </div>
+                            <div class="nk-tb-col tb-col-sm">
+                            <div class="user-card">
+                            <div class="user-avatar sm bg-azure-dim">
+                            <span>DE</span>
+                            </div>
+                            <div class="user-name">
+                            <span class="tb-lead">Desiree Edwards</span>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <span class="tb-sub">02/02/2020</span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="tb-sub tb-amount">596.75 <span>USD</span></span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="badge badge-dot badge-dot-xs bg-danger">Cancelled</span>
+                            </div>
+                            </div>
+                            <div class="nk-tb-item">
+                            <div class="nk-tb-col">
+                            <span class="tb-lead"><a href="#">#95812</a></span>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <div class="user-card">
+                            <div class="user-avatar sm bg-warning-dim">
+                            <img src="./images/avatar/b-sm.jpg" alt="">
+                            </div>
+                            <div class="user-name">
+                            <span class="tb-lead">Blanca Schultz</span>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <span class="tb-sub">02/01/2020</span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="tb-sub tb-amount">199.99 <span>USD</span></span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="badge badge-dot badge-dot-xs bg-success">Paid</span>
+                            </div>
+                            </div>
+                            <div class="nk-tb-item">
+                            <div class="nk-tb-col">
+                            <span class="tb-lead"><a href="#">#95256</a></span>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <div class="user-card">
+                            <div class="user-avatar sm bg-purple-dim">
+                            <span>NL</span>
+                            </div>
+                            <div class="user-name">
+                            <span class="tb-lead">Naomi Lawrence</span>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <span class="tb-sub">01/29/2020</span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="tb-sub tb-amount">1099.99 <span>USD</span></span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="badge badge-dot badge-dot-xs bg-success">Paid</span>
+                            </div>
+                            </div>
+                            <div class="nk-tb-item">
+                            <div class="nk-tb-col">
+                            <span class="tb-lead"><a href="#">#95135</a></span>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <div class="user-card">
+                            <div class="user-avatar sm bg-success-dim">
+                            <span>CH</span>
+                            </div>
+                            <div class="user-name">
+                            <span class="tb-lead">Cassandra Hogan</span>
+                            </div>
+                            </div>
+                            </div>
+                            <div class="nk-tb-col tb-col">
+                            <span class="tb-sub">01/29/2020</span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="tb-sub tb-amount">1099.99 <span>USD</span></span>
+                            </div>
+                            <div class="nk-tb-col">
+                            <span class="badge badge-dot badge-dot-xs bg-warning">Due</span>
+                            </div>
+                            </div>*@
+                            </div>
+                        </div>
+
+                    </div><!-- .card -->
+                </div>
+            }
+
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.UpcomingHolidays) && Model.LeaveLists.Count() > 0)
+            {
+                int holidaycount = 1;
+                <div class="col-xxl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Upcoming Holidays</h6>
+                                </div>
+                                <div class="card-tools">
+                                    @* <div class="dropdown">
+                                <a href="#" class="dropdown-toggle link link-light link-sm dropdown-indicator" data-bs-toggle="dropdown">yearly</a>
+                                <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
+                                <ul class="link-list-opt no-bdr">
+                                <li><a href="#"><span>Daily</span></a></li>
+                                <li><a href="#" class="active"><span>Weekly</span></a></li>
+                                <li><a href="#"><span>Monthly</span></a></li>
+                                </ul>
+                                </div>
+                                </div>*@
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @foreach (var Leave in Model.LeaveLists)
+                                {
+                                    <li class="user-card">
+                                        <div class="nk-tb-col">
+                                            <div class="user-card">
+                                                <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(holidaycount))">
+                                                    <span style="text-transform:uppercase;"> @Leave.Title?.Substring(0,1)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="title font-weight-bold">@Leave.Title</div>
+                                            <div class="count">@Leave.LeaveDay</div>
+                                        </div>
+                                        <div class="total">
+                                            <div class="text-purple font-weight-bold">@Leave.LeaveDate.ToString(Constant.DateFormat)</div>
+                                            @*<div class="price">$99.00</div>*@
+                                        </div>
+                                    </li>
+                                    holidaycount++;
+                                }
+                                @*<li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/a.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Pink Fitness Tracker</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/b.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Purple Smartwatch</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/c.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Black Smartwatch</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/d.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">Black Headphones</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>
+                            <li class="item">
+                            <div class="thumb">
+                            <img src="./images/product/e.png" alt="">
+                            </div>
+                            <div class="info">
+                            <div class="title">iPhone 7 Headphones</div>
+                            <div class="price">$99.00</div>
+                            </div>
+                            <div class="total">
+                            <div class="amount">$990.00</div>
+                            <div class="count">10 Sold</div>
+                            </div>
+                            </li>*@
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.UpcomingCelebration) && Model.Celebrations.Count() > 0)
+            {
+                int celebrationcount = 1;
+                <div class="col-xxl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Upcoming Celebrations</h6>
+                                </div>
+                                <div class="card-tools">
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @foreach (var value in Model.Celebrations)
+                                {
+                                    <li class="user-card">
+                                        <div class="nk-tb-col">
+                                            <div class="user-card">
+                                                <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(celebrationcount))">
+                                                    <span style="text-transform:uppercase;"> @value.EmployeeName.Trim()?.Substring(0,1)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="info">
+                                            <div class="title font-weight-bold">
+                                                @(
+                                                    value.EmployeeName
+                                                    )
+                                            </div>
+                                            <div class="count">
+                                                @(
+                                                    value.CelebrationName
+                                                    )
+                                            </div>
+
+                                        </div>
+                                        <div class="total">
+                                            <div class="text-purple font-weight-bold">
+                                                @(
+                                                    value.CelebrationDate
+                                                    )
+                                            </div>
+
+                                        </div>
+                                    </li>
+                                    celebrationcount++;
+                                }
+
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }           
+          
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.LeaveApproved) && Model.TopFiveLeaveViews.Where(x => x.LeaveApproved == 1).Count() > 0)
+            {
+                int leavecount = 1;
+                <div class="col-xxl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner leave-card">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Leave Approved</h6>
+                                </div>
+                                <div class="card-tools">
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @{
+                                    var approvedList = Model.TopFiveLeaveViews.Where(x => x.LeaveApproved == 1).ToList();
+                                    int approveCount = 1;
+                                }
+
+                                @foreach (var value in approvedList)
+                                {
+                                    @if (approveCount < 6)
+                                    {
+                                        <li class="user-card">
+                                            @if (value.LeaveApproved == 1)
+                                            {
+                                                <div class="nk-tb-col">
+                                                    <div class="user-card">
+                                                        <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(leavecount))">
+                                                            <span style="text-transform:uppercase;"> @value.EmployeeName?.Substring(0,1)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info">
+                                                    <div class="title font-weight-bold">
+                                                        @(value.EmployeeName)
+                                                    </div>
+                                                    <div class="count">
+                                                        @(value.LeaveType)
+                                                    </div>
+                                                </div>
+                                                <div class="info mb-4 ml-2">
+                                                    <td class="nk-tb-col tb-col">
+                                                        <b class="badge badge-dim bg-primary">Approved</b>
+                                                    </td>
+                                                </div>
+                                                <div class="total">
+                                                    <div class="text-purple font-weight-bold">@value.LeaveDate.ToString(Constant.DateFormat)</div>
+                                                </div>
+                                            }
+                                        </li>
+                                        leavecount++;
+                                    }
+                                    approveCount++;
+                                }
+
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.LeavePending) && Model.TopFiveLeaveViews.Where(x => x.LeaveApproved == 0).Count() > 0)
+            {
+                <div class="col-xxl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner leave-card">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Leave Pending</h6>
+                                </div>
+                                <div class="card-tools">
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @{
+                                    var pendingList = Model.TopFiveLeaveViews.Where(x => x.LeaveApproved == 0).ToList();
+                                    int pendingCount = 1;
+                                    int leavepenCount = 1;
+                                }
+                                @foreach (var value in pendingList)
+                                {
+                                    @if (pendingCount < 5)
+                                    {
+                                        <li class="user-card">
+                                            @*<div class="info mb-4 ml-1">*@
+                                            @if (value.LeaveApproved == 0)
+                                            {
+                                                <div class="nk-tb-col">
+                                                    <div class="user-card">
+                                                        <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(leavepenCount))">
+                                                            <span style="text-transform:uppercase;"> @value.EmployeeName?.Substring(0,1)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="info">
+                                                    <div class="title font-weight-bold">
+                                                        @value.EmployeeName
+                                                    </div>
+                                                    <div class="count">
+                                                        @value.LeaveType
+                                                    </div>
+                                                </div>
+                                                <div class="info mb-4 ml-2">
+                                                    <td class="nk-tb-col tb-col">
+                                                        <b class="badge badge-dim bg-warning">Pending</b>
+                                                    </td>
+                                                </div>
+                                                <div class="total">
+                                                    <div class="text-purple font-weight-bold">@value.LeaveDate.ToString(Constant.DateFormat)</div>
+                                                </div>
+                                            }
+                                            @* </div>*@
+
+                                        </li>
+                                        leavepenCount++;
+                                    }
+                                    @if (pendingCount == 5)
+                                    {
+                                        <div class="load-more text-center pt-4">
+                                            <a href="/LeaveSummary/LeaveApprovedEmployees" class="nk-menu-link" style="background-color:lavender;padding: 5px 12px;"><span class="nk-menu-text">Load more</span></a>
+                                        </div>
+                                    }
+                                    pendingCount++;
+                                }
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }          
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.AnnouncementDetails) && Model.Announcements.Count() > 0)
+            {
+                int announcecount = 1;
+                <div class="col-xxl-4 col-lg-6" id="getData">
+                    <div class="card h-100">
+                        <div class="card-inner">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Announcement Details</h6>
+                                </div>
+                                <div class="card-tools">
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+                                @foreach (var value in Model.Announcements)
+                                {
+                                    <li class="user-card">
+                                        <div class="nk-tb-col">
+                                            <div class="user-card">
+                                                <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(announcecount))">
+                                                    <span style="text-transform:uppercase;"> @value.AnnouncementName?.Substring(0,1)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="info ViewAnnouncement" data-id="@value.AnnuncementId">
+                                            <div class="title font-weight-bold"> @value.AnnouncementName</div>
+                                            <div class="count">@value.Description</div>
+                                        </div>
+                                        <div class="total">
+                                            <div class="text-purple font-weight-bold">@value.AnnouncementDate</div>
+                                        </div>
+                                    </li>
+                                    announcecount++;
+                                }
+
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+
+            @if (RolePrivileges.Contains((int)EmployeeDashboardPages.LeaveWorkFromHome) && Model.TopFiveLeaveViews.Count() > 0)
+            {
+                int wfhcount = 1;
+                <div class="col-xxl-4 col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-inner leave-card">
+                            <div class="card-title-group mb-2">
+                                <div class="card-title">
+                                    <h6 class="title">Leave / Work From Home</h6>
+                                </div>
+                                <div class="card-tools">
+                                    <p class="title">Date</p>
+                                </div>
+                            </div>
+                            <ul class="nk-top-products">
+
+                                @if (Model.TopFiveLeaveViews.Count() < 4)
+                                {
+                                    @foreach (var value in Model.TopFiveLeaveViews)
+                                    {
+                                        <li class="user-card">
+                                            <div class="nk-tb-col">
+                                                <div class="user-card">
+                                                    <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(wfhcount))">
+                                                        <span style="text-transform:uppercase;"> @value.EmployeeName?.Substring(0,1)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="info">
+                                                <div class="title font-weight-bold">
+                                                    @(
+                                                        value.EmployeeName
+                                                        )
+                                                </div>
+                                                <div class="count">
+                                                    @(
+                                                        value.LeaveType
+                                                        )
+                                                </div>
+                                            </div>
+                                            <div class="total">
+                                                <div class="text-purple font-weight-bold">@value.LeaveDate.ToString(Constant.DateFormat)</div>
+
+                                            </div>
+                                        </li>
+                                        wfhcount++;
+                                    }
+
+                                }
+                                else
+                                {
+                                    @foreach (var value in Model.TopFiveLeaveViews)
+                                    {
+                                        <li class="user-card">
+                                            <div class="nk-tb-col">
+                                                <div class="user-card">
+                                                    <div class="user-avatar @(Common.GetClassNameForLeaveDashboard(wfhcount))">
+                                                        <span style="text-transform:uppercase;"> @value.EmployeeName?.Substring(0,1)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="info">
+                                                <div class="title font-weight-bold">
+                                                    @(
+                                                        value.EmployeeName
+                                                        )
+                                                </div>
+                                                <div class="count">
+                                                    @(
+                                                        value.LeaveType
+                                                        )
+                                                </div>
+                                            </div>
+                                            <div class="total">
+                                                <div class="text-purple font-weight-bold">@value.LeaveDate.ToString(Constant.DateFormat)</div>
+
+                                            </div>
+                                        </li>
+                                        wfhcount++;
+                                    }
+                                    <div class="load-more text-center pt-4">
+                                        <a href="/Dashboard/LeaveWorkFromHome" class="nk-menu-link" style="background-color:lavender;padding: 5px 12px;"><span class="nk-menu-text">Load more</span></a>
+                                    </div>
+                                }
+
+                            </ul>
+                        </div><!-- .card-inner -->
+                    </div><!-- .card -->
+                </div>
+
+                <!-- .col -->
+            }
+        </div><!-- .row -->
+    </div><!-- .nk-block -->
+</div>
+
+
+<div class="modal" id="success_ClockOutMsg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alert Message</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <input type="hidden" id="txt_CompanyId" />
+                <input type="hidden" id="txt_EntryStatus" />
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Reason</label>
+                        <input type="text" class="form-control" id="txt_ClockOutReason" />
+                        <span class="error text-danger" id="errValid-ClockOutReason"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnClockOutOk" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseClock" value="Cancel" />
+                    @*<input type="button" class="btn btn-danger" id="btnClockOutCancel" value="Cancel" />*@
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">View Announcement</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <div>
+                   
+                    <div class="form-group">
+                        <label class="form-label">Announcer Name</label>
+                            <div>
+                                <label style="text-transform:uppercase;" class="text-primary" id="annuncerName"></label>
+                            </div>
+                            <label class="form-label">Announcement</label>
+                            <div>
+                                <label class="text-primary" id="annuncementName"></label>
+                            </div>
+                            <label class="form-label">Announcement Date </label>
+                            <div>
+                                <label class=" text-primary" id="date"></label>
+                            </div>
+                            <label class="form-label">Announcement End Date </label>
+                            <div>
+                                <label class=" text-primary" id="Enddate"></label>
+                            </div>
+                    </div>
+                </div>
+               
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-danger ml-auto" id="btnCloseAnnouncement" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+
+
+
+    //$("#txtLockClock").click(function() {
+
+    //    var entryStaus;
+    //    if ($(this).val() == "Clock In") {
+    //        $(this).val("Clock Out");
+    //        $(this).removeClass('btn-success');
+    //        $(this).addClass('btn-danger');
+    //        entryStaus = "In";
+    //    }
+    //    else if ($(this).val() == "Clock Out") {
+    //        $(this).val("Clock In");
+    //        $(this).removeClass('btn-danger');
+    //        $(this).addClass('btn-success');
+    //        entryStaus = "Out";
+    //    }
+    //    var companyId = 1;
+    //    var empId = @empId;
+
+    //    var formData = new FormData();
+    //    formData.append("CompanyId", companyId);
+    //    formData.append("EmployeeId", empId);
+    //    formData.append("EntryStatus", entryStaus);
+
+    //    var url = "/Dashboard/LogTiminingByEmpId";
+    //    $.ajax({
+    //        type: "POST",
+    //        url: url,
+    //        data: formData,
+    //        contentType: false,
+    //        processData: false,
+    //        beforeSend: function() {
+    //            $('.loader').removeClass('d-none');
+    //        },
+    //        success: function(result) {
+    //            if (result == true) {
+
+    //            }
+    //        },
+    //        complete: function() {
+    //            $('.loader').addClass('d-none');
+    //        }
+    //    });
+
+    //});
+
+    // View Announcement
+
+    $('#getData').on('click', '.ViewAnnouncement', function () {
+        var formData = new FormData();
+        var id = $(this).data("id");
+        formData.append("AnnuncementId", id);
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetAnnuncements",
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function () {
+                $('.loader').removeClass('d-none');
+            },
+            success: function (Result) {
+                
+                $("#Create_Popup").modal('show');
+                $("#annuncerName").text(Result.announcerName);
+                $("#date").text(Result.announcementDate);
+                $("#annuncementName").text(Result.announcementName);
+                $("#Enddate").text(Result.announcementEndDate);
+            },
+            complete: function () {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#btnCloseAnnouncement").click(function () {
+        $("#Create_Popup").modal('hide');
+        $('.loader').addClass('d-none');
+    });
+
+    $(document).ready(function () {
+        $("#success_ClockOutMsg_Popup").modal({
+            show: false,
+            backdrop: 'static'
+        });
+
+        function getLogInTimeFn() {
+            // do whatever you like here
+            var companyId = $("#txt_CompanyId").val();
+            var empId = @empId;
+            var formData = new FormData();
+            formData.append("CompanyId", companyId);
+            formData.append("EmployeeId", empId);
+            $('.loader').addClass('d-none');
+            var url = "/Dashboard/UpdateLogInTimeEveryOneMinuteByEmpId";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').addClass('d-none');
+                },
+                success: function (result) {
+                    if (result != null) {
+                        var onGoingTime = result.timeOngoingTime;
+                        var clkPercentage = result.timeClockPercentage
+                        if (clkPercentage == null) {
+                            clkPercentage = "0";
+                        }
+                        if (onGoingTime == null) {
+                            onGoingTime = "00:00"
+                        }
+                        $(".progress-bar").attr('data-progress', clkPercentage);
+                        $("#txt-Ongoing-time").text(onGoingTime + " hrs");
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+
+            setTimeout(getLogInTimeFn, 60000);
+        }
+        getLogInTimeFn();
+    });
+
+    // In Future for attendance
+
+    $("#txtLockClock").click(function () {
+        $("#txt_ClockOutReason").val("");
+        $("#errValid-ClockOutReason").text('');
+        var companyId = @companyId;
+        //var entryStaus;
+        $("#success_ClockOutMsg_Popup").modal('show');
+        $("#txt_CompanyId").val(companyId);
+        //$("#txt_EntryStatus").val(entryStaus);
+    });
+
+    $("#btnClockOutCancel").click(function () {
+        $("#success_ClockOutMsg_Popup").modal('hide');
+    });
+
+    $("#btnCloseClock").click(function () {
+        $("#success_ClockOutMsg_Popup").modal('hide');
+        $('.loader').addClass('d-none');
+    });
+
+    $("#btnClockOutOk").click(function () {
+
+        var entryStaus;
+
+        var isValid = true;
+        $("#errValid-ClockOutReason").text('');
+        var reason = $("#txt_ClockOutReason").val();
+        if (reason == "") {
+            $("#errValid-ClockOutReason").text('Please enter reason');
+            isValid = false;
+        }
+        else {
+            if ($("#txtLockClock").val() == "Clock In") {
+                $("#txtLockClock").val("Clock Out");
+                $("#txtLockClock").removeClass('btn-success');
+                $("#txtLockClock").addClass('btn-danger');
+                entryStaus = "in";
+            }
+            else if ($("#txtLockClock").val() == "Clock Out") {
+                $("#txtLockClock").val("Clock In");
+                $("#txtLockClock").removeClass('btn-danger');
+                $("#txtLockClock").addClass('btn-success');
+                entryStaus = "out";
+            }
+        }
+
+        var companyId = $("#txt_CompanyId").val();
+        var empId = @empId;
+        // var entryStaus = $("#txt_EntryStatus").val();
+        // $("#txt_EntryStatus").val(entryStaus);
+        var formData = new FormData();
+        formData.append("CompanyId", companyId);
+        formData.append("EmployeeId", empId);
+        formData.append("EntryStatus", entryStaus);
+        formData.append("Reason", reason);
+
+        if (isValid) {
+            var url = "/Dashboard/LogTiminingByEmpId";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result == true) {
+                        $("#success_ClockOutMsg_Popup").modal('hide');
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Total Project Line Cahrt   
+
+    var strProjectMonthCountVal = $("#strProjectMonthCount").val();
+    if (typeof (strProjectMonthCountVal) != 'undefined') {
+        if (strProjectMonthCountVal != null && strProjectMonthCountVal != '') {
+            var splitProjectCountTotalMonth = strProjectMonthCountVal.split(',');
+
+            var todayRevenue = {
+                labels: splitProjectCountTotalMonth,
+                dataUnit: 'Projects',
+                lineTension: .3,
+                datasets: [{
+                    label: "Projects",
+                    color: "#33d895",
+                    background: NioApp.hexRGB('#33d895', .25),
+                    data: [@Model.TotalProjectView?.ProjectByMonthCount]
+                }]
+            };
+        }
+    }
+
+    // Total Employee Line Cahrt    
+
+    var strEmpMonthCountVal = $("#strEmpMonthCount").val();
+    if (typeof (strEmpMonthCountVal) != 'undefined') {
+        if (strEmpMonthCountVal != null && strEmpMonthCountVal != '') {
+            var splitEmpCountTotalMonth = strEmpMonthCountVal.split(',');
+
+            var todayOrders = {
+                labels: splitEmpCountTotalMonth,
+                dataUnit: 'Employees',
+                lineTension: .3,
+                datasets: [{
+                    label: "Employees",
+                    color: "#6A29FF",
+                    background: NioApp.hexRGB('#6A29FF', .25),
+                    data: [@Model.TotalEmployeeView?.EmployeeByMonthCount]
+                }]
+            };
+        }
+    }
+
+    // Total Client Line Cahrt
+    
+    var strClientMonthCountVal = $("#strClientMonthCount").val();
+    if (typeof (strClientMonthCountVal) != 'undefined') {
+        if (strClientMonthCountVal != null && strClientMonthCountVal != '') {
+            var splitClientCountTotalMonth = strClientMonthCountVal.split(',');
+            var todayCustomers = {
+                labels: splitClientCountTotalMonth,
+                dataUnit: 'Clients',
+                lineTension: .3,
+                datasets: [{
+                    label: "Clients",
+                    color: "#ff63a5",
+                    background: NioApp.hexRGB('#ff63a5', .25),
+                    data: [@Model.TotalClientView?.ClientByMonthCount]
+                }]
+            };
+        }
+    }
+    
+
+    // Total TopFiveProjects Line Chart
+
+    var project = $("#topFiveProject").val();
+    if (typeof (project) != 'undefined') {
+        if (project != null && project != '') {
+            var splitprojectLength = project.split(',');
+            var orderStatistics = {
+                labels: splitprojectLength,
+                dataUnit: 'Peoples',
+                legend: false,
+                datasets: [{
+                    borderColor: "#fff",
+                    background: ["#816bff", "#13c9f2", "#ff82b7", "#559bfb", "#abd67f"],
+                    data: [@Model.TopFiveProjectsView?.ProjectByEmployeeCount]
+                }]
+            };
+        }
+    }
+
+    var strLeaveDayCountVal = $("#strLeaveDayCount").val();
+    var strTotalEmployeePresentCountVal = $("#strTotalEmployeePresentCount").val();
+    var strTotalEmployeeAbsentCountVal = $("#strTotalEmployeeAbsentCount").val();
+    if (typeof (strLeaveDayCountVal) != 'undefined') {
+        if (strLeaveDayCountVal != null && strLeaveDayCountVal != '') {
+            var splitstrLeaveDayCountValLength = strLeaveDayCountVal.split(',');
+            var salesStatistics = {
+                labels: splitstrLeaveDayCountValLength,
+                dataUnit: 'People',
+                lineTension: .4,
+                datasets: [{
+                    label: "Total orders",
+                    color: "#1a76d1",
+                    dash: 0,
+                    background: NioApp.hexRGB('#1a76d1', .15),
+                    data: [@Model.TotalEmployeeLeaveView?.TotalEmployeePresentCount]
+                }, {
+                    label: "Canceled orders",
+                    color: "#FB559B",
+                    dash: 0,
+                    background: "transparent",
+                    data: [@Model.TotalEmployeeLeaveView?.TotalEmployeeAbsentCount]
+                }]
+            };
+        }
+    }
+
+    function courseSellsChart(selector, set_data) {
+        var $selector = (selector) ? $(selector) : $('.courseSells');
+        $selector.each(function () {
+            var $self = $(this), _self_id = $self.attr('id'), _get_data = (typeof set_data === 'undefined') ? eval(_self_id) : set_data;
+            var selectCanvas = document.getElementById(_self_id).getContext("2d");
+
+            var chart_data = [];
+            for (var i = 0; i < _get_data.datasets.length; i++) {
+                chart_data.push({
+                    label: _get_data.datasets[i].label,
+                    tension: _get_data.lineTension,
+                    backgroundColor: _get_data.datasets[i].background,
+                    borderWidth: 2,
+                    borderColor: _get_data.datasets[i].color,
+                    pointBorderColor: 'transparent',
+                    pointBackgroundColor: 'transparent',
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: _get_data.datasets[i].color,
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 4,
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHitRadius: 4,
+                    data: _get_data.datasets[i].data,
+                });
+            }
+            var chart = new Chart(selectCanvas, {
+                type: 'line',
+                data: {
+                    labels: _get_data.labels,
+                    datasets: chart_data,
+                },
+                options: {
+                    legend: {
+                        display: (_get_data.legend) ? _get_data.legend : false,
+                        rtl: NioApp.State.isRTL,
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20,
+                            fontColor: '#6783b8',
+                        }
+                    },
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        enabled: true,
+                        rtl: NioApp.State.isRTL,
+                        callbacks: {
+                            title: function (tooltipItem, data) {
+                                return data['labels'][tooltipItem[0]['index']];
+                            },
+                            label: function (tooltipItem, data) {
+                                return data.datasets[tooltipItem.datasetIndex]['data'][tooltipItem['index']] + ' ' + _get_data.dataUnit;
+                            }
+                        },
+                        backgroundColor: '#1c2b46',
+                        titleFontSize: 10,
+                        titleFontColor: '#fff',
+                        titleMarginBottom: 4,
+                        bodyFontColor: '#fff',
+                        bodyFontSize: 10,
+                        bodySpacing: 4,
+                        yPadding: 6,
+                        xPadding: 6,
+                        footerMarginTop: 0,
+                        displayColors: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            display: false,
+                            ticks: {
+                                beginAtZero: true,
+                                fontSize: 12,
+                                fontColor: '#9eaecf',
+                                padding: 0
+                            },
+                            gridLines: {
+                                color: NioApp.hexRGB("#526484", .2),
+                                tickMarkLength: 0,
+                                zeroLineColor: NioApp.hexRGB("#526484", .2)
+                            },
+                        }],
+                        xAxes: [{
+                            display: false,
+                            ticks: {
+                                fontSize: 12,
+                                fontColor: '#9eaecf',
+                                source: 'auto',
+                                padding: 0,
+                                reverse: NioApp.State.isRTL
+                            },
+                            gridLines: {
+                                color: "transparent",
+                                tickMarkLength: 0,
+                                zeroLineColor: NioApp.hexRGB("#526484", .2),
+                                offsetGridLines: true,
+                            }
+                        }]
+                    }
+                }
+            });
+        })
+    }
+
+    // init chart
+
+    NioApp.coms.docReady.push(function () { courseSellsChart(); });
+
+
+</script>
+

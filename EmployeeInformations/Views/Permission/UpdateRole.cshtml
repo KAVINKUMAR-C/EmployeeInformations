@@ -1,0 +1,233 @@
+﻿@using EmployeeInformations.Model.PrivilegeViewModel;
+@using Microsoft.Extensions.Configuration
+@using EmployeeInformations.Common.Enums
+@model RoleAssignViewModel
+@{
+    int count = 0;
+}
+<div class="leave-dtl-block">
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Update Permission Details</h3>
+        </div><!-- .nk-block-head-content -->        
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="col-12 pb-3 px-0">
+        <div class="col-12 mt-3">           
+                        <div class="form-group">
+                            <input type="hidden" value="@Model.Id" id="hdRoleId" />
+
+                            <div class="d-flex">
+                                <label class="my-auto mr-3" style="font-weight:bold;">Role</label>
+                                <label class="my-auto badge bg-primary badge-sm"> @Model.Rolename</label>
+                            </div>
+                        </div>          
+        </div>
+
+        <div class="col-12 p-0">
+    
+          
+            <div class="card p-3">
+                        <div class="card-title mt-2 mb-4">
+                <h6 class="title">Grant access to following sections</h6>
+             </div>
+             <div class="datatable-wrap">
+                    <table class="datatable-init nk-tb-list nk-tb-ulist dataTable" data-auto-responsive="false">
+                    <thead>
+                            <tr class="nk-tb-item table-header">
+                            <th class="nk-tb-col"><span class="sub-text">Module / SubModule Name</span></th>
+                            <th class="nk-tb-col tb-col"><span class="sub-text">IsEnabled</span></th>
+                            <th class="nk-tb-col tb-col"><span class="sub-text">IsWritable</span></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if(Model.RolePrivilegeViewModels.Count() > 0)
+                        {
+                             @foreach (var module in Model.RolePrivilegeViewModels)
+                            {
+                                <tr>
+
+                                    <td class="nk-tb-col tb-col pb-0" colspan="3">
+                                        <b class="tb-sub text-secondary">@module.FirstOrDefault()?.ModuleName</b>
+                                    </td>
+                                </tr>
+                                @foreach (var item in module)
+                                {
+                                    <tr class="role_permission nk-tb-item">
+                                        <td class="nk-tb-col tb-col">
+                                            <span class="text-primary" id="@item.SubModuleId"> @item.SubModuleName </span>
+                                        </td>
+
+                                        <td class="nk-tb-col tb-col">
+                                            @if (item.IsEnabled)
+                                            {
+                                                    <div class="custom-control custom-control-sm custom-checkbox">
+                                                        <input type="checkbox" name="chkIsEnabledModule" checked class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule@(count)" value="1">
+                                                        <label class="custom-control-label" for="chkIsEnabledModule@(count)"></label>
+                                                    </div>
+                                               @* <input type="checkbox" checked class="chkIsEnabledModule" name="chkIsEnabledModule" value="1" />*@
+                                            }
+                                            else
+                                            {
+                                                      <div class="custom-control custom-control-sm custom-checkbox">
+                                                          <input type="checkbox" name="chkIsEnabledModule" class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule@(count)" value="0">
+                                                         <label class="custom-control-label" for="chkIsEnabledModule@(count)"></label>
+                                                      </div>
+
+
+                                                @*<input type="checkbox" class="chkIsEnabledModule" name="chkIsEnabledModule" value="0" />*@
+
+                                            }
+                                        </td>
+                                        <td class="nk-tb-col tb-col">
+                                            @if (item.IsWritable)
+                                            {
+                                                     <div class="custom-control custom-control-sm custom-checkbox">
+                                                          <input type="checkbox" name="chkIsWritableModule" checked class="custom-control-input chkIsWritableModule" id="chkIsWritableModule@(count)" value="1">
+                                                         <label class="custom-control-label" for="chkIsWritableModule@(count)"></label>
+                                                     </div>
+                                                @*<input type="checkbox" checked class="chkIsWritableModule" name="chkIsWritableModule" value="1" />*@
+                                            }
+                                            else
+                                            {
+                                                           <div class="custom-control custom-control-sm custom-checkbox">
+                                                                <input type="checkbox" name="chkIsWritableModule" class="custom-control-input chkIsWritableModule" id="chkIsWritableModule@(count)" value="0">
+                                                                <label class="custom-control-label" for="chkIsWritableModule@(count)"></label>
+                                                            </div>
+                                               @* <input type="checkbox" class="chkIsWritableModule" name="chkIsWritableModule" value="0" />*@
+                                            }
+                                        </td>
+
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        }                                               
+                    </tbody>
+
+                </table>
+             </div>
+             
+            </div>
+        </div>
+
+        <div class="col-lg-12 d-flex mt-3 p-0">
+            <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+            <input type="button" class="btn btn-primary" id="btnSave" value="Save" />          
+        </div>
+ 
+</div>
+
+</div>
+<div class="modal" id="success_Permission_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Access Category has been added Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnClosePermission">
+                <button type="button" class="btn btn-md btn-primary mr-auto" data-dismiss="modal">OK</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+
+    $(function() {
+
+        $("#btnBack").click(function() {
+
+            window.location.href = "/Permission/RoleList";
+
+        });
+
+
+        $('input[type=checkbox][name=chkIsEnabledModule]').change(function() {
+
+            if ($(this).is(':checked')) {
+
+                $(this).val("1");
+            }
+            else {
+                $(this).val("0");
+            }
+        });
+
+        $('input[type=checkbox][name=chkIsWritableModule]').change(function() {
+
+            if ($(this).is(':checked')) {
+
+                $(this).val("1");
+            }
+            else {
+                $(this).val("0");
+            }
+        });
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------------
+
+    // update role 
+
+    $("#btnSave").click(function() {
+
+        var rolePrivilegeList = [];
+        var formData = new FormData();
+        var dragColumns = document.querySelectorAll('.role_permission').length;
+        var val = 0;
+        for (var i = 0; i < dragColumns; i++) {
+
+            var subModuleId = document.querySelectorAll('.role_permission')[i].cells[0].firstElementChild.id;
+            var isEnabled = document.querySelectorAll('.role_permission')[i].cells[1].firstElementChild.querySelector('.chkIsEnabledModule').value;
+            var isWritable = document.querySelectorAll('.role_permission')[i].cells[2].firstElementChild.querySelector('.chkIsWritableModule').value;
+
+            console.log("test : " + subModuleId + "  " + isEnabled + "  " + isWritable);
+            rolePrivilegeList.push({
+                roleId: $("#hdRoleId").val(),
+                subModuleId: subModuleId,
+                isEnabled: isEnabled,
+                isWritable: isWritable
+            });
+        }
+
+        formData.append("Permission", JSON.stringify(rolePrivilegeList));
+        $('.loader').removeClass('d-none');
+        $.ajax({
+            type: "POST",
+            url: "/Permission/AddAccessCategoryByRole",
+            data: formData,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function(response) {               
+                $("#success_Permission_Popup").css('display', 'none !important');
+                swal.fire({
+                    title: "Added Successfully",
+                    text: "",
+                    icon: "success",
+                    allowOutsideClick: false  // This prevents closing on outside click
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var urlToRedirect = '@Url.Action("RoleList", "Permission")';
+                        window.location.href = urlToRedirect;
+                    };
+                });
+                
+                $('.loader').addClass('d-none');
+            }
+        });
+
+    });
+
+</script>

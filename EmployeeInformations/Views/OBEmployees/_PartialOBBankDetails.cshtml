@@ -1,0 +1,255 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBBankDetails
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+
+<form>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="d-flex mb-1 title data-head">
+        <h6>Bank Details</h6>
+    </div>
+
+    <div class="row p-3">
+     
+        @Html.HiddenFor(m => m.BankId)
+        @Html.HiddenFor(m => m.EmpId)
+        @Html.HiddenFor(m => m.CompanyId)
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label"> Account Holder Name</label>
+                @Html.TextBoxFor(m => m.AccountHolderName, new { @class = "form-control"} )
+                @Html.ValidationMessageFor(m=>m.AccountHolderName,"",new{@class="error text-danger",id="errValid-AccountHolderName"})
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Account Number</label>
+                @if (Model.AccountNumber == 0)
+                {
+                    <input type="text" id="AccountNumber" class="form-control" value="" />
+                }
+                else
+                {
+                    @Html.TextBoxFor(m => m.AccountNumber, new { @class = "form-control" })
+                }
+                @Html.ValidationMessageFor(m => m.AccountNumber,"",new{@class="error text-danger",id="errValid-AccountNumber"})
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Bank Name</label>
+                @Html.TextBoxFor(m =>m.BankName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m=>m.BankName,"",new{@class="error text-danger",id="errValid-BankName"})
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">IFSC Code</label>
+                @Html.TextBoxFor(m =>m.IFSCCode, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m=>m.IFSCCode,"",new{@class="error text-danger",id="errValid-IFSCCode"})
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Branch Name</label>
+                @Html.TextBoxFor(m =>m.BranchName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m=>m.BranchName,"",new{@class="error text-danger",id="errValid-BranchName"})
+            </div>
+        </div>
+
+        <div class="col-lg-12 d-flex mt-3">
+            <input type="button" class="btn btn-secondary" id="btnBankDetailsBack" value="Back" />
+            <input type="button" class="btn btn-primary ml-auto" id="btnAddBankDetails" value="Save" />
+        </div>
+       
+        
+    </div>
+   
+</form>
+
+
+<div class="modal" id="success_CreateEmployeeAllDetails_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Saved Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseEmployeeAllDetails">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_CreateEmployeeIsVerified_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Saved Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseEmployeeAllDetails">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.selectedwizard li').removeClass('current');
+        $("#step7").addClass('current');
+    });
+
+    $("#btnBankDetailsBack").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/Createexperience?empId=" + empId);
+    });
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    $("#AccountNumber").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Create Bank Details
+
+    $('#btnAddBankDetails').click(function () {
+   
+        var isValid = true;
+        $("#errValid-AccountHolderName").text(" ");
+        $("#errValid-AccountNumber").text(" ");
+        $("#errValid-BankName").text(" ");
+        $("#errValid-IFSCCode").text(" ");
+        $("#errValid-BranchName").text(" ");
+
+        if ($("#AccountHolderName").val() == "") {
+            isValid = false;
+        }
+
+        if ($("#AccountNumber").val() == "") {
+            isValid = false;
+        }
+
+        if ($("#BankName").val() == "") {
+            isValid = false;
+        }
+        if ($("#IFSCCode").val() == "") {
+            isValid = false;
+        }
+        if ($("#BranchName").val() == "") {
+            isValid = false;
+        }
+
+        var empId = $("#EmpId").val();
+        var bankId = $("#BankId").val();
+        var accountHolderName = $("#AccountHolderName").val();
+        var accountNumber = $("#AccountNumber").val();
+        var bankName = $("#BankName").val();
+        var iFSCCode = $("#IFSCCode").val();
+        var branchName = $("#BranchName").val();
+
+        var bankDetails = {
+            EmpId: empId,
+            BankId: bankId,
+            AccountHolderName: accountHolderName,
+            AccountNumber: accountNumber,
+            BankName: bankName,
+            IFSCCode: iFSCCode,
+            BranchName: branchName
+        };
+
+        var url = "/OBEmployees/AddBankDetails";
+        if (isValid) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: bankDetails,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result > 0) {
+                        if (@roleId == 1 || @roleId == 2) {
+
+                            // $("#success_CreateEmployeeAllDetails_Popup").css('display', 'none !important');
+                            swal.fire({
+                                title: "Saved Successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("OnboardingCompletion", "OBEmployees")';
+                                    window.location.href = urlToRedirect;
+                                };
+                            });
+                           
+                        }
+                        else {
+                            $("#success_CreateEmployeeAllDetails_Popup").css('display', 'none !important');
+                            swal.fire({
+                                title: "Saved Successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("OnboardingCompletion", "OBEmployees")';
+                                    window.location.href = urlToRedirect;
+                                };
+                            });
+                           
+                        }
+                    }
+                    else {
+                        swal.fire({
+                            title: "Something error",
+                            text: "",
+                            icon: "error",
+                            allowOutsideClick: false  // This prevents closing on outside click
+                        }).then((resultValue) => {
+                            var empId = $("#EmpId").val();
+                            PageUtil.goTo("/Employees/CreateBankDetails?empId=" + empId);
+                        });
+                        
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            //return false;
+            var urlToRedirect = '@Url.Action("OnboardingCompletion","OBEmployees")';
+            window.location.href = urlToRedirect;
+
+        }
+    });
+
+</script>
+

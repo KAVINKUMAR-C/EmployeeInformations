@@ -1,0 +1,23 @@
+﻿@using EmployeeInformations.Model.EmailDraftViewModel;
+@using Microsoft.AspNetCore.Http;
+@model EmailDraftContent
+@{
+    var roleId = Context.Session.GetInt32("Id");
+
+}
+
+<div id="bind-EmailDraftContentmodal-content">
+</div>
+
+<input type="hidden" id="txt-Id" value="@Model.Id" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+       
+        var id = $("#txt-Id").val();
+       // PageUtil.goToEmailDraftContent("/EmailDraft/UpdateEmailDraftContent?EmailTrapTypeId=" + id);
+        PageUtil.goToEmailDraftContent("/EmailDraft/UpdateEmailDraftContent?Id=" + id);
+    });
+
+</script>

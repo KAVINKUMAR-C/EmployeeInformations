@@ -1,0 +1,336 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.CoreModels.Model
+@using EmployeeInformations.Model.ReportsViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model EmployeePrivilegesViewModel
+@{
+    ViewBag.Title = "LeavePermission";
+    Layout = "_Layout";
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.LeaveDetailsEmployees;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content d-flex">
+            <h3 class="nk-block-title page-title myy-auto me-auto">Employee Privileges</h3>
+           
+        </div><!-- .nk-block-head-content -->
+         <button type="button" class="btn btn-primary waves-effect waves-light d-flex mb-1" data-bs-toggle="modal" data-bs-target="#staticBackdrop1">Create</button>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="leavePermission">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="leaveType"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="leaveFromDate"><span class="sub-text">Earn Leave</span></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="staticBackdrop1" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Create Event Food menu </h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <div>
+
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label class="form-label"> Category Name <span class="required" style="color: #FF0000">*</span></label>
+                                        @Html.DropDownListFor(m => m.EmployeeID, new SelectList(Model.Employees, "EmployeeId", "EmployeeIdWithName"), "--Select Employee--", new { @class = "form-control", id = "employee" })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.EmployeeID, "", new { @class = "error text-danger", id = "errvalid-employee" })
+                                    <span id="errVerify-EmployeeId" style="display:none;" class="error text-danger">Name already exists! </span>
+                                </div>
+
+                                <div class="col-12 mt-3">
+                                    <div class="form-group">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" role="switch" id="earnLeave">
+                                            <label class="form-label"> Enable Earn Leave <span class="required" style="color: #FF0000">*</span></label>
+                                        </div>
+                                    </div>
+                                    <span class="text-danger" id="errvalid-earnLeave"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-danger" id="btnCls" value="Cancel" />
+                <input type="button" class="btn btn-primary waves-effect waves-light" id="btncreate" value="Save" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        geteleavePermissionDatas();
+
+        function geteleavePermissionDatas() {
+            var table = $('#leavePermission').DataTable();
+            if (table) {
+                table.destroy();
+            }
+            console.log('geteleavePermissionDatas');
+
+            $('#leavePermission').DataTable({
+                "bInfo": true,
+                "paging": true,
+                "processing": true,
+                "serverSide": true,
+                "language": {
+                    "infoFiltered": "",
+                },
+                pageLength: entries, // Page length
+                ajax: {
+                    url: "/Permission/GetLeavePermission",
+                    type: "GET",
+                    data: function (d) {
+                        // SearchFilter
+                        var leavePermissionSearch = document.querySelector("input[type='search']");
+                        var leavePermissionData = leavePermissionSearch.value;
+
+                        // PagingLength
+                        var leavePermissionCount = document.getElementById("leavePermission_length");
+                        var page = leavePermissionCount.querySelector("select");
+                        var leavePermissionFilterCount = page.value;
+
+                        d.sSearch = leavePermissionData;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || leavePermissionFilterCount;
+                        d.sEcho = d.start;
+                        d.columnName = columnIndex;
+                        d.columnDirection = columnDirection;
+                    },
+                },
+                columns: [
+
+                    {
+                        data: 'employeesName',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-primary'>" + row.employeesName + "</b>";
+                        }
+                    },
+                    {
+                        data: 'IsEarnLeave',
+                        render: function (data, type, row) {
+                            var html = "<div class='form-group'>";
+                            html += "<div class='form-check form-switch'>";
+                            if (row.isEarnLeave == true) {
+                                html += "<input class='form-check-input' type='checkbox' role='switch' data-id='" + row.privilegeID + "'checked>";
+                            } 
+                            else {
+                                html += "<input class='form-check-input' type='checkbox' role='switch' data-id='" + row.privilegeID + "'>";
+                            }        
+                            html += "<label class='form-label'>Enable Earn Leave <span class='required' style='color: #FF0000'>*</span></label>";
+                            html += "</div></div>";
+                            return html;
+                        }
+                    }
+                ],
+                "createdRow": function (row, data) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+            });
+
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc';
+            }
+            columnIndex = $(this).data('id');
+        });
+
+        $("#leavePermission").on('change', 'select', function () {
+            entries = parseInt($(this).val());
+            geteleavePermissionDatas();
+        });
+    });
+
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        function handleTableUpdate() {
+            console.log("Table update triggered");
+            setTimeout(function () {
+                var tableHeight = $('.datatable-scroll table').height();
+                console.log("Table height: " + tableHeight);
+
+                if (tableHeight <= 200) {
+                    $('.datatable-scroll table').addClass('table-data-limit');
+                    console.log("Class 'table-data-limit' added");
+                } else {
+                    $('.datatable-scroll table').removeClass('table-data-limit');
+                    console.log("Class 'table-data-limit' removed");
+                }
+            }, 1000);
+        }
+
+        // Attach the event handler to the search input
+        $('input[type="search"]').on('keyup', handleTableUpdate);
+
+        // Attach the event handler to the pagination buttons
+        $(document).on('click', '.pagination .paginate_button', function (e) {
+            e.preventDefault();
+            handleTableUpdate();
+        });
+    });
+
+
+     $(document).ready(function () {
+        $("#btnCls").click(function () {
+            $("#employee").val('');
+            $("#earnLeave").val('');
+            $("#errvalid-employee").text("");
+            $("#errvalid-earnLeave").text("");
+            $("#staticBackdrop1").modal('hide');
+        });
+    });
+
+    $('#staticBackdrop1').on('click', '#btncreate', function () {
+        debugger;
+        var formData = new FormData();
+        var isValid = true;
+        $("#errvalid-employee").text("");
+        $("#errvalid-earnLeave").text("");
+
+        if ($("#employee").val() == "") {
+            $("#errvalid-employee").text("Employee Name field is required");
+            isValid = false;
+        }
+
+        if ($("#earnLeave").val() == "") {
+            $("#errvalid-earnLeave").text("EarnLeave field is required");
+            isValid = false;
+        }
+        var name = $("#employee").val();
+        var earnLeave = $("#earnLeave").prop("checked");
+        formData.append("EmployeeID", name);
+        formData.append("IsEarnLeave", earnLeave);
+
+        if (isValid) {
+
+            var url = "/Permission/CreateLeavePermission";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                if (result === true) {
+                     $("#staticBackdrop1").modal('hide');
+                    swal.fire({
+                        title: "Added Successfully",
+                        text: "",
+                        icon: "success",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((resultValue) => {
+                        window.location.href = "/Permission/LeavePermission";
+                    });
+                }
+                else {
+                    $("#errVerify-EmployeeId").show();
+                    $("#staticBackdrop1").modal('hide');
+                    swal.fire({
+                        title: "Something error",
+                        text: "",
+                        icon: "error",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((resultValue) => {
+                        window.location.href = "/Permission/LeavePermission";
+                    });
+
+                }
+            },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+    });
+
+
+    $('#leavePermission').on('change', '.form-check-input', function () {
+        debugger;
+        var formData = new FormData();
+        var id = $(this).data('id');
+        var isEarnLeave = $(this).prop("checked");
+        formData.append("PrivilegeID", id);
+        formData.append("IsEarnLeave", isEarnLeave);
+        var url = "/Permission/CreateLeavePermission";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (result) {
+                if (result === true) {
+                   Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {                         
+                                window.location.href = "/Permission/LeavePermission";
+                        });     
+                }
+                else{
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((result) => {                         
+                                window.location.href = "/Permission/LeavePermission";
+                        });                       
+                    }
+            },
+        });
+    });
+</script>

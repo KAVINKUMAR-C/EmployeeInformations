@@ -1,0 +1,24 @@
+﻿@using EmployeeInformations.Model.APIModel;
+@model WebsiteJobViewModel
+@{
+    
+}
+
+   <div id="bind-websitejobpost-content">
+       
+   </div>  
+
+   <input type="hidden" id="txt-JobId" value="@Model.JobId" />
+
+   <script src="https://cdn.ckeditor.com/4.19.1/standard/ckeditor.js"></script>
+
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+  
+    var jobId = $("#txt-JobId").val();
+    PageUtil.goToWebsiteJobPostContent("/WebsiteJob/UpdateJobPost?jobId=" + jobId);
+});
+
+</script>

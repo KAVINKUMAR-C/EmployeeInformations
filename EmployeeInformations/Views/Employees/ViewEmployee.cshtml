@@ -1,0 +1,232 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Business.IService
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model Employees
+@{
+    Layout = "_Layout";
+    var roleId = Context.Session.GetInt32("RoleId");
+    var lastViewPage = Context.Session.GetString("LastView");
+    var lastControllerPage = Context.Session.GetString("LastController");    
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (roleId >= 0)
+    {
+        var id = roleId.Value;
+        int employeeModuleId = (int)EmployeesInformationsPages.SalaryModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(employeeModuleId, id);
+    }
+}
+<div class="emp-view-block">
+    <div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">View Employee</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+                @if (roleId == 1 || roleId == 2)
+                {                   
+                    @Html.ActionLink("Back", lastViewPage, lastControllerPage, null, new { @class = "btn btn-secondary ml-auto mr-0" })                   
+                }
+                else
+                {
+                    @Html.ActionLink("Back","EditEmployees","Employees", null, new { @class = "btn btn-secondary ml-auto mr-0" })
+                }
+            
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+@*<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between"> 
+           
+    </div>
+</div>
+*@
+<input type="hidden" id="txt-empId" value="@Model.EmpId" />
+
+    <div class="nk-content p-0 card-aside-block">
+        <div class="container-fluid p-0">
+            <div class="nk-content-inner">
+                <div class="nk-content-body">
+                    <div class="nk-block">
+                        <div class="card">
+                            <div class="card-aside-wrap">
+                                <div class="card-inner p-0 card-inner-lg" id="bind-employee-viewmodel">
+                                </div>
+                                <div class="card-aside card-aside-left user-aside toggle-slide" data-toggle-body="true" data-content="userAside" data-toggle-screen="lg" data-toggle-overlay="true">
+                                    <div class="card-inner-group" data-simplebar>
+                                        <div class="card-inner p-3 border-0">
+                                            <div class="user-card">
+                                                <div class="user-avatar bg-light">
+                                                    @if(Model.EmployeeProfileImage == "")
+                                                    {
+                                                        <span>@Model.EmployeeSortName</span>  <span></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="/ProfileImages/@(Model.EmployeeProfileImage)">
+                                                    }                                             
+                                                </div>
+                                                <div class="user-info">
+                                                    <span class="lead-text">@Model.FirstName @Model.LastName</span>
+                                                    <span class="sub-text">@Model.OfficeEmail</span>
+                                                </div>                                                
+                                            </div><!-- .user-card -->
+                                        </div><!-- .card-inner -->
+                                      
+                                            <div class="user-account-info py-0">
+                                              
+                                            </div>
+                                       
+                                        <div class="card-inner p-0">
+                                            @* <ul class="nk-stepper-nav nk-stepper-nav-s1 stepper-nav is-vr selectedwizard">
+                                <li id="step1" class="employeePersonalInfo">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Intro</div>
+                                            <div class="sub-text">Edit Details</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step2" class="empProfileInfo">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Profile Information</div>
+                                            <div class="sub-text">Profile</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step3" class="empAddressInfo">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Address Information</div>
+                                            <div class="sub-text">Address</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step4" class="empOtherDetails">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Other Details</div>
+                                            <div class="sub-text">Other</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step5" class="empQualificationInfo">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Qualification Information</div>
+                                            <div class="sub-text">Qualification</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step6" class="empExperieneInfo">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Experience Information</div>
+                                            <div class="sub-text">Experience</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step7" class="empBankDetails">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Bank Details</div>
+                                            <div class="sub-text">Bank</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>*@
+                                            <ul class="link-list-menu viewActive">
+                                                <li class="employeePersonalInfo active"><a href="javascript:void(0)"><em class="icon ti-user"></em><span>Personal Information</span></a></li>
+                                                <li class="empProfileInfo"><a href="javascript:void(0)"><em class="icon ti-id-badge"></em><span>Profile Information</span></a></li>
+                                                <li class="empAddressInfo"><a href="javascript:void(0)"><em class="icon ti-location-pin"></em><span>Address Information</span></a></li>
+                                                <li class="empOtherDetails"><a href="javascript:void(0)"><em class="icon ti-book"></em><span>Other Details</span></a></li>
+                                                <li class="empQualificationInfo"><a href="javascript:void(0)"><em class="icon ti-bookmark-alt"></em><span>Qualification Information</span></a></li>
+                                                <li class="empExperieneInfo"><a href="javascript:void(0)"><em class="icon ti-briefcase"></em><span>Experience Information</span></a></li>                                                
+                                                @if (rolePrivileges == true)
+                                                {
+                                                    <li class="empSalaryDetails"><a href="javascript:void(0)"><em class="icon ti-files"></em><span>Salary Details</span></a></li>
+                                                } 
+                                                <li class="empBankDetails"><a href="javascript:void(0)"><em class="icon ti-files"></em><span>Bank Details</span></a></li>
+                                                @* @if(Model.BenefitId > 0)
+                                                {
+                                                    <li class="empBenefitDetails"><a href="javascript:void(0)"><em class="icon ti-files"></em><span>Benefits</span></a></li>
+                                                }*@
+                                            </ul>
+                                        </div><!-- .card-inner -->
+                                    </div><!-- .card-inner-group -->
+                                </div><!-- card-aside -->
+
+                            </div><!-- .card-aside-wrap -->
+                        </div><!-- .card -->
+                    </div><!-- .nk-block -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewEmployeeInfo?EmpId=" + empId);
+
+    });
+
+    // Click summary
+
+    $('.employeePersonalInfo').click(function() {      
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewEmployeeInfo?EmpId=" + empId);
+    });
+
+    $('.empProfileInfo').click(function() {       
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewProfileInfo?empId=" + empId);
+    });
+
+    $('.empAddressInfo').click(function() {        
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewAddressInfo?empId=" + empId);
+    });
+
+    $('.empOtherDetails').click(function() {       
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewOtherDetails?empId=" + empId);
+    });
+
+    $('.empQualificationInfo').click(function() {       
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewQualification?empId=" + empId);
+    });
+
+    $('.empExperieneInfo').click(function() {        
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewExperience?empId=" + empId);
+    }); 
+
+    $('.empBankDetails').click(function() {        
+         var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewBankDetails?empId=" + empId);
+    });
+
+    $('.empBenefitDetails').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewBenefits?empId=" + empId);
+    });
+
+    $('.empSalaryDetails').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/Employees/ViewSalary?empId=" + empId);
+    });
+
+</script>

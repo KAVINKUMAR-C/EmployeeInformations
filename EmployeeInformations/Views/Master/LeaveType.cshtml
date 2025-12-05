@@ -1,0 +1,449 @@
+﻿@using EmployeeInformations.Model.MasterViewModel;
+@model LeaveTypeViewModel
+@{
+    ViewBag.Title = "LeaveType";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Leave Type Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreateLeaveType" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getLeaveType">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col"><span class="sub-text">Name</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">Status</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model.LeaveTypeMaster)
+                {
+                    <tr class="nk-tb-item">
+                        <td class="nk-tb-col tb-col">
+                            <b class="tb-sub text-primary">@item.LeaveType</b>
+                        </td>
+                        @if (item.IsActive)
+                        {
+                            <td class="nk-tb-col tb-col">
+                                <b class="badge badge-dot bg-success">Active</b>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="nk-tb-col tb-col">
+                                <b class="badge badge-dot bg-danger">In Active</b>
+                            </td>
+                        }
+                        <td class="nk-tb-col tb-col">
+
+                            <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                <ul class="nk-tb-actions gx-1 my-n1">
+                                    <li class="me-n1">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <ul class="link-list-opt no-bdr">
+                                                    <li><a href="javascript:void(0)" class="btnUpdate" data-id="@item.LeaveTypeId" data-isactive="@item.IsActive" data-leavetypename="@item.LeaveType"><em class="icon ni ni-edit"></em><span>Status</span></a></li>
+                                                    <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.LeaveTypeId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+
+                    </tr>
+                    <!-- .nk-tb-item  -->
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Leave Type</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Type<span class="required" style="color: #FF0000">*</span></label>
+                        <input type="text" class="form-control" id="LeaveType" />
+                        @Html.ValidationMessageFor(m => m.LeaveType,"",new { @class = "error text-danger",id = "errValid-LeaveType"})
+                        <span id="errVerify-LeaveType" style="display:none;" class="error text-danger">Type Already Exists! </span>
+                    </div>
+                    <span class="error text-danger" id="errValid-LeaveType"></span>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseLeaveType" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_Leave_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Status Leave Type</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                @Html.HiddenFor(m => m.LeaveTypeId)
+                <div class="col-12">
+                    <label class="form-label"> Type<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="LeaveTypes" />
+                        @Html.ValidationMessageFor(m => m.LeaveType,"",new { @class = "error text-danger",id = "errorValid-LeaveType"})                      
+                    </div>
+                    <span class="error text-danger" id="errorValid-LeaveType"></span>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="custom-control custom-control-sm custom-checkbox">
+                            <input type="checkbox" name="chkIsActiveModule" class="custom-control-input chkIsActiveModule" id="chkIsActiveModule">
+                            <label class="custom-control-label" for="chkIsActiveModule">Status</label>
+                        </div>
+                        @*        <label>Status</label>
+                        <input type="checkbox" class="chkIsActiveModule" name="chkIsActiveModule" />*@
+                    </div>
+                    <span class="error text-danger" id="errValid-Name"></span>
+                </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreateLeave" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnLeaveType" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteLeave_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title">  Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteLeave">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#getLeaveType').DataTable({
+            "bInfo": true,
+            "paging": true
+        });
+    });
+
+    $(document).ready(function () {
+        $("#CreateLeaveType").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+
+        $("#LeaveTypes").keyup(function () {
+            $("#errorValid-LeaveType").text("");
+            if ($("#LeaveTypes").val() == "") {
+                $("#errorValid-LeaveType").text("Type field is required");
+            }
+        });
+    });
+
+    $("#btnCloseLeaveType").click(function () {
+        $("#Create_Popup").hide();
+        var urlToRedirect = '@Url.Action("LeaveType","Master")';
+        window.location.href = urlToRedirect;
+    });
+
+    $("#btnClose").click(function () {
+        $("#Edit_Popup").hide();
+        var urlToRedirect = '@Url.Action("LeaveType","Master")';
+        window.location.href = urlToRedirect;
+    });
+
+    $("#btnLeaveType").click(function () {
+        $("#Create_Popup").hide();
+        var urlToRedirect = '@Url.Action("LeaveType","Master")';
+        window.location.href = urlToRedirect;
+    });
+
+    $("#LeaveType").keyup(function () {
+        var isValid = true;
+        $("#errValid-LeaveType").text("");
+        $("#errVerify-LeaveType").hide();
+
+        if ($("#LeaveType").val() == "") {
+            $("#errValid-LeaveType").text("Type field is required");
+            isValid = false;
+        }
+    });
+    //----------------------------------------------------------------------------------------------------------------------------------
+
+    // Create Leavetype
+
+    $("#btnCreate").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-LeaveType").text("");
+        if ($("#LeaveType").val() == "") {
+            $('#errValid-LeaveType').text("Type field is required");
+            isValid = false;
+        }
+
+        var leaveType = $("#LeaveType").val();
+        formData.append("LeaveType", leaveType);
+
+        if (isValid) {
+
+            var url = "/Master/AddLeaveType";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    $('.loader').addClass('d-none');
+                    $("#Create_Popup").css('display', 'none !important');
+                    if (result.leaveTypeCount == 1) {
+                        $('.loader').addClass('d-none');
+                        $("#errVerify-LeaveType").show();
+                        return false;
+                    }
+                    else {
+                        if (result.leaveTypeId > 0) {
+                            swal.fire({
+                                        title: "Added Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                         if (resultValue.isConfirmed) {
+                                    window.location.href = "/Master/LeaveType";
+                                };
+                                    });
+                            
+                        }
+                        else {
+                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          window.location.href = "/Master/LeaveType";
+                                    });
+                            
+                        }
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            $("#errValid-LeaveType").show();
+            return false;
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------
+
+    // update Leave type
+
+    $('#getLeaveType').on('click', '.btnUpdate', function () {
+        $("#success_Leave_Popup").modal('show');
+        var leavetypes = $(this).data("leavetypename");
+        var isActive = $(this).data("isactive");
+        var id = $(this).data("id");
+        isActive == 'True' ? $(".chkIsActiveModule").prop("checked", true) : $(".chkIsActiveModule").prop("checked", false);
+        $("#LeaveTypes").val(leavetypes);
+        var leavetypename = $(this).data("leavetypename");
+        $('#success_Leave_Popup').on('click', '#btnCreateLeave', function () {
+
+            var action = $(".chkIsActiveModule").prop('checked');
+            var leaveName = $("#LeaveTypes").val();
+            var leaveId = $("#LeaveTypeId").val(id);
+            var leave = {
+                IsActive: action,
+                LeaveTypeId: id,
+                LeaveType: leaveName
+            };
+            
+            var isValid = true;
+            $("#errorValid-LeaveType").text("");
+
+            if ($("#LeaveTypes").val() == "") {
+                $("#errorValid-LeaveType").text("Type field is required");
+                isValid = false;
+            }
+            $('.loader').removeClass('d-none');
+            if (isValid) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Master/UpadateLeaveType",
+                    data: leave,
+                    success: (Result) => {
+                        $("#success_Leave_Popup").css('display', 'none !important');
+
+                        if (Result > 0) {
+                            swal.fire({
+                                        title: "Updated Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          if (resultValue.isConfirmed) {
+                                    window.location.href = "/Master/LeaveType";
+                                };
+                                    });
+                           
+                        }
+                        else {
+                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                         window.location.href = "/Master/LeaveType";
+                                    });
+                            
+                        }
+
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $("#errorValid-LeaveType").show();
+                $('.loader').addClass('d-none');
+                return false;
+            }
+        });
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete Leavetype
+
+    $('#getLeaveType').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var leaveType = {
+                    LeaveTypeId: id
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/Master/DeleteLeaveType",
+                    data: leaveType,
+                    success: (Result) => {
+                        if (Result == true) {
+                            swal.fire({
+                                        title: "Deleted Successfully!",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          window.location.href = "/Master/LeaveType";
+                                    });
+                            
+                        }
+                        else {
+                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          window.location.href = "/Master/LeaveType";
+                                    });
+                            
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });   
+    $(document).ready(function () {
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#success_Leave_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+</script>

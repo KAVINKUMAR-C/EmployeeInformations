@@ -1,0 +1,428 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel;
+@using EmployeeInformations.Common.Enums;
+@using EmployeeInformations.Common
+@model CompanySetting
+@{
+    ViewBag.Title = "CompanySetting";
+    //Layout = "_Layout";
+}
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Email Content</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+            <form>
+                <div class="tab-content">
+                    <div class="tab-pane active">
+                        <br>
+                        @Html.HiddenFor(m => m.CompanyId)
+                        @Html.HiddenFor(m => m.CompanySettingId)
+                        <div class="row">
+                         
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">Mode<span class="required" style="color: #FF0000">*</span></label>
+                                    <div>
+                                        @Html.DropDownListFor(m => m.ModeId,Html.GetEnumSelectList<ActiveModes>(),"--Select Mode--",new{@class="form-control"})
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.ModeId,"",new{@class="error text-danger" , @id="errValid-ModeId"})
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">Time Zone<span class="required" style="color: #FF0000">*</span></label>
+                                    @Html.TextBoxFor(m => m.TimeZone,"", new { @class = "form-control",id="TimeZone"})
+                                    @Html.ValidationMessageFor(x => x.TimeZone,"" , new { @class = "text-danger" , @id="errValid-TimeZone"})
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">Currency<span class="required" style="color: #FF0000">*</span></label>
+                                    @Html.TextBoxFor(m => m.Currency,"", new { @class = "form-control",id="Currency"})
+                                    @Html.ValidationMessageFor(x => x.Currency,"" , new { @class = "text-danger" , @id="errValid-Currency"})
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">Language<span class="required" style="color: #FF0000">*</span></label>
+                                    @Html.TextBoxFor(m => m.Language,"", new { @class = "form-control",id="Language"})
+                                    @Html.ValidationMessageFor(x => x.Language,"" , new { @class = "text-danger" , @id="errValid-Language"})
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">Company Code<span class="required" style="color: #FF0000">*</span></label>
+                                    @Html.TextBoxFor(m => m.CompanyCode,"", new { @class = "form-control",id="CompanyCode"})
+                                    @Html.ValidationMessageFor(x => x.CompanyCode,"" , new { @class = "text-danger" , @id="errValid-CompanyCode"})
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-label">GST Number<span class="required" style="color: #FF0000">*</span></label>
+                                    @Html.TextBoxFor(m => m.GSTNumber,"", new { @class = "form-control",id="GSTNumber"})
+                                    @Html.ValidationMessageFor(x => x.GSTNumber,"" , new { @class = "text-danger" , @id="errValid-GSTNumber"})
+                                </div>
+                            </div>
+                            <div class="col-12 my-3">
+                                @if (Model.IsTimeLockEnable)
+                                {
+                                    <div class="custom-control custom-control-sm custom-checkbox">
+                                        <input type="checkbox" name="chkIsEnabledModule" checked class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule" value="1">
+                                        <label class="custom-control-label" for="chkIsEnabledModule"><b>Today Clock Time</b></label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="custom-control custom-control-sm custom-checkbox">
+                                        <input type="checkbox" name="chkIsEnabledModule" class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule" value="0">
+                                        <label class="custom-control-label" for="chkIsEnabledModule"><b>Today Clock Time</b></label>
+                                    </div>
+                                }
+                            </div>
+                        </div>                      
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    @if (Model.CompanySettingId > 0)
+                    {
+                        <div class="col-lg-12 d-flex mt-3 p-0">
+                            <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                            <input type="button" class="btn btn-primary" id="btnCompany" value="Update" />                           
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                        <input type="button" class="btn btn-primary" id="btnCompany" value="Add" />                        
+                    }
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_DeleteCompany_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteCompany">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    $('input[type=checkbox][name=chkIsEnabledModule]').change(function () {
+
+        if ($(this).is(':checked')) {
+
+            $(this).val("1");
+        }
+        else {
+            $(this).val("0");
+        }
+    });
+
+    $("#btnBack").click(function () {
+        var urlToRedirect = '@Url.Action("Company","Company")';
+        window.location.href = urlToRedirect;
+    });
+
+    // Keyup summary
+
+    $("#TimeZone").keyup(function () {
+        $("#errValid-TimeZone").text("");
+
+        if ($("#TimeZone").val() == "") {
+            $("#errValid-TimeZone").text("Time Zone field is required");
+        }
+    });
+
+    $("#Currency").keyup(function () {
+        $("#errValid-Currency").text("");
+
+        if ($("#Currency").val() == "") {
+            $("#errValid-Currency").text("Currency field is required");
+        }
+    });
+
+    $("#ModeId").click(function () {
+        $("#errValid-ModeId").text("");
+
+        if ($("#ModeId").val() == "") {
+            $("#errValid-ModeId").text("Mode field is required");
+        }
+    });
+
+    $("#CompanyCode").keyup(function () {
+        $("#errValid-CompanyCode").text("");
+
+        if ($("#CompanyCode").val() == "") {
+            $("#errValid-CompanyCode").text("Company Code field is required");
+        }
+    });
+
+    $("#GSTNumber").keyup(function () {
+        $("#errValid-GSTNumber").text("");
+
+        if ($("#GSTNumber").val() == "") {
+            $("#errValid-GSTNumber").text("GST Number field is required");
+        }
+    });
+
+    $("#Language").keyup(function () {
+        $("#errValid-Language").text("");
+
+        if ($("#Language").val() == "") {
+            $("#errValid-Language").text("Language field is required");
+        }
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // update company setting
+
+    $("#btnCompany").click(function () {
+
+        var isValid = true;
+        $("#errValid-CompanyId").text("");
+        $("#errValid-ModeId").text("");
+        $("#errValid-TimeZone").text("");
+        $("#errValid-Currency").text("");
+        $("#errValid-Language").text("");
+        $("#errValid-CompanyCode").text();
+        $("#errValid-GSTNumber").text();
+
+        if ($("#CompanyId").val() == "") {
+            $("#errValid-CompanyId").text("Company field is required");
+            isValid = false;
+        }
+
+        if ($("#ModeId").val() == "") {
+            $("#errValid-ModeId").text("Mode field is required");
+            isValid = false;
+        }
+
+        if ($("#TimeZone").val() == "") {
+            $("#errValid-TimeZone").text("TimeZone field is required");
+            isValid = false;
+        }
+
+        if ($("#Currency").val() == "") {
+            $("#errValid-Currency").text("Currency field is required");
+            isValid = false;
+        }
+
+        if ($("#Language").val() == "") {
+            $("#errValid-Language").text("Language field is required");
+            isValid = false;
+        }
+
+        if ($("#CompanyCode").val() == "") {
+            $("#errValid-CompanyCode").text("CompanyCode field is required");
+            isValid = false;
+        }
+
+        if ($("#GSTNumber").val() == "") {
+            $("#errValid-GSTNumber").text("GSTNumber field is required");
+            isValid = false;
+        }
+
+        
+        var companySettingId = $("#CompanySettingId").val();
+        var companyId = $("#CompanyId").val();
+        var modeId = $("#ModeId").val();
+        var timeZone = $("#TimeZone").val();
+        var currency = $("#Currency").val();
+        var language = $("#Language").val();
+        var companyCode = $("#CompanyCode").val();
+        var gSTNumber = $("#GSTNumber").val();
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+
+        var companySettings = {
+            CompanySettingId: companySettingId,
+            CompanyId: companyId,
+            ModeId: modeId,
+            TimeZone: timeZone,
+            Currency: currency,
+            Language: language,
+            CompanyCode: companyCode,
+            GSTNumber: gSTNumber,
+            IsTimeLockEnable: checkbox
+
+        };
+
+        if (isValid) {
+
+            if (companySettingId == 0) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Company/CreateCompanySetting",
+                    data: companySettings,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result > 0) { 
+                            Swal.fire({
+                                title: 'Added Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("Company", "Company")';
+                                    window.location.href = urlToRedirect;
+                                };
+                            });
+                        }
+                        else{
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("Company", "Company")';
+                                window.location.href = urlToRedirect;
+                            });
+                        }                        
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Company/CreateCompanySetting",
+                    data: companySettings,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result > 0) { 
+                            Swal.fire({
+                                title: 'Updated Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("Company", "Company")';
+                                    window.location.href = urlToRedirect;
+                                };
+                            });                           
+                        }
+                        else{
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("Company", "Company")';
+                                window.location.href = urlToRedirect;
+                            });                           
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+
+        }
+        else {
+            return false;
+        }
+
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------
+    
+    // Delete
+
+    $("#btnCompanydelete").click(function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                var companySettingId = $("#CompanySettingId").val();
+                var companySettings = {
+                    CompanySettingId: companySettingId,
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/Company/DeletedCompanySetting",
+                    data: companySettings,
+                    success: (result) => {
+                        if (result == true) {
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("Company", "Company")';
+                                window.location.href = urlToRedirect;
+                            });                      
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("Company", "Company")';
+                                window.location.href = urlToRedirect;
+                            });                           
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });
+</script>

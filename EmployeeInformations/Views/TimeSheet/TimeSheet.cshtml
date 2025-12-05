@@ -1,0 +1,438 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.TimesheetSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model TimeSheet
+@{
+    ViewBag.Title = "TimeSheet";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int timeSheetModuleId = (int)EmployeesInformationsPages.TimeSheetModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(timeSheetModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">TimeSheet Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create", "CreateTimeSheet", "TimeSheet", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+
+        <table class="display employee-holiday-table mb-3 no-sorting label-search-hide" style="width:100%"  id="getTimeSheetData">         
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="ProjectName"><span class="sub-text">Project Name</span></th>
+                    @if (loginRoleId <= 5)
+                    {
+                        <th class="nk-tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    }
+                    <th class="nk-tb-col tb-col" data-id="TaskName"><span class="sub-text">Task Name</span></th>
+                    @*  <th class="nk-tb-col tb-col"><span class="sub-text">Description</span></th>*@
+                    <th class="nk-tb-col tb-col" data-id="StartDate"><span class="sub-text">Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="StartTime"><span class="sub-text">Start Time</span></th>
+                    <th class="nk-tb-col tb-col" data-id="EndTime"><span class="sub-text">End Time</span></th>
+                    <th class="nk-tb-col tb-col" data-id="TimesheetStatus"><span class="sub-text">Status</span></th>
+                    @*<th class="nk-tb-col tb-col-md"><span class="sub-text">File Name</span></th>*@
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>                    
+                    }
+                </tr>
+            </thead>           
+        </table>      
+    </div>
+</div>
+
+
+<div class="modal" id="success_DeleteTimeSheet_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Deleted Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteTimeSheet">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+  $(document).ready(function () {
+
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindTimeSheetData();
+        function BindTimeSheetData() {
+            var table = $("#getTimeSheetData").DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 0;
+
+        $('#getTimeSheetData').DataTable({
+           
+            serverSide: true,  
+                processing: true,                         
+            ajax: {
+                url: "/TimeSheet/GetTimeSheets",
+                type: 'Get',
+                data: function (d) {
+                    var searchFilter = document.getElementById("getTimeSheetData_filter"); // get search div id
+                    var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                    var searchValue = searchInput.value;  // get search value
+                    var timesheetEntry = document.getElementById("getTimeSheetData_length"); //get entries div id
+                    var entrySelect = timesheetEntry.querySelector("select"); //get entries div select
+                    entries = entrySelect.value; // get entries value
+                    d.sSearch = searchValue;
+                    // Pass pagination parameters
+                    d.iDisplayStart = d.iDisplayStart || 0;
+                    d.iDisplayLength = d.iDisplayLength || entries;
+                    d.sEcho = d.start;
+                    d.columnDirection = columnDirection;
+                    d.ColumnName = columnIndex;
+                }
+            },
+
+            columns: [
+                {
+                    data: 'projectName',
+                    render: function (data, type, row, meta) {
+                        if (count > 5)
+                            count = 1;
+                        var className = getClassNameForGrid(count);
+                        count++;
+                        return "<div class='user-card'> <div class='user-avatar " + className + " '><span style='text-transform:uppercase;'> " + (row.projectName)[0] + "</span></div><div class='user-info'>" + (row.projectName) + "</div></div>";
+                    }
+                },
+
+                {
+                    data: 'employeeName',
+                    render: function (data, type, row) {
+                        if (@loginRoleId <= 5) {
+                            var empClr = "";
+                            if (row.Status == 1) {
+                                empClr = "bg-danger";
+                            }
+                            else {
+                                empClr = "bg-primary";
+                            }
+                                return '<a href="javascript:void(0)" id="viewEmployee" data-empid="' + row.empId + '" ><span class="badge badge-dim ' + empClr + '">' + (row.employeeName) + '</span></a>'
+                        }
+                    }
+                },
+
+                {
+                    data: 'taskName',
+                    render: function (data, type, row) {
+                        var trimtaskName = row.taskName.trim();
+                        return "<div class='leave-reason'> <p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimtaskName + "'>" + row.taskName + "</p></div>";
+                    }
+                },
+
+                {
+                    data: 'startDate',
+                    render: function (data, type, row) {
+                        return "<span>" + dateFormat(row.startDate) + "</span>";
+                    }
+                },
+
+                {
+                    data: 'startTime',
+                    render: function (data, type, row) {
+                        return "<span>" + startTimeFormat(row.startTime) + "</span>";
+                    }
+                },
+
+                {
+                    data: 'endTime',
+                    render: function (data, type, row) {
+                        return "<span>" + endTimeFormat(row.endTime) + "</span>";
+                    }
+                },
+
+                {
+                    data: 'timesheetStatus',
+                    render: function (data, type, row) {
+
+                        var timeSheetStatusClr = "";
+                        if (row.status == 1) {
+                            timeSheetStatusClr = "bg-warning";
+                        }
+                        else if (row.status == 2) {
+                            timeSheetStatusClr = "bg-info";
+                        }
+                        else {
+                            timeSheetStatusClr = "bg-success";
+                        }
+                        return "<b class='badge badge-sm badge-dot has-bg " + timeSheetStatusClr + " d-sm-inline-flex'>" + row.timesheetStatus + "</b>";
+                    }
+                },
+
+                {
+                    data: 'null',
+                        "orderable": false,
+                    render: function (data, type, row) {
+
+                        if (@loginRoleId == 1 || @loginRoleId == 2) {
+                                return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnView" data-id="' + row.timeSheetId + '"><em class="icon ni ni-eye"></em><span>View</span></a></li><li><a href="javascript:void(0)" class="btnUpdate" data-id="' + row.timeSheetId + '"><em class="icon ni ni-edit"></em><span>Edit</span></a></li><li><a href="javascript:void(0)" id="btnDelete" data-id="' + row.timeSheetId + '" ><em class="icon ni ni-delete"></em><span>Delete</span></a></li></ul></div></div></li></ul></div>'
+                            if (row.attachmentFileName != null) {
+                                    return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigge" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnDownload" data-id="' + row.timeSheetId + '"><em class="icon ni ni-download"></em><span>Download</span></a></li></ul></div></div></li></ul></div>'
+                            }
+                        }
+                        else {
+                            if (row.empId == @loginEmpId) {
+                                if (row.empId == @loginEmpId) {
+                                        return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigge" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnView" data-id="' + row.timeSheetId + '"><em class="icon ni ni-eye"></em><span>View</span></a></li><li><a href="javascript:void(0)" class="btnUpdate" data-id="' + row.timeSheetId + '"><em class="icon ni ni-edit"></em><span>Edit</span></a></li><li><a href="javascript:void(0)" id="btnDelete" data-id="' + row.timeSheetId + '"><em class="icon ni ni-delete"></em><span>Delete</span></a></li></ul></div></div></li></ul></div>'
+                                }
+                                if (row.attachmentFileName != null) {
+                                        return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigge" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnDownload" data-id="' + row.timeSheetId + '"><em class="icon ni ni-download"></em><span>Download</span></a></li></ul></div></div></li></ul></div>'
+                                }
+                            }
+                            else {
+                                if (row.attachmentFileName != null) {
+                                        return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigge" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnDownload" data-id="' + row.timeSheetId + '"><em class="icon ni ni-download"></em><span>Download</span></a></li></ul></div></div></li></ul></div>'
+                                }
+                                else {
+                                        return '<div class="nk-tb-col nk-tb-col-tools py-0 border-0"><ul class="nk-tb-actions gx-1 my-n1"><li class="me-n1"><div class="dropdown"><a href="#" class="dropdown-toggle btn btn-icon btn-trigge" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a><div class="dropdown-menu dropdown-menu-end"><ul class="link-list-opt no-bdr"><li><a href="javascript:void(0)" class="btnView" data-id="' + row.timeSheetId + '"><em class="icon ni ni-eye"></em><span>View</span></a></li></ul></div></div></li></ul></div>'
+                                }
+                            }
+                        }
+                    }
+                },
+            ],
+
+                "columnDefs": [
+                    { "width": "300px", "targets": [0, 1, 2, 3, 4, 5, 6] },                   
+                ],            
+
+            "createdRow": function (row, data, dataIndex, settings) {
+                // Add custom class to the row
+                $(row).addClass('nk-tb-item');
+                // Add custom classes to each cell in the row if necessary
+                $(row).find('td').addClass('nk-tb-col tb-col');
+            },
+            "initComplete": function (settings, json) {
+                // Access recordsTotal and recordFiltered
+                var recordsTotal = json.recordsTotal;
+                var recordFiltered = json.recordFiltered;
+                console.log("Total records: " + recordsTotal);
+                console.log("Filtered records: " + recordFiltered);
+            }
+        });
+        // $('[data-bs-toggle="tooltip"]').tooltip();
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+     }
+
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+  });
+  
+    function getClassNameForGrid(input)
+    {
+            var className = "";
+            switch (input)
+            {
+                case 1:
+                    className = "bg-success";
+                    break;
+                case 2:
+                    className = "bg-warning";
+                    break;
+                case 3:
+                    className = "bg-info";
+                    break;
+                case 4:
+                    className = "bg-blue";
+                    break;
+                case 5:
+                    className = "bg-pink";
+                    break;
+                case 6:
+                    className = "bg-danger";
+                    break;
+            }
+            return className;
+    }
+    
+
+    @*  $(document).ready(function() {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+        var id = (@loginRoleId < 5 ) ? 3 : 2;
+        $('#getTimeSheetData').DataTable({
+        "bInfo": true,
+        "paging": true,
+        order: [
+        [id, "desc"]
+        ],
+        });
+
+        }); *@
+
+        //Timesheet StartDate
+        function dateFormat(startDate) {
+
+         var dateObject = new Date(startDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+
+    //Timesheet StartTime
+    function startTimeFormat(startTime) {
+        var dateObject = new Date(startTime);
+        var hours = ("0" + dateObject.getHours()).slice(-2);
+        var minutes = ("0" + dateObject.getMinutes()).slice(-2);
+        var seconds = ("0" + dateObject.getSeconds()).slice(-2);      
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+        var starttime = hours + ":" + minutes + " " + ampm;
+        return starttime;
+    }    
+
+    //Timesheet EndTime
+    function endTimeFormat(endTime) {
+        var dateObject = new Date(endTime);
+        var hours = ("0" + dateObject.getHours()).slice(-2);
+        var minutes = ("0" + dateObject.getMinutes()).slice(-2);
+        var seconds = ("0" + dateObject.getSeconds()).slice(-2);
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+        var endtime = hours + ":" + minutes + " " + ampm;
+        return endtime;
+    }
+
+    //--------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    $('#getTimeSheetData').on('click', '#viewEmployee', function () {
+        var empId = $(this).data('empid');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+
+    $('#getTimeSheetData').on('click', '.btnView', function () {
+        var timeSheetId = $(this).data('id');
+        PageUtil.goToContent("/TimeSheet/ViewTimeSheet?timeSheetId=" + timeSheetId);
+    });
+
+    $('#getTimeSheetData').on('click', '.btnUpdate', function () {
+        debugger
+        var timeSheetId = $(this).data('id');
+        PageUtil.goToContent("/TimeSheet/EditTimeSheet?TimeSheetId=" + timeSheetId);
+    });
+
+    // Delete
+
+    $('#getTimeSheetData').on('click', '#btnDelete', function() {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var timeSheet = {
+                    TimeSheetId: id
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/TimeSheet/DeleteTimeSheet",
+                    data: timeSheet,
+                    success: (Result) => {
+                        if (Result == true) {
+                            @*  $("#success_DeleteTimeSheet_Popup").modal('show');
+                                $("#btnCloseDeleteTimeSheet").click(function() { *@
+                                swal.fire({
+                                    title: "Deleted Successfully!",
+                                    text: "",
+                                    icon: "success",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    var urlToRedirect = '@Url.Action("TimeSheet", "TimeSheet")';
+                                    window.location.href = urlToRedirect;
+                                });
+                        }
+                        else{
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                var urlToRedirect = '@Url.Action("TimeSheet", "TimeSheet")';
+                                window.location.href = urlToRedirect;
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        })
+    });
+    //-----------------------------------------------------------------------------------------------------------------------
+    // Download
+    $('#getTimeSheetData').on('click', '.btnDownload', function() {
+        var timeSheetId = $(this).data("id")
+        window.location.href = "/TimeSheet/DownloadFiles?timeSheetId=" + timeSheetId;
+        $('.loader').addClass('d-none');
+    });
+</script>

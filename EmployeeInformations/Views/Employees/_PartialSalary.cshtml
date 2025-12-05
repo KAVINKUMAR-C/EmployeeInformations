@@ -1,0 +1,492 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums
+@model SalaryViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+
+<div class="d-flex mb-1 title data-head">
+    <h6>Salary Information</h6>
+</div>
+<div class="tab-pane p-3">
+    <div class="card my-4 boxshadow-none edit-page table-card" data-simplebar>
+        <table class="table" id="getsalarydata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Year</th>
+                    <th>Month</th>
+                    <th style="display:none;">Months</th>
+                    <th>CTC</th>
+                    <th class="nk-tb-col">
+                        <div class="nk-tb-col py-0 border-0">
+                            Action
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="displaySalary">
+                @if (Model.salary?.Count() > 0)
+                {
+                    foreach (var item in Model.salary)
+                    {
+                        <tr>
+                            <td>
+                                @item.Year 
+                            </td>
+                            <td>
+                                @item.MonthName                                
+                            </td>
+                            <td style="display:none;">
+                                @item.Month
+                            </td>
+                            <td>
+                                @item.Amount
+                            </td>
+                            <td>
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="editBtn" data-id="@item.SalaryId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="deleteBtn" data-id="@item.SalaryId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="dataTables_empty" style="text-align:center;" colspan="5">No data available</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card boxshadow-none p-3">
+
+        <div class="row">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.EmpId">
+            <input type="hidden" class="form-control" id="SalaryId" value="@Model.SalaryId">
+
+            <div class="col-lg-3 ">
+                <div class="form-group">
+                    <label class="form-label">Year<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.Year, new SelectList(Model.Years, "Year", "StrYear"), "--Select Year--", new { @class = "form-control", id = "year" })
+                        </div>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Year, "", new { @class = "error text-danger", id = "errValid-Year" })
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 autocomplete">
+                <div class="form-group">
+                    <label class="form-label">Month<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        <div class="selectbox">
+                        @Html.DropDownListFor(m => m.Month, Html.GetEnumSelectList<Months>(), "--Select Month--", new { @class = "form-control", id = "month" })
+                        </div>
+                        <span id="errVerify-Month" style="display:none;" class="error text-danger">Month already exists! </span>
+                    </div>
+                    <span class="error text-danger" id="errValid-Month"></span>
+                </div>
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label class="form-label"> CTC<span class="required" style="color: #FF0000">*</span></label>
+                    @if (Model.Amount == 0)
+                    {
+                        <input type="text" id="Amount" class="form-control" placeholder="Enter the CTC" value="" />
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.Amount, new { @class = "form-control" })
+                    }
+                    @Html.ValidationMessageFor(m => m.Amount, "", new { @class = "error text-danger", id = "errValid-Amount" })
+                </div>
+            </div>
+
+            <div class="col-12 d-flex mb-3 mt-auto">
+                <button type="button" class="btn btn-primary ml-auto" id="btnAdd" value="add">Add</button>
+                <button type="button" class="btn btn-primary ml-auto" id="btnUpdate" value="update" style="display:none">Update</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 d-flex mt-3">
+        <input type="button" class="btn btn-secondary mr-auto" id="btnsalaryBack" value="Back" />
+        <input type="button" class="btn btn-primary" id="btnsalary" value="Next" />
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.selectedwizard li').removeClass('current');
+        $("#step8").addClass('current');
+    });
+
+
+    // KeyUp Summary
+
+    $("#Amount").keyup(function () {
+        $("#errValid-Amount").text("");
+        if ($("#Amount").val() == "") {
+            $("#errValid-Amount").text("CTC field is required");
+        }
+        else {
+            $("#errValid-Amount").text("");
+        }
+    });
+
+    // Change Summary
+    $("#year").change(function () {
+
+        $("#errValid-Year").text("");
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+        }
+        else {
+            $("#errValid-Year").text("");
+        }
+    });
+
+    $("#month").change(function () {
+
+        $("#errValid-Month").text("");
+        $("#errVerify-Month").hide();
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+        }
+        else {
+            $("#errValid-Month").text("");
+        }
+    });
+
+    //Click Summary
+    $("#btnsalaryBack").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/Createexperience?empId=" + empId);
+    });
+
+    $("#Amount").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $('#btnsalary').click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/CreateBankDetails?empId=" + empId);
+    });
+
+    //Create Salary
+    $('#btnAdd').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Year").text("");
+        $("#errValid-Amount").text("");
+        $("#errValid-Month").text("");
+        $("#errVerify-Month").hide();
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            isValid = false;
+        }
+
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            isValid = false;
+        }
+
+        if ($("#Amount").val() == "") {
+            $("#errValid-Amount").text("CTC field is required");
+            isValid = false;
+        }
+
+        var empId = $("#EmpId").val();
+        var salaryId = $("#SalaryId").val();
+        var year = $("#year").val();
+        var amount = $("#Amount").val();
+        var month = $("#month").val();
+        
+        formData.append("empId", empId);
+        formData.append("SalaryId", salaryId);
+        formData.append("year", year);
+        formData.append("Amount", amount);
+        formData.append("Month", month);
+
+
+        if (isValid) {
+            var url = "/Employees/GetBySalaryCount";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (result) => { //list of data count                   
+                    if (result == 0) {
+                        var url = "/Employees/AddSalaryDetails";
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: (Result) => { //list of data count
+                                $('#displaySalary').html("");
+
+                                if (Result.length > 0) {
+                                    Swal.fire({
+                                        title: 'Added Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((resultvalue) => {
+                                        if (resultvalue.isConfirmed) {
+                                            $.each(Result, function (key, value) {
+                                                $('#displaySalary').append("<tr><td>" + value.year + "</td><td>" + value.monthName + "</td><td style='display: none;'> " + value.month + "</td><td>" + value.amount + ".00" + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='editBtn' data-id=" + value.salaryId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='deleteBtn' data-id=" + value.salaryId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li></ul></div></div></li></ul></div></td></tr>");
+                                            });
+                                        };
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        var empId = $("#EmpId").val();
+                                        PageUtil.goTo("/Employees/GetAllSalaryByEmpId?empId=" + empId);
+                                    });
+                                }
+                            },
+                            complete: function () {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                         $("#year").val('');
+                         $("#Amount").val('');
+                         $("#month").val('');
+                        $("#errVerify-Month").hide();
+                    }
+                    else {
+                        $("#errVerify-Month").show();                        
+                        $('.loader').addClass('d-none');
+                        return false;
+                    }
+                }
+            });
+        }
+        else {
+            return false;
+        }             
+    });
+
+
+    $('#getsalarydata').on('click', '#editBtn', function () { 
+        
+        $("#errValid-Year").text("");
+        $("#errValid-Amount").text("");
+        $("#btnUpdate").show();
+        $("#btnAdd").hide();
+        $("#errVerify-Month").hide();
+
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim();
+        var FourthCol = tr.find('td:eq(3)').text().trim();
+
+        $('#SalaryId').val(id);
+        $('#year').val(FirstCol);
+        $('#month').val(ThirdCol);
+        $('#Amount').val(FourthCol);
+        $("#year").prop('disabled', true);
+        $('#month').prop('disabled', true);
+    });
+
+
+    $('#btnUpdate').click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Year").text("");
+        $("#errValid-Amount").text("");
+        $("#errValid-Month").text("");
+        $("#errVerify-Month").hide();
+
+        if ($("#year").val() == "") {
+            $("#errValid-Year").text("Year field is required");
+            isValid = false;
+        }
+
+        if ($("#Amount").val() == "") {
+            $("#errValid-Amount").text("Amount field is required");
+            isValid = false;
+        }
+        if ($("#month").val() == "") {
+            $("#errValid-Month").text("Month field is required");
+            isValid = false;
+        }
+        
+        var empId = $("#EmpId").val();
+        var salaryId = $("#SalaryId").val();
+        var year = $("#year").val();
+        var amount = $("#Amount").val();
+        var month = $("#month").val();
+
+        formData.append("empId", empId);
+        formData.append("SalaryId", salaryId);
+        formData.append("year", year);
+        formData.append("Amount", amount);
+        formData.append("Month", month);
+      
+        if (isValid) {
+
+            var url = "/Employees/AddSalaryDetails";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (Result) => { //list of data count
+                    $('#displaySalary').html("");
+
+                    if (Result.length > 0) {
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                $.each(Result, function (key, value) {
+                                    $('#displaySalary').append("<tr><td>" + value.year + "</td><td>" + value.monthName + "</td><td style='display: none;'>" + value.month + "</td><td>" + value.amount + ".00" + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='editBtn' data-id=" + value.salaryId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='deleteBtn' data-id=" + value.salaryId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li></ul></div></div></li></ul></div></td></tr>");
+                                });
+                                $("#btnAdd").show();
+                                $("#btnUpdate").hide();
+                            };
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            var empId = $("#EmpId").val();
+                            PageUtil.goTo("/Employees/GetAllSalaryByEmpId?empId=" + empId);
+                        });
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+
+        }
+        else {
+            return false;
+        }
+        $("#SalaryId").val('');
+        $("#year").val('');
+        $("#Amount").val('');
+        $("#year").prop('disabled', false);
+        $("#month").val('');
+        $("#errVerify-Month").hide();
+        $("#month").prop('disabled', false);
+    });
+
+    $('#getsalarydata').on('click', '#deleteBtn', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var id = $(this).data("id")
+                var salary = {
+                    SalaryId: id,
+                    EmpId: $("#EmpId").val()
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/DeleteSalary",
+                    data: salary,
+                    success: (Result) => {
+                        $('#displaySalary').html('')
+
+                        Swal.fire({
+                            title: 'Deleted Successfully!',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                if (Result.length == 0) {
+                                    $('#displaySalary').append("<tr><td class='dataTables_empty' style = 'text-align:center;' colspan = '5' > No data available </td></tr>");
+                                }
+                                else {
+                                    $.each(Result, function (key, value) {
+                                        $('#displaySalary').append("<tr><td>" + value.year + "</td><td>" + value.monthName + "</td><td style='display: none;'> " + value.month + "</td><td>" + value.amount + ".00" + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='editBtn' data-id=" + value.salaryId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='deleteBtn' data-id=" + value.salaryId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li></ul></div></div></li></ul></div></td></tr>");
+                                    });
+
+                                }
+                                $('.loader').addClass('d-none');
+                            };
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+
+                $("#SalaryId").val('');
+                $("#year").val('');
+                $("#Amount").val('');
+                $("#month").val('');
+                $("#errVerify-Month").hide();
+            }
+        })
+    });
+</script>

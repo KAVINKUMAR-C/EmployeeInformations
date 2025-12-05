@@ -1,0 +1,316 @@
+﻿@using EmployeeInformations.Model.APIModel
+@model WebsiteJobApplyModel;
+@{
+    ViewBag.Title = "CreateWebsiteJobApply";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Create Website JobApply</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                @Html.HiddenFor(m => m.JobApplyId)
+                <input type="hidden" id="strFmtSkill" value="@Model.SkillSet" />
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 autocomplete">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>                      
+                        @Html.DropDownListFor(m => m.JobId, new SelectList(Model.WebsiteJobs, "JobId", "JobName"), "--Select Role Name--", new { @class = "form-control", id = "jobid" })                    
+                        @Html.ValidationMessageFor(m => m.JobId, "", new { @class = "error text-danger", id = "errValid-jobid" })
+
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Full Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", id = "fullname" })
+                        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "error text-danger", id = "errValid-FirstName" })
+                    </div>
+                </div>
+
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Email<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @type = "email", id = "webemail" })
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "error text-danger", id = "errValid-OfficeEmail" })
+                        <span id="errVerify-EmailExist" style="display:none;" class="error text-danger"> Office Email already exists! </span>
+                        <span id="errVerifyEmailFormat-OfficeEmail" style="display:none;" class="error text-danger">Email is invalid </span>
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Experience<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.Experience, new { @class = "form-control", id = "webExperience" })
+                        @Html.ValidationMessageFor(m => m.Experience, "", new { @class = "error text-danger", id = "errValid-webExperience" })
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 autocomplete">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Skill Sets<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.SkillSet, new SelectList(Model.skillSets, "SkillId", "SkillName"), "--Select Skill Sets--", new { @class = "form-control", id = "skills", multiple = true })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.SkillSet, "", new { @class = "error text-danger", id = "errValid-Skills" })
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Relevant Experience<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.RelevantExperience, new { @class = "form-control", id = "releventExperience" })
+                        @Html.ValidationMessageFor(m => m.RelevantExperience, "", new { @class = "error text-danger", id = "errValid-releventExperience" })
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6" id="documentBlock">
+                    <div class="form-group">
+                        <label class="form-label" id="documentLable">Document<span class="required" style="color: #FF0000">*</span></label>
+
+                        <div class="input-group custom-file-button">
+                            @Html.TextBoxFor(m => m.FilePath, "", new { type = "file", @class = "form-control", name = "file", disable = true, id = "docfiles" })
+                        </div>
+                        <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                        <span class="error text-danger" id="errValid-InvalidFormate"> Invalid File Format</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-12 d-flex mt-3 p-0">
+                <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                <input type="button" class="btn btn-primary" id="btnCreate" value="Save" />
+            </div>
+
+        </form>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+
+        $("#skills,#jobid").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        $("#errValid-InvalidFormate").hide();
+    });
+    $("#jobid").change(function () {
+        $("#errValid-Department").text("");
+        if ($("#jobid").val() == "") {
+            $("#errValid-jobid").text("Name field is required");
+        }
+        else {
+            $("#errValid-jobid").text("");
+        }
+    });
+
+    $("#skills").change(function () {
+        $("#errValid-Department").text("");
+        if ($("#skills").val() == "") {
+            $("#errValid-Skills").text("Skill field is required");
+        }
+        else {
+            $("#errValid-Skills").text("");
+        }
+    });
+
+    $("#fullname").keyup(function () {
+
+        $("#errValid-FirstName").text("");
+
+        if ($("#fullname").val() == "") {
+            $("#errValid-FirstName").text("Full Name field is required");
+        }
+    });
+    $("#webemail").keyup(function () {
+
+        $("#errValid-OfficeEmail").text("");
+
+        if ($("#webemail").val() == "") {
+            $("#errVerifyEmailFormat-OfficeEmail").text("");
+            $("#errValid-OfficeEmail").text("Email field is required");
+        }
+    });
+    $("#webExperience").keyup(function () {
+
+        $("#errValid-webExperience").text("");
+     
+        if ($("#webemail").val() == "") {
+          
+            $("#errValid-webExperience").text("Experience field is required");
+        }
+    });
+    $("#releventExperience").keyup(function () {
+
+        $("#errValid-releventExperience").text("");
+
+        if ($("#releventExperience").val() == "") {
+            $("#errValid-releventExperience").text("Relevent Experience field is required");
+        }
+    });
+
+    $("#docfiles").change(function () {
+
+        $("#errValid-ErrorFileSize").text("");
+
+        if ($("#docfiles").val() == "") {
+            $("#errValid-ErrorFileSize").text("File  field is required");
+        }
+    });
+    var skillSets = $("#skills").select2();
+    $("#btnCreate").click(function () {
+        
+        $("#errValid-jobid").text("");
+        $("#errValid-InvalidFormate").hide();
+        $("#errValid-FirstName").text("");
+        $("#errValid-OfficeEmail").text("");
+        $("#errValid-Skills").text("");
+        $("#errValid-webExperience").text("");
+        $("#errValid-releventExperience").text("");
+        $("#errValid-ErrorFileSize").text("");
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        var formData = new FormData();
+        var isValid = true;
+        var jobId = $("#jobid").val();
+        var fullname = $("#fullname").val();
+        var email = $("#webemail").val();
+        var experience = $("#webExperience").val();
+        var skills = $("#skills").val();
+        var releventExperience = $("#releventExperience").val();
+        var isRecodForm = $("#isRecodForm").val();
+        var Jobfiles = $("#docfiles").val();
+
+        if (Jobfiles != "") {
+            var ext = Jobfiles.split('.').pop();
+            if (ext == "pdf" || ext == "doc" || ext == "jpeg" || ext == "png" || ext == "jpg" || ext == "jfif" || ext == "bmp") {
+
+            } else {
+                $("#errValid-InvalidFormate").show();
+                isValid = false;
+            }
+        }
+        formData.append("JobId", jobId);
+        formData.append("FullName", fullname);
+        formData.append("Email", email);
+        formData.append("Experience", experience);
+        formData.append("SkillSet", skills);
+        formData.append("RelevantExperience", releventExperience);
+        formData.append("IsRecordForm", isRecodForm);
+        formData.append("file", $('#docfiles').prop("files")[0]);
+
+        if ($("#jobid").val() == "") {
+            $("#errValid-jobid").text("Name field is required");
+            isValid = false;
+        }
+        if ($("#fullname").val() == "") {
+            $("#errValid-FirstName").text("Full Name field is required");
+            isValid = false;
+        }
+        if ($("#webemail").val() == "") {
+            $("#errValid-OfficeEmail").text("Email field is required");
+            isValid = false;
+        }
+        if ($("#webExperience").val() == "") {
+            $("#errValid-webExperience").text("Experience field is required");
+            isValid = false;
+        }
+        if ($("#skills").val() == "") {
+            $("#errValid-Skills").text("skills field is required");
+            isValid = false;
+        }
+        if ($("#releventExperience").val() == "") {
+            $("#errValid-releventExperience").text("Relevent Experience field is required");
+            isValid = false;
+        }
+        if ($("#docfiles").val() == "") {
+            $("#errValid-ErrorFileSize").text("File field is required");
+            isValid = false;
+        }
+
+        if (isValid) {
+            var isEmailVerify = emailCheck(email);
+            if (isEmailVerify) {
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "/WebsiteJob/AddSiteJopApply",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            Swal.fire({
+                                title: 'Added Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    window.location.href = "/WebsiteJob/WebsiteJobApply";
+                                };
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/WebsiteJob/WebsiteJobApply";
+                            });
+                        }
+
+                        $('#DocumentFilePath').val('');
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        }
+
+        else {
+          
+            return false;
+        }
+    });
+
+    $("#btnBack").click(function () {
+
+        window.location.href = "/WebsiteJob/WebsiteJobApply";
+
+    });
+    function emailCheck(email) {
+        var isEmailValid = true;
+        var mailformat = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        $("#errMsgEmailFormat-Email").text("");
+        if (!mailformat.test(email)) {
+            $("#errVerifyEmailFormat-OfficeEmail").show();
+            isEmailValid = false;
+        }
+        return isEmailValid
+    }
+</script>

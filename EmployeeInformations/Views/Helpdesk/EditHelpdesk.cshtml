@@ -1,0 +1,20 @@
+﻿@using EmployeeInformations.Model.HelpdeskViewModel
+@using Microsoft.AspNetCore.Http;
+@model Helpdesk
+@{
+    var Id = Context.Session.GetInt32("Id");
+
+}
+<div id="bind-Helpdeskmodal-content">
+</div>
+
+<input type="hidden" id="txt-Id" value="@Model.Id" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var Id = $("#txt-Id").val();
+        PageUtil.goToHelpdesk("/Helpdesk/UpdateHelpdesk?Id=" + Id);
+    });
+
+</script>

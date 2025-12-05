@@ -1,0 +1,307 @@
+﻿@using EmployeeInformations.Model.TeamsViewModel
+@model Teams
+@{
+    ViewBag.Title = "Teams";
+    Layout = "_Layout";
+   
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title"> Teams Meeting Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreateTeams" value="Create" />
+           @*   <a href="@authorizationUrl" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm"><span class="nk-menu-text">Create</span></a>  *@
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        @Html.HiddenFor(m => m.Code)
+        <table class="display employee-holiday-table mb-3 no-sorting label-search-hide" style="width:100%" id="getTeamsData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col" data-id="MeetingName"><span class="sub-text">Meeting Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="AttendeeEmail"><span class="sub-text">Attendee Email</span></th>
+                    <th class="nk-tb-col tb-col" data-id="StartDate"><span class="sub-text">Start Time</span></th>
+                    <th class="nk-tb-col tb-col" data-id="EndDate"><span class="sub-text">End Time</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindTeamsData();
+        function BindTeamsData() {
+            var table = $("#getTeamsData").DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 0;
+
+            $('#getTeamsData').DataTable({
+
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: "/Teams/GetTeamsMeeting",
+                    type: 'Get',
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getTeamsData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var timesheetEntry = document.getElementById("getTeamsData_length"); //get entries div id
+                        var entrySelect = timesheetEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        // Pass pagination parameters
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                    }
+                },
+
+                columns: [
+                    {
+                        data: 'employeeName',
+                        render: function (data, type, row, meta) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+                            return "<div class='user-card'> <div class='user-avatar " + className + " '><span style='text-transform:uppercase;'> " + (row.employeeName)[0] + "</span></div><div class='user-info'>" + (row.employeeName) + "</div></div>";
+                        }
+                    },
+
+                    {
+                        data: 'meetingName',
+                        render: function (data, type, row) {
+                            var name = row.meetingName.trim();
+                            return "<div class='leave-reason'> <p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + name + "'>" + row.meetingName + "</p></div>";
+                        }
+                    },
+
+                    {
+                        data: 'attendeeEmail',
+                        render: function (data, type, row) {
+                            var email = row.attendeeEmail.trim();
+                            return "<div class='leave-reason'> <p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + email + "'>" + row.attendeeEmail + "</p></div>";
+                        }
+                    },
+                    {
+                        data: 'startDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateTimeFormat(row.startDate) + "</span>";
+                        }
+                    },
+
+                    {
+                        data: 'endDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateTimeFormat(row.endDate) + "</span>";
+                        }
+                    },
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+
+                            var html = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='editTeamsBtn' data-id=" + row.teamsMeetingId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + row.teamsMeetingId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li>";
+
+                            html += "</ul></div></div></li></ul></div>";
+                            return html;
+                        }
+
+                    }
+
+                ],
+
+
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+                "initComplete": function (settings, json) {
+                    // Access recordsTotal and recordFiltered
+                    var recordsTotal = json.recordsTotal;
+                    var recordFiltered = json.recordFiltered;
+                    console.log("Total records: " + recordsTotal);
+                    console.log("Filtered records: " + recordFiltered);
+                }
+            });
+
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+        }
+
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+    });
+
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+
+    //Timesheet StartDate
+
+
+    function dateTimeFormat(createdDate) {
+        var dateObject = new Date(createdDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        var seconds = dateObject.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours from 24-hour to 12-hour format
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+
+        // Add leading zeros to minutes and seconds
+        minutes = ("0" + minutes).slice(-2);
+        seconds = ("0" + seconds).slice(-2);
+
+        var formattedDate = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ampm;
+        return formattedDate;
+    }
+
+
+    $('#getTeamsData').on('click', '#editTeamsBtn', function () {       
+        var code = $("#Code").val();
+        var teamsMeetingId = $(this).data('id');      
+        var url = "/Teams/EditTeams?TeamsMeetingId=" +teamsMeetingId +"&Code="+code;
+        PageUtil.goToContent(url);
+    });
+
+    $("#CreateTeams").click(function () {      
+        var code = $("#Code").val();
+        var url = "/Teams/TeamMeeting?Code=" + code;
+        window.location.href = url;
+    });
+
+   
+
+
+    $('#getTeamsData').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+           
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var code = $("#Code").val();
+                var teams = {
+                    TeamsMeetingId: id,
+                    Code: code
+                };
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Teams/DeleteTeamsMeeting",
+                    data: teams,
+                    success: (Result) => {
+                        if (Result == true) {
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                var urlToRedirect = '@Url.Action("Teams", "Teams")';
+                                window.location.href = urlToRedirect;
+                                
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                var urlToRedirect = '@Url.Action("Teams", "Teams")';
+                                window.location.href = urlToRedirect;
+                            });
+                        }
+
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        })
+    });
+
+
+
+</script>
+
+

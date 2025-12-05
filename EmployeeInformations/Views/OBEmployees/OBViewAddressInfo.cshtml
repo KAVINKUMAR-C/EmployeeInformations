@@ -1,0 +1,134 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel
+@model OBViewAddressInfo
+
+<form>
+
+    <div class="card-title mb-4">
+        <h6 class="title">Permanent Address</h6>
+    </div>
+    <div class="row p-3">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 1</label>
+                <div>
+                    <label class="form">@Model.Address1</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 2</label>
+                <div>
+                    <label class="form">@Model.Address2</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <div>
+                    <label class="form">@Model.CountryName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">State</label>
+                <div>
+                    <label class="form">@Model.StateName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">City</label>
+                <div>
+                    <label class="form">@Model.CityName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Pin Code</label>
+                <div>
+                    <label class="form">@Model.Pincode</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-title mb-4">
+        <h6 class="title">Current Address</h6>
+    </div>
+    <div class="row p-3">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 1</label>
+                <div>
+                    <label class="form">@Model.SecondaryAddress1</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 2</label>
+                <div>
+                    <label class="form">@Model.SecondaryAddress2</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Country</label>
+                <div>
+                    <label class="form">@Model.SecondaryCountryName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">State</label>
+                <div>
+                    <label class="form">@Model.SecondaryStateName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">City</label>
+                <div>
+                    <label class="form">@Model.SecondaryCityName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Pin Code</label>
+                <div>
+                    <label class="form">@Model.SecondaryPincode</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('.viewActive li').removeClass('active');
+        $(".empAddressInfo").addClass('active');
+    });
+
+</script>

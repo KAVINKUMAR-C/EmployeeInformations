@@ -1,0 +1,621 @@
+﻿@using EmployeeInformations.Model.BenefitViewModel
+@model EmployeeBenefitViewModel
+@{
+    ViewBag.Title = "Benefits";
+    //Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Benefit</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="btnAddBenefit" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="employeeBenefits">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getBenefitData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="BenefitName"><span class="sub-text">Type</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                </tr>
+            </thead>
+
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="success_RejectTab1_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Benefits</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                @* <div class="col-12">
+                <label class="form-label">Employee Name</label>
+                <div class="form-group">
+                <label id="employeeName" class="employee-name mb-0"></label>
+                </div>
+                </div>*@
+                @Html.HiddenFor(m => m.BenefitId)
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Employee Name<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.EmpId, new SelectList(Model.reportingPeople, "EmpId", "EmployeeName"), "--Select Employee Name--", new { @class = "form-control", @id = "EmpId" })
+                        </div>
+                        <span class="error text-danger" id="errValid-EmployeeName"></span>
+                    </div>
+                </div>
+
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Type<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.BenefitTypeId, new SelectList(Model.BenefitTypes, "BenefitTypeId", "BenefitName"), "--Select Type--", new { @class = "form-control", id = "BenefitTypeId" })
+                        </div>
+                        <span class="error text-danger" id="errValid-BenefitType"></span>
+                    </div>
+                </div>
+
+                @*  <div class="col-12">
+                <div class="form-group">
+                <label class="form-label">Reason</label>
+                @Html.TextArea("RejectReason" , null, new { cols = "5", rows = "10", @class="form-control" })
+                </div>
+                <span class="error text-danger" id="errValid-Reason"></span>
+                </div>*@
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnAddDetails" value="Save" />
+                    <input type="button" class="btn btn-primary ml-auto mr-3" style="display:none;" id="btnUpdate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseRejectTab1" value="Cancel" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteRejection_PopupTab1" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteRejection">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    //   $(document).ready(function () {
+    //     $("#btnAddBenefit").click(function () {
+    //         $("#success_RejectTab1_Popup").modal('show');
+    //     });
+
+    //     $("#btnCloseRejectTab1").click(function () {
+    //        $("#success_RejectTab1_Popup").hide();
+    //        window.location.href = "/Benefit/BenefitTab";
+    //     });
+
+    //     $('#success_RejectTab1_Popup').modal({backdrop: 'static', keyboard: false})
+
+    //   });
+
+     $("#btnCloseRejectTab1").click(function () {
+            $("#success_RejectTab1_Popup").hide();
+                $("#errValid-EmployeeName").text("");
+            $("#errValid-BenefitType").text("");
+     });
+   
+
+
+    // $(document).ready(function () {
+
+    //     $('#getBenefitData').DataTable({
+    //         "bInfo": true,
+    //         "paging": true,
+    //     });
+    // });
+
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        getBenefitDatas();
+
+        function getBenefitDatas() {
+            var table = $('#getBenefitData').DataTable();
+            if (table) {
+                table.destroy();
+            }
+            $('#getBenefitData').DataTable({
+                serverSide: true,
+                processing: true,
+                pageLength: entries, // Page length
+                "language": {
+                    "infoFiltered": "",
+                },
+                ajax: {
+                    url: "/Benefit/BenefitFilter",
+                    type: "GET",
+                    data: function (d) {
+                        //SearchFilter
+                        var benefitFilter = document.getElementById("getBenefitData_filter");
+                        var benefitSearch = benefitFilter.querySelector("input[type='search']");
+                        var benefitData = benefitSearch.value;
+                        //PagingLength
+                        var benefitCount = document.getElementById("getBenefitData_length");
+                        var page = benefitCount.querySelector("select");
+                        var benefitFilterCount = page.value;
+
+                        d.sSearch = benefitData;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || benefitFilterCount;
+                        d.sEcho = d.start;
+                        d.columnName = columnIndex;
+                        d.columnDirection = columnDirection;
+
+                    }
+                },
+                columns: [
+                    {
+                        data: 'employeeName',
+                        render: function (data, type, row) {
+                            if (row.employeeStatus == true) {
+                                return "<a href='javascript: void (0)' id='viewEmployee' data-empid=" + row.empId + "><span class='badge badge-dim bg-danger'>" + row.employeeName + "</span></a>"
+                            }
+                            else {
+                                return "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + row.empId + "><span class='badge badge-dim bg-primary'>" + row.employeeName + "</span></a>"
+                            }
+
+                        }
+                    },
+
+                    {
+                        data: 'benefitName',
+                        render: function (data, type, row) {
+                            return "<span class='font-weight-bold'>" + row.benefitName + "</span>"
+                        }
+                    },
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+                            return "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='EditBtn' data-id=" + row.benefitId + " data-empid=" + row.empId + " data-benefit=" + row.benefitTypeId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + row.benefitId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnView' data-id=" + row.benefitId + "><em class='icon ni ni-eye'></em><span>View</span></a></li></ul></div></div></li></ul></div>"
+                        }
+                    },
+                ],
+                "createdRow": function (row, data) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+            });
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+        $("#getBenefitData_length").on('change', 'select', function () {
+            entries = parseInt($(this).val());
+            getBenefitDatas();
+        });
+
+
+        $(document).ready(function () {
+            $('.nav-tabs li').removeClass('active');
+            $("#tabItem1").addClass('active');
+
+            $("#EmpId").select2({
+                dropdownParent: $("#success_RejectTab1_Popup")
+            });
+            //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+            // nice scroll for Employee,BenefitType
+
+            $("#EmpId,#BenefitTypeId").select2().on("select2:open", function () {
+                $('.select2-results__options').niceScroll({
+                    cursorcolor: "#4e5e7a",
+                    cursorwidth: "5px",
+                    autohidemode: false,
+                    cursorborder: "1px solid #4e5e7a",
+                    horizrailenabled: false,
+                });
+            });
+        });
+
+        $('#btnBack').click(function () {
+            var urlToRedirect = '@Url.Action("Benefit", "Benefit")';
+            window.location.href = urlToRedirect;
+        });
+
+        $('#employeeBenefits').on('click', '#viewEmployee', function () {
+            var empId = $(this).data('empid');
+            window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+        });
+
+        $('#employeeBenefits').on('click', '.btnView', function () {
+            var BenefitId = $(this).data('id');
+            PageUtil.goToContent("/Benefit/ViewEmployeeBenefits?BenefitId=" + BenefitId);
+        });
+
+        //Change Summary
+
+        $("#EmpId").change(function () {
+            $("#errValid-EmployeeName").text("");
+            if ($("#EmpId :selected").val() == "") {
+                $("#errValid-EmployeeName").text("Employee Name field is required");
+            }
+        });
+
+        $("#BenefitTypeId").change(function () {
+            $("#errValid-BenefitType").text("");
+            if ($("#BenefitTypeId :selected").val() == "") {
+                $("#errValid-BenefitType").text("Type field is required");
+            }
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        //Edit Benefit
+       $(document).ready(function () {
+        $('#employeeBenefits').on('click', '#EditBtn', function () {
+
+            $('#BenefitId').val('');
+            $("#success_RejectTab1_Popup").show();
+            $("#errValid-EmployeeName").text("");
+            $("#errValid-BenefitType").text("");
+            $('#EmpId').select2('val', '');
+            var id = $(this).data("id");
+            var empId = $(this).data("empid");
+            var benefitid = $(this).data("benefit");
+            var tr = $(this).closest('tr');
+            var FirstCol = tr.find('td:eq(0)').text().trim();
+            var SecondCol = tr.find('td:eq(1)').text().trim();
+            $('#BenefitId').val(id);
+            $('#EmpId').val(empId).change();
+            $("#EmpId option[value=" + empId + "]").trigger("change");
+            $('#BenefitTypeId').val(benefitid).change();
+            $("#btnUpdate").show();
+            $("#btnback").show();
+            $("#btnAddDetails").hide();
+
+        });
+
+        //Update Benefit
+
+        $("#btnUpdate").click(function () {
+            var isValid = true;
+            var formData = new FormData();
+            $("#errValid-EmployeeName").text("");
+            $("#errValid-BenefitType").text("");
+
+            var isValid = true;
+            if ($("#EmpId").val() == "") {
+                $("#errValid-EmployeeName").text("Employee Name field is required");
+                isValid = false;
+            }
+
+            if ($("#BenefitTypeId").val() == "") {
+                $("#errValid-BenefitType").text("Type field is required");
+                isValid = false;
+            }
+
+            var benefitId = $("#BenefitId").val();
+            var empId = $("#EmpId").val();
+            var benefitTypeId = $("#BenefitTypeId").val();
+
+
+            formData.append("BenefitId", benefitId);
+            formData.append("EmpId", empId);
+            formData.append("BenefitTypeId", benefitTypeId);
+
+
+            if (isValid) {
+
+                var url = "/Benefit/AddBenefits";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+                        $('#success_RejectTab1_Popup').hide();
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false                          
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#employeeBenefits').empty();
+                                var tablehtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getBenefitData'><thead><tr class='nk-tb-item table-header'><th class='nk-tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Type</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Action</span></th></tr></thead><tbody id='displayBenefits'>";
+
+
+                                var datas = Result.employeeBenefit.map(function (value) {
+
+                                    tablehtml += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'>";
+                                    if (value.employeeStatus == true) {
+                                        tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-danger'>" + value.employeeName + "</span></a>";
+                                    }
+                                    else {
+                                        tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-primary'>" + value.employeeName + "</span></a>";
+                                    }
+
+                                    tablehtml += "</td><td class='nk-tb-col tb-col'><span class='font-weight-bold'>" + value.benefitName + "</span></td><td class='nk-tb-col tb-col'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id ='EditBtn' data-id=" + value.benefitId + " data-empid=" + value.empId + " data-benefit=" + value.benefitTypeId + "><em class='icon ni ni-edit' ></em><span>Edit</span > </a></li><li><a href='javascript:void(0)' id = 'btnDelete' data-id=" + value.benefitId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnView' data-id=" + value.benefitId + "><em class='icon ni ni-eye'></em><span>View</span></a></li></ul></div></div></li></ul></div></td></tr>";
+                                }).join("");
+
+                                tablehtml += "</tbody></table></div></div>";
+                                $('#employeeBenefits').append(tablehtml);
+
+                                $('#getBenefitData').DataTable({
+                                    "bInfo": true,
+                                    "paging": true,
+                                    "language": {
+                                        "infoFiltered": "",
+                                    },
+                                });
+                                //getBenefitDatas();
+                            };
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                        $('#BenefitId').val('');
+                        $('#EmpId').val('');
+                        $('#BenefitTypeId').val('');
+                    }
+                });
+            }
+            else {
+                return false;
+            }
+
+        });
+       });
+
+        //Create Benefit
+
+        $('#btnAddBenefit').click(function () {
+            $("#btnUpdate").hide();
+            $("#btnback").show();
+            $("#btnAddDetails").show();
+            $("#success_RejectTab1_Popup").show();
+            // $("#EmpId option[value='']").attr('selected', 'selected').trigger("change");
+            $("#errValid-EmployeeName").text("");
+            $('#EmpId').val('').change();
+            $('#BenefitTypeId').val('').change();
+            $("#errValid-EmployeeName").text("");
+            $("#errValid-BenefitType").text("");
+            $('#btnAddDetails').click(function () {
+
+                var isValid = true;
+                if ($("#EmpId").val() == "") {
+                    $("#errValid-EmployeeName").text("Employee Name field is required");
+                    isValid = false;
+                }
+
+                if ($("#BenefitTypeId").val() == "") {
+                    $("#errValid-BenefitType").text("Type field is required");
+                    isValid = false;
+                }
+
+
+                var empId = $("#EmpId").val();
+                var benefitTypeId = $("#BenefitTypeId").val();
+                var benifit = {
+                    EmpId: empId,
+                    //RejectReason: reason,
+                    BenefitTypeId: benefitTypeId
+                };
+
+                if (isValid) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Benefit/AddBenefits",
+                        data: benifit,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: (Result) => {
+                            if (Result != null) {
+                                $('#success_RejectTab1_Popup').hide();
+                                $('#employeeBenefits').empty();
+                                Swal.fire({
+                                    title: 'Added Successfully',
+                                    text: "",
+                                    icon: 'success',
+                                    allowOutsideClick: false                                   
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        var tablehtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getBenefitData'><thead><tr class='nk-tb-item table-header'><th class='nk-tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Type</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Action</span></th></tr></thead><tbody id='displayBenefits'>";
+
+                                        var datas = Result.employeeBenefit.map(function (value) {
+    @*  $.each(Result.employeeBenefit, function (key, value) { *@
+                                                tablehtml += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'>";
+                                            if (value.employeeStatus == true) {
+                                                tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-danger'>" + value.employeeName + "</span></a>";
+                                            }
+                                            else {
+                                                tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-primary'>" + value.employeeName + "</span></a>";
+                                            }
+                                            tablehtml += "</td><td class='nk-tb-col tb-col'><span class='font-weight-bold'>" + value.benefitName + "</span></td><td class='nk-tb-col tb-col'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id ='EditBtn' data-id=" + value.benefitId + " data-empid=" + value.empId + " data-benefit=" + value.benefitTypeId + "><em class='icon ni ni-edit' ></em><span>Edit</span > </a></li><li><a href='javascript:void(0)' id = 'btnDelete' data-id=" + value.benefitId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnView' data-id=" + value.benefitId + "><em class='icon ni ni-eye'></em><span>View</span></a></li></ul></div></div></li></ul></div></td></tr>";
+
+                                        });
+
+                                        tablehtml += "</tbody></table></div></div>";
+                                        $('#employeeBenefits').append(tablehtml);
+
+                              $('#getBenefitData').DataTable({
+                                    "bInfo": true,
+                                    "paging": true,
+                                    "language": {
+                                        "infoFiltered": "",
+                                    },
+                                });
+                                       //getBenefitDatas();
+                                    };
+                                });
+                            }
+                            $('.loader').addClass('d-none');
+                        },
+                        error: (Result) => {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                    $('#EmpId').val('');
+                    $('#BenefitTypeId').val('');
+                    $('#BenefitId').val('');
+                }
+                else {
+                    return false;
+                };
+            });
+        });
+
+        //Delete Benefit
+
+        $(document).on('click', '#btnDelete', function () {
+            Swal.fire({
+                title: 'Are you sure want to delete?',
+                //text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1ee0ac',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var id = $(this).data("id");
+                    var benifit = {
+                        BenefitId: id,
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Benefit/DeleteBenefit",
+                        data: benifit,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: (Result) => {
+                            if (Result.employeeBenefit.length == 0) {
+                                $('#success_RejectTab1_Popup').hide();
+                                $('#displayBenefits').html('');
+                                $('#displayBenefits').append("<tr><td class='dataTables_empty' style = 'text-align:center;' colspan = '3' > No data available </td></tr>");
+                                $("#success_DeleteRejection_PopupTab1").show();
+                            }
+                            else {
+                                $('#success_RejectTab1_Popup').hide();
+    @*  $('#displayBenefits').html('');
+                                    $.each(Result.employeeBenefit, function (key, value) {
+                                    var tablehtml = "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'>";
+                                    if (value.employeeStatus == true) {
+                                    tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-danger'>" + value.employeeName + "</span></a>";
+                                    }
+                                    else {
+                                    tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-primary'>" + value.employeeName + "</span></a>";
+                                    }
+                                    tablehtml += "</td><td class='nk-tb-col tb-col'><span class='font-weight-bold'>" + value.benefitName + "</span></td><td class='nk-tb-col tb-col'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id ='EditBtn' data-id=" + value.benefitId + " data-empid=" + value.empId + " data-benefit=" + value.benefitTypeId + "><em class='icon ni ni-edit' ></em><span>Edit</span > </a></li><li><a href='javascript:void(0)' id = 'btnDelete' data-id=" + value.benefitId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnView' data-id=" + value.benefitId + "><em class='icon ni ni-eye'></em><span>View</span></a></li></ul></div></div></li></ul></div></td></tr>";
+                                    }); *@
+
+                                    $('#employeeBenefits').empty();
+
+                                var tablehtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getBenefitData'><thead><tr class='nk-tb-item table-header'><th class='nk-tb-col'><span class='sub-text'>Employee Name</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Type</span></th><th class='nk-tb-col tb-col'><span class='sub-text'>Action</span></th></tr></thead><tbody id='displayBenefits'>";
+
+                                var datas = Result.employeeBenefit.map(function (value) {
+    @*  $.each(Result.employeeBenefit, function (key, value) { *@
+                                        tablehtml += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'>";
+                                    if (value.employeeStatus == true) {
+                                        tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-danger'>" + value.employeeName + "</span></a>";
+                                    }
+                                    else {
+                                        tablehtml += "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + value.empId + "><span class='badge badge-dim bg-primary'>" + value.employeeName + "</span></a>";
+                                    }
+                                    tablehtml += "</td><td class='nk-tb-col tb-col'><span class='font-weight-bold'>" + value.benefitName + "</span></td><td class='nk-tb-col tb-col'><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id ='EditBtn' data-id=" + value.benefitId + " data-empid=" + value.empId + " data-benefit=" + value.benefitTypeId + "><em class='icon ni ni-edit' ></em><span>Edit</span > </a></li><li><a href='javascript:void(0)' id = 'btnDelete' data-id=" + value.benefitId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnView' data-id=" + value.benefitId + "><em class='icon ni ni-eye'></em><span>View</span></a></li></ul></div></div></li></ul></div></td></tr>";
+
+                                });
+
+                                tablehtml += "</tbody></table></div></div>";
+                                $('#employeeBenefits').append(tablehtml);
+
+                                $('#getBenefitData').DataTable({
+                                    "bInfo": true,
+                                    "paging": true,
+                                    "language": {
+                                        "infoFiltered": "",
+                                    },
+                                });
+                               // getBenefitDatas();
+
+                                $("#success_DeleteRejection_PopupTab1").show();
+                            }
+                            $('#BenefitId').val('');
+                            $('.loader').addClass('d-none');
+                        },
+                        error: (Result) => {
+                            $('.loader').addClass('d-none');
+                        }
+
+                    });
+
+                }
+            });
+        });
+
+        $("#btnCloseDeleteRejection").click(function () {
+            $("#success_DeleteRejection_PopupTab1").hide();
+    @* $('#EmpId').val('');
+                $('#BenefitTypeId').val('');*@
+                $("#errValid-EmployeeName").text("");
+            $("#errValid-BenefitType").text("");
+
+        });
+
+        // $("#btnCloseRejectTab1").click(function () {
+        //     $("#success_RejectTab1_Popup").hide();
+        //         $("#errValid-EmployeeName").text("");
+        //     $("#errValid-BenefitType").text("");
+        // });
+    });
+</script>
+

@@ -1,0 +1,161 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.EmployeesViewModel
+@model List<EmployeeActivityLog>
+@{
+    ViewBag.Title = "EmployeeActivityLog";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Employee Activity Log</h3>
+        </div><!-- .nk-block-head-content -->
+       
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmployeeActivityLog">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="CompanyName"><span class="sub-text">Company Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="UserName"><span class="sub-text"></span>Employee Name</th>
+                    <th class="nk-tb-col tb-col" data-id="LastLoginDate"><span class="sub-text">Last Login Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="IPAddress"><span class="sub-text">IP Address</span></th>
+                </tr>
+            </thead>
+          
+        </table>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+
+        BindEmployeeLogData();
+        function BindEmployeeLogData() {
+            var table = $("#getEmployeeActivityLog").DataTable();
+
+            if (table) {
+                table.destroy();
+           }
+       
+            $('#getEmployeeActivityLog').DataTable({
+               
+                serverSide: true,
+                processing: true,
+                pageLength: entries,
+                ajax: {
+                    url: "/Login/GetEmployeeActivityLogDetails",
+                    type: 'Get',
+                    data: function (d) {
+
+                         var searchFilter = document.getElementById("getEmployeeActivityLog_filter"); // get search div id
+                         var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                         var searchValue = searchInput.value;  // get search value
+                         var activeEntry = document.getElementById("getEmployeeActivityLog_length"); //get entries div id
+                        var entrySelect = activeEntry.querySelector("select"); //get entries div select
+                         entries = entrySelect.value; // get entries value
+                         d.sSearch = searchValue; // Pass search query
+                         d.iDisplayStart = d.iDisplayStart || 0;
+                         d.iDisplayLength = d.iDisplayLength || entries;
+                         d.sEcho = d.start;
+                         d.ColumnName = columnIndex;
+                         d.ColumnDirection = columnDirection;
+                        
+                    }
+                },
+                columns: [
+
+                    {
+                        data: 'companyName',
+                        render: function (data, type, row, meta) {
+                            return "<div class='user-card'> <div class='user-info'><span class='tb-lead text-primary'>" + row.companyName + " </span></div></div>";
+                        }
+                    },
+
+
+                    {
+                        data: 'employeeName',
+                        render: function (data, type, row, meta) {
+                            return "<div class='user-card'> <div class='user-info'><span class='tb-lead font-weight - bold'>" + row.userName + " </span></div></div>";
+
+                        }
+                    },
+
+
+                    {
+                        data: 'lastLoginDate',
+                        render: function (data, type, row, meta) {
+                            return "<span>" + dateTimeFormat(row.lastLoginDate) + " </span>";
+                        }
+                    },
+
+                    {
+                        data: 'iPAddress',
+                        render: function (data, type, row, meta) {
+                            return "<div class='user-card'> <div class='user-info'><span class='tb - lead font - weight - bold'>" + row.ipAddress + " </span></div></div>";
+                        }
+                    },
+                ],
+
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+            });
+
+            $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+                var target = e.target;
+                var parent = target.parentNode;
+                var index = [].indexOf.call(parent.children, target);
+
+                if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+                columnIndex = $(this).data('id');
+            });
+        }
+          
+    });
+
+    function dateTimeFormat(createdDate) {
+        var dateObject = new Date(createdDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        var seconds = dateObject.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours from 24-hour to 12-hour format
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+
+        // Add leading zeros to minutes and seconds
+        minutes = ("0" + minutes).slice(-2);
+        seconds = ("0" + seconds).slice(-2);
+
+        var formattedDate = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ampm;
+        return formattedDate;
+    }
+
+</script>

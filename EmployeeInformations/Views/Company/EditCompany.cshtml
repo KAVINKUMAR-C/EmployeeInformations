@@ -1,0 +1,21 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel
+@using Microsoft.AspNetCore.Http;
+@model Company
+@{
+    var roleId = Context.Session.GetInt32("CompanyId");
+}
+
+<div id="bind-Company-content">
+</div>
+
+<input type="hidden" id="txt-CompanyId" value="@Model.CompanyId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        var companyId = $("#txt-CompanyId").val();
+        PageUtil.goToCompany("/Company/UpdateCompany?CompanyId=" + companyId);
+    });
+
+</script>

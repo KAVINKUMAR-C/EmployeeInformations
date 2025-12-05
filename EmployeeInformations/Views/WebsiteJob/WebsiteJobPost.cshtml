@@ -1,0 +1,585 @@
+﻿@using EmployeeInformations.Common
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Model.APIModel;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model List<WebsiteJobViewModel>
+@{
+    ViewBag.Title = "WebsiteJobInfo";
+    Layout = "_Layout";
+
+    var roleId = Context.Session.GetInt32("RoleId");
+    var rolePrivileges = false;
+
+    if (roleId >= 0)
+    {
+        var id = roleId.Value;
+        int websiteJobPostModuleId = (int)EmployeesInformationsPages.JobPostModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(websiteJobPostModuleId, id);
+    }
+
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Website Job Post</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create", "CreateJobPost", "WebsiteJob", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm mr-2" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div><!-- .nk-block-head -->
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="WebsiteJobData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="JobCode"><span class="sub-text">Job Code</span></th>
+                    <th class="nk-tb-col col-w" data-id="JobName"><span class="sub-text">Job Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="Qualification"><span class="sub-text">Qualification</span></th>
+                    <th class="nk-tb-col tb-col" data-id="Experience"><span class="sub-text">Experience</span></th>
+                    <th class="nk-tb-col tb-col" data-id="Location"><span class="sub-text">Location</span></th>
+                    <th class="nk-tb-col tb-col" data-id="SkillName"><span class="sub-text">Skills</span></th>
+                    <th class="nk-tb-col tb-col" data-id="JobPostedDate"><span class="sub-text">Posted Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="isDeleted"><span class="sub-text">Status</span></th>
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                        @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col  py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                    }
+                </tr>
+            </thead>
+
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteWebsiteJob_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Website Job Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteWebsiteJob">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_StatusWebsiteJob_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <h4 class="nk-modal-title" id="txtStatusSuccessMeg"> Post Activated Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseStatusWebsiteJob">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_Skill_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <label>Skill Detail</label>
+                <div class="col-12 form-sec-login">
+                    <div class="form-group">
+                        <label>Skills</label>
+                        <input type="text" class="form-control" placeholder="" value="" id="newSkills" />
+                        <span id="errVerify-SkillExist" style="display:none; color: #dc3545!important;"> SkillName already exists! </span>
+                        <span id="errVerify-Skills" style="display:none; color: #dc3545!important;"> Skill Field Is Required </span>
+                    </div>
+                </div>
+                <div>
+                    <input type="button" class="btn btn-danger" id="btnCreate" value="Create" />
+                    <input type="button" class="btn btn-primary" id="btnCloseCreateSkill" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="success_CreateSkill_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Skill Created Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseSkill">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    @* $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#WebsiteJobData').DataTable({
+        "bInfo": true,
+        "paging": true,
+        order: [
+        [6, "desc"]
+        ],
+        });
+        }); *@
+
+        $(document).ready(function () {
+            var count = 1;
+            var columnIndex = "";
+            var columnDirection = "";
+            var entries = 10;
+            getWebsiteJobPostDatas();
+
+            function getWebsiteJobPostDatas() {
+                var table = $('#WebsiteJobData').DataTable();
+                if (table) {
+                    table.destroy();
+                }
+                $('#WebsiteJobData').DataTable({
+                    "language": {
+                        "infoFiltered": "",
+                    },
+                   // serverSide: true,
+                processing: true,
+                    pageLength: entries, // Page length
+                    ajax: {
+                        url: "/WebsiteJob/WebsiteJobPostFilter",
+                        type: "GET",
+                        data: function (d) {
+                            //SearchFilter
+                            var websitejobFilter = document.getElementById("WebsiteJobData_filter");
+                            var websitejobFilterSearch = websitejobFilter.querySelector("input[type='search']");
+                            var websitejobFilterinput = websitejobFilterSearch.value;
+                            //PagingLength
+                            var websitejobFilterData = document.getElementById("WebsiteJobData_length");
+                            var page = websitejobFilterData.querySelector("select");
+                            var websitejobFilterCount = page.value;
+
+                            d.sSearch = websitejobFilterinput;
+                            d.iDisplayStart = d.iDisplayStart || 0;
+                            d.iDisplayLength = d.iDisplayLength || websitejobFilterCount;
+                            d.sEcho = d.start;
+                            d.columnName = columnIndex;
+                            d.columnDirection = columnDirection;
+                        }
+                    },
+                    columns: [
+                        {
+                            data: 'jobCode',
+                            render: function (data, type, row) {
+
+                                return "<b class='tb-sub text-primary'>" + row.jobCode + "</b>";
+
+                            }
+                        },
+                        {
+                            data: 'jobName',
+                            render: function (data, type, row) {
+
+                                return "<span class='font-weight-bold'>" + row.jobName + "</span>";
+
+                            }
+                        },
+                        {
+                            data: 'qualification',
+                            render: function (data, type, row) {
+
+                                return "<span>" + row.qualification + "</span>";
+
+                            }
+                        },
+                        {
+                            data: 'experience',
+                            render: function (data, type, row) {
+
+                                return "<span>" + row.experience + "</span>";
+
+                            }
+                        },
+                        {
+                            data: 'location',
+                            render: function (data, type, row) {
+
+                                return "<span>" + row.location + " </span>";
+
+                            }
+                        },
+                        {
+                            data: 'skillName',
+                            render: function (data, type, row) {
+
+                                return "<span class='badge badge-dim bg-primary'>" + row.skillName + "</span>";
+
+                            }
+                        },
+                        {
+                            data: 'jobPostedDate',
+                            render: function (data, type, row) {
+
+                                return "<span>" + dateFormat(row.jobPostedDate) + "</span>";
+
+                            }
+                        },
+                       
+                        {
+                        data: 'isDeleted',
+                        render: function (data, type, row) {
+                            if (row.isDeleted === 0) {
+                                return "<b class='badge badge-dot bg-danger'>InActive</b>";
+                            }
+                            else if (row.isDeleted === 2) {
+                                return "<b class='badge badge-dot bg-success'>Active</b>";
+                            }
+                        }
+                        },
+                        {
+                            data: 'null',
+                            "orderable": false,
+                            render: function (data, type, row) {
+
+                                var data = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnUpdate' data-id=" + row.jobId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' class='btnDelete' data-id=" + row.jobId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li>"
+                                if (row.isDeleted == 2) {
+                                    data += "<li><a href='javascript:void(0)' class='btnChangeStatus' data-id=" + row.jobId + " data-statusid='0'><em class='icon ni ni-pause'></em><span>Pause</span></a></li></ul></div></div></li></ul></div>"
+                                }
+                                else {
+                                    data += "<li><a href='javascript:void(0)' class='btnChangeStatus' data-id=" + row.jobId + " data-statusid='2'><em class='icon ni ni-play'></em><span>Play</span></a></li>"
+                                }
+
+                                data += "</ul></div></div></li></ul></div>";
+                                return data;
+
+                            }
+                        },
+                    ],
+                    "createdRow": function (row, data) {
+                        // Add custom class to the row
+                        $(row).addClass('nk-tb-item');
+                        // Add custom classes to each cell in the row if necessary
+                        $(row).find('td').addClass('nk-tb-col tb-col');
+                    }
+                });
+                $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+                // $('[data-bs-toggle="tooltip"]').tooltip();
+            }
+            $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+                var target = e.target;
+                var parent = target.parentNode;
+                var index = [].indexOf.call(parent.children, target);
+
+                if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+                columnIndex = $(this).data('id');
+            });
+            $("#WebsiteJobData_length").on('change', 'select', function () {
+                entries = parseInt($(this).val());
+                getWebsiteJobPostDatas();
+            });
+        });
+
+    function dateFormat(jobPostedDate) {
+
+        var dateObject = new Date(jobPostedDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // keyup
+
+    $("#newSkills").keyup(function () {
+
+        $("#errVerify-SkillExist").hide("");
+        $("#errVerify-Skills").hide("");
+
+
+        if ($("#newSkills").val() == "") {
+            $("#errVerify-Skills").show();
+        }
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Sent id for update
+
+    $(document).on('click', '.btnUpdate', function () {
+
+        var jobId = $(this).data('id');
+        PageUtil.goToContent("/WebsiteJob/EditJobPost?jobId=" + jobId);
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Status Change
+
+    $(document).on('click', '.btnChangeStatus', function () {
+        var jobId = $(this).data("id");
+        var status = $(this).data("statusid");
+        $('.loader').removeClass('d-none');
+        $.ajax({
+            type: "POST",
+            url: "/WebsiteJob/ChangeStatusWebsiteJobPost",
+            data: { jobId: jobId, status: status },
+            success: (Result) => {
+                if (Result) {
+
+                    if (status == 0) {
+                        Swal.fire({
+                            title: 'Post Deactivated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            window.location.href = "/WebsiteJob/WebsiteJobPost";
+                        });
+                    }
+                    else if (status == 2) {
+                        Swal.fire({
+                            title: 'Post Activated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            window.location.href = "/WebsiteJob/WebsiteJobPost";
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            window.location.href = "/Client/Client";
+                        });
+                    }
+
+    @*  $("#success_StatusWebsiteJob_Popup").modal('show'); *@
+    @* if (status == 0) {
+                        $("#txtStatusSuccessMeg").text("");
+                        $("#txtStatusSuccessMeg").text("Post Deactivated Successfully");
+                        }
+                        $("#btnCloseStatusWebsiteJob").click(function () {
+                        var urlToRedirect = '@Url.Action("WebsiteJobPost", "WebsiteJob")';
+                        window.location.href = urlToRedirect;
+                        }); *@
+                    }
+                else { alert("Failed") }
+                $('.loader').addClass('d-none');
+            },
+            error: (result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Button click for popup
+
+    $("#btnCreateSkill").click(function () {
+        $("#newSkills").text('');
+        $("#success_Skill_Popup").show();
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Create
+
+    $("#btnCreate").click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errVerify-SkillExist").hide();
+        $("#errVerify-Skills").hide();
+        var formData = new FormData();
+
+        if ($("#newSkills").val() == "") {
+            $("#errVerify-Skills").show();
+            isValid = false;
+        }
+
+        var skill = $("#newSkills").val();
+        var isDeleted = false;
+
+        formData.append("SkillName", skill);
+        formData.append("IsDeleted", isDeleted);
+
+        if (isValid) {
+
+
+            $.ajax({
+                type: "POST",
+                url: "/WebsiteJob/GetSkillCount",
+                contentType: false,
+                processData: false,
+                data: formData,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+
+                    if (result == 0) {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/WebsiteJob/CreateSkills",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function () {
+                                $('.loader').removeClass('d-none');
+                            },
+                            success: (Result) => {
+                                if (Result) {
+                                    $("#success_Skill_Popup").hide();
+                                    $("#success_CreateSkill_Popup").modal('show');
+                                    $("#btnCloseSkill").click(function () {
+                                        var urlToRedirect = '@Url.Action("WebsiteJobPost", "WebsiteJob")';
+                                        window.location.href = urlToRedirect;
+                                    });
+                                }
+                                else { alert("Failed") }
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        $("#errVerify-SkillExist").show();
+                        return false;
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+
+        }
+        else {
+            $("#errVerify-Skills").show();
+            return false;
+        }
+
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete
+
+    $('#WebsiteJobData').on('click', '.btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            text: "",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+                var jobId = $(this).data("id")
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/WebsiteJob/DeleteWebsiteJobPost",
+                    data: { jobId: jobId },
+                    success: (Result) => {
+                        if (Result) {
+                            $("#success_DeleteWebsiteJob_Popup").modal('show');
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/WebsiteJob/WebsiteJobPost";
+                            });
+                        }
+                        else {
+
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/WebsiteJob/WebsiteJobPost";
+                            });
+
+                        }
+                        //else { alert("Failed") }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        })
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------
+
+    // Close
+
+    $("#btnCloseCreateSkill").click(function () {
+        $("#success_Skill_Popup").hide();
+        var urlToRedirect = '@Url.Action("WebsiteJobPost", "WebsiteJob")';
+        window.location.href = urlToRedirect;
+    })
+    //--------------------------------------------------------------------------------------------------------------------------------------
+
+</script>

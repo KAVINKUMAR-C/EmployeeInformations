@@ -1,0 +1,1389 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.EmployeesViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OtherDetailsViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+
+@Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="d-flex mb-1 title data-head">
+    <h6>Other Details</h6>
+</div>
+
+<div class="tab-pane p-3">
+    <div class="card my-4 boxshadow-none edit-page table-card" data-simplebar>
+        <table class="table" id="getdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Document Type</th>
+                    <th>Document Number</th>
+                    <th style="display:none;">Document Name</th>
+                    <th>Valid From</th>
+                    <th>Valid Upto</th>
+                    <th class="nk-tb-col">
+                        <div class="nk-tb-col py-0 border-0">
+                            Action
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="displayotherdetails">
+                @if (Model.OtherDetails?.Count() > 0)
+                {
+                    foreach (var item in Model.OtherDetails)
+                    {
+                        <tr>
+                            <td>
+                                @item.DocumentTypeName
+                            </td>
+                            <td>
+                                @item.DocumentNumber
+                            </td>
+                            <td style="display:none" value="@item.DocumentViewImage"></td>
+                            <td>
+                                @item.ValidFrom?.ToString(Constant.DateFormat)
+                            </td>
+                            <td>
+                                @item.ValidTo?.ToString(Constant.DateFormat)
+                            </td>
+                            <td>
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.DetailId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.DetailId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="dataTables_empty" style="text-align:center;" colspan="6">No data available</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card boxshadow-none p-3">
+
+        <div class="row">
+            <input type="hidden" class="form-control" id="detailId">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.EmpId">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.CompanyId">
+            <div class="col-xxl-3 col-xl-6 col-lg-6 col-md-12">
+                <div class="form-group">
+                    <label class="form-label">Document Type<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.DocumentTypeId, new SelectList(Model.documentTypes, "DocumentTypeId", "DocumentName"), "--Select Document--", new { @class = "form-control ", id = "DocumentTypeId", @disable = false })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DocumentTypeId, "", new { @class = "error text-danger", id = "errValid-DocumentTypeId" })
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-xl-6 col-lg-6 col-md-12">
+                <div class="form-group">
+                    <label class="form-label">Document Number<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="documentNumber" placeholder="">
+                    <span class="error text-danger" id="errValid-documentNumber"></span>
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-xl-6 col-lg-6 col-md-12" id="validFrom" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Valid From Date<span class="required" style="color: #FF0000">*</span></label>
+                    <div id="datepicker5" class="input-group date" data-date-format="dd/mm/yyyy">
+                        @Html.TextBoxFor(m => m.ValidFrom, "{0:dd/MM/yyyy}", new { @class = "form-control", @Value = Model.ValidFrom?.ToString(Constant.DateFormat) })
+                        <span class="input-group-addon">
+                            <i class="icon ni ni-calendar-alt"></i>
+                        </span>
+                    </div>
+                    <span>
+                        @Html.ValidationMessageFor(m => m.ValidFrom, "", new { @class = "error text-danger", id = "errValid-ValidFrom" })
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-xxl-3 col-xl-6 col-lg-6 col-md-12" id="validTo" style="display:none">
+                <div class="form-group">
+                    <label class="form-label">Valid Upto Date<span class="required" style="color: #FF0000">*</span></label>
+                    <div id="datepicker6" class="input-group date" data-date-format="dd/mm/yyyy">
+                        @Html.TextBoxFor(m => m.ValidTo, "{0:dd/MM/yyyy}", new { @class = "form-control", @Value = Model.ValidTo?.ToString(Constant.DateFormat) })
+                        <span class="input-group-addon">
+                            <i class="icon ni ni-calendar-alt"></i>
+                        </span>
+                    </div>
+                    <span id="errVerify-ValidTo" style="display:none;" class="error text-danger"> Please select <b>Valid To</b> should not be less than <b>Valid From</b> </span>
+                    @Html.ValidationMessageFor(m => m.ValidTo, "", new { @class = "error text-danger", id = "errValid-ValidTo" })
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="form-label">Document<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="input-group custom-file-button">
+                        @Html.TextBoxFor(m => m.DocumentFilePath, new { type = "file", name = "file", multiple = "multiple", @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DocumentFilePath, "", new { @class = "error text-danger", id = "errValid-DocumentFilePath" })
+                    <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                </div>
+                <div id="hide_documentName" style="display:none;" class="text-primary mt-1">
+                    <ul class="displayOtherDetailsDoc d-flex flex-wrap"></ul>
+                </div>
+                @*<span id="errValid-Document" class="error text-danger" style="display:none;"> Invalid document </span>*@
+            </div>
+            <div class="col-12 d-flex mb-3 mt-auto">
+                <button type="button" class="btn btn-primary ml-auto" id="btnAdd" value="add">Add</button>
+                <button type="button" class="btn btn-primary ml-auto" id="btnUpdate" value="update" style="display:none">Update</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 d-flex mt-3">
+        <input type="button" class="btn btn-secondary mr-auto" id="btnOthersDetailsBack" value="Back" />
+        <input type="button" class="btn btn-primary" id="btnCreateOtherdetails" value="Next" />
+    </div>
+
+</div>
+
+<div class="modal" id="success_CreateOtherDetails_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Added Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseCreateOtherDetails">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_UpdateOtherDetails_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Updated Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateOtherDetails">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteOtherDetails_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteOtherDetails">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $("#datepicker5").datepicker({
+            autoclose: true,
+            todayHighlight: true
+        });
+        $("#datepicker6").datepicker({
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        $("#ValidFrom").change(function () {
+
+            $("#errValid-ValidFrom").text(" ");
+            if ($("#ValidFrom").val() == "") {
+                $("#errValid-ValidFrom").text("Valid From field is required");
+
+            }
+            else {
+                $("#errValid-ValidFrom").text(" ");
+            }
+        });
+
+        $("#ValidTo").change(function () {
+
+            $("#errValid-ValidTo").text(" ");
+            $("#errVerify-ValidTo").hide();
+            if ($("#ValidTo").val() == "") {
+                $("#errValid-ValidTo").text("Valid To field is required");
+            }
+            else {
+                $("#errValid-ValidTo").text(" ");
+            }
+        });
+
+        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // nice scroll For Country
+
+        $("#DocumentTypeId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        $('.selectedwizard li').removeClass('current');
+        $("#step4").addClass('current');
+    });
+
+    $(".displayOtherDetailsDoc").on('click', 'li', function () {
+        var imgName = $(this).text();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/OtherDetails/' + imgName + '');
+    });
+
+    $("#displayDocumentName").click(function () {
+
+        var imgName = $(this).text();
+        var urlName = window.location.origin;
+        // window.open(urlName+imgName+);
+        window.open(urlName + '/OtherDetails/' + imgName + '');
+    });
+
+    $("#btnOthersDetailsBack").click(function () {
+
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/CreateAddress?empId=" + empId);
+    });
+
+    // Change Summary
+
+    $("#DocumentTypeId").change(function () {
+        $("#errValid-DocumentTypeId").text("");
+        if ($("#DocumentTypeId").val() == '') {
+            $("#errValid-DocumentTypeId").text("Document Type field is required");
+        }
+        else {
+            $("#errValid-DocumentTypeId").text("");
+        }
+    });
+
+    // KeyUp Summary
+
+    $("#documentNumber").keyup(function () {
+        $("#errValid-documentNumber").text("");
+        if ($("#documentNumber").val() == "") {
+            $("#errValid-documentNumber").text("Document Number field is required");
+        }
+        else {
+            $("#errValid-documentNumber").text("");
+        }
+    });
+
+    $("#DocumentFilePath").change(function () {
+        $("#errValid-DocumentFilePath").text("");
+        $("#errValid-ErrorFileSize").hide();
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        if (attachmentFilePath == "") {
+            $("#errValid-DocumentFilePath").text("Attachment field is required");
+            $("#displayDocumentName").text('');
+            $("#errValid-ErrorFileSize").hide();
+        }
+        else {
+            $("#errValid-DocumentFilePath").text("");
+        }
+    });
+
+
+    //$("#AdharNumber").on("input", function (evt) {
+    //    var self = $(this);
+    //    self.val(self.val().replace(/\D/g, ""));
+    //    if ((evt.which < 48 || evt.which > 57)) {
+    //        evt.preventDefault();
+    //    }
+    //});
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Click Summary
+
+    $("#btnCreateOtherdetails").click(function () {
+
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/CreateQualification?empId=" + empId);
+    });
+
+    // Create Other Details
+
+    $('#btnAdd').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-DocumentTypeId").text("");
+        $("#errValid-documentNumber").text(" ");
+        $("#errValid-DocumentFilePath").text("");
+        //$("#errValid-Document").hide();
+        $("#displayDocumentName").text('');
+        $("#displayDocumentName").hide();
+        $("#success_CreateOtherDetails_Popup").hide();
+        $("#errValid-ValidFrom").text(" ");
+        $("#errValid-ValidTo").text(" ");
+        $("#errVerify-ValidTo").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        $("#errValid-DocumentTypeId").hide();
+        $("#errValid-ErrorFileSize").hide();
+
+        if ($("#DocumentTypeId").val() == "") {
+            $("#errValid-DocumentTypeId").text("Document Type field is required");
+            $("#errValid-DocumentTypeId").show();
+            isValid = false;
+        }
+
+        if ($("#documentNumber").val() == "") {
+            $("#errValid-documentNumber").text("Document Number field is required");
+            isValid = false;
+        }
+
+        if ($("#DocumentTypeId").val() == 3) {
+            if ($("#ValidFrom").val() == "") {
+                $("#errValid-ValidFrom").text("Valid From field is required");
+                isValid = false;
+            }
+
+            if ($("#ValidTo").val() == "") {
+                $("#errValid-ValidTo").text("Valid To field is required");
+                isValid = false;
+            }
+        }
+        else if ($("#DocumentTypeId").val() == 4) {
+            if ($("#ValidTo").val() == "") {
+                $("#errValid-ValidTo").text("Valid To field is required");
+                isValid = false;
+            }
+        }
+    
+        var attachmentFilePath = $("#DocumentFilePath").val();
+
+        if (attachmentFilePath == "") {
+            $("#errValid-DocumentFilePath").text("Attachment field is required");
+            $("#displayDocumentName").text('');
+            $("#errValid-ErrorFileSize").hide();
+            isValid = false;
+        }
+
+        if (attachmentFilePath != "") { //filepath get
+            var ext = attachmentFilePath.split('.').pop(); // pdf or not check
+            if (ext == "pdf" || ext == "doc" || ext == "jpeg" || ext == "png" || ext == "jpg" || ext == "jfif" || ext == "bmp") {
+
+            } else {
+                $("#errValid-Document").show();
+                isValid = false;
+            }
+        }
+        // Logic for verify PAN number
+
+        var typeId = $("#DocumentTypeId").val();
+
+        if (typeId == 2) {
+            var regExp = /[a-zA-z]{5}\d{4}[a-zA-Z]{1}/;
+            var num = $("#documentNumber").val();
+            if (num.length == 10 && num.match(regExp)) {
+                $("#errValid-documentNumber").text("");
+            }
+            else {
+                $("#errValid-documentNumber").text("Invalid PAN number");
+                isValid = false;
+            }
+        }        
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var empId = $("#EmpId").val();
+        var documentTypeId = $("#DocumentTypeId").val();
+        var documentNumber = $("#documentNumber").val();
+        var validFrom = $("#ValidFrom").val();
+        var validTo = $("#ValidTo").val();
+
+        formData.append("EmpId", empId);
+        formData.append("DocumentTypeId", documentTypeId);
+        formData.append("DocumentNumber", documentNumber);
+        formData.append("ValidFrom", validFrom);
+        formData.append("ValidTo", validTo);
+        formData.append("StrValidFrom", validFrom);
+        formData.append("StrValidTo", validTo);
+
+        if (isValid) {
+            var isValidDate = dateDifference(validFrom, validTo);
+            if (documentTypeId == 3) {
+                if (isValidDate) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Employees/AddOthersdetails",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: function (result) {
+
+                            $('#displayotherdetails').html("");
+                            $("#DocumentTypeId").val("").change();
+                            $("#errValid-DocumentTypeId").hide();
+                            $("#success_CreateOtherDetails_Popup").css('display', 'none !important');
+                            if (result.empId > 0) {
+                                Swal.fire({
+                                    title: 'Added Successfully',
+                                    text: "",
+                                    icon: 'success',
+                                    allowOutsideClick: false
+                                }).then((resultvalue) => {
+                                    if (resultvalue.isConfirmed) {
+                                        $.each(result.otherDetails, function (key, value) {
+                                            if (value.validFrom != null) {
+                                                var obj = new Date(value.validFrom);
+                                                var yyyy = obj.getFullYear();
+                                                var mm = obj.getMonth() + 1;
+                                                var dd = obj.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                                var valueValidTo = new Date(value.validTo);
+                                                var yyyy = valueValidTo.getFullYear();
+                                                var mm = valueValidTo.getMonth() + 1;
+                                                var dd = valueValidTo.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validTo = dd + '/' + mm + '/' + yyyy;
+                                            }
+                                            else if (value.validTo != null && value.documentTypeId == 4) {
+                                                var validFrom = "";
+                                                var valueValidTo = new Date(value.validTo);
+                                                var yyyy = valueValidTo.getFullYear();
+                                                var mm = valueValidTo.getMonth() + 1;
+                                                var dd = valueValidTo.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validTo = dd + '/' + mm + '/' + yyyy;
+                                            }
+                                            else {
+                                                var validFrom = '';
+                                                var validTo = '';
+                                            }
+                                            $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                        });
+                                    };
+                                });
+                               
+                            }
+                            else {                               
+                                Swal.fire({
+                                    title: 'Something error',
+                                    text: "",
+                                    icon: 'error',
+                                    allowOutsideClick: false
+                                }).then((resultvalue) => {
+                                    var empId = $("#EmpId").val();
+                                    PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+                                });
+                            }
+                        },
+                        complete: function () {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-ValidTo").show();
+                    return false;
+                }
+            }
+            else if (documentTypeId == 4) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/AddOthersdetails",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+
+                        $('#displayotherdetails').html("");
+                        $("#DocumentTypeId").val("").change();
+                        $("#errValid-DocumentTypeId").hide();
+                        $("#success_CreateOtherDetails_Popup").css('display', 'none !important');
+                        if (result.empId > 0) {
+                            Swal.fire({
+                                title: 'Added Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultvalue) => {
+                                if (resultvalue.isConfirmed) {
+                                    $.each(result.otherDetails, function (key, value) {
+                                        if (value.validFrom != null) {
+                                            var obj = new Date(value.validFrom);
+                                            var yyyy = obj.getFullYear();
+                                            var mm = obj.getMonth() + 1;
+                                            var dd = obj.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else if (value.validTo != null && value.documentTypeId == 4) {
+                                            var validFrom = "";
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else {
+                                            var validFrom = '';
+                                            var validTo = '';
+                                        }
+                                        $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                    });
+                                };
+                           });
+
+                        }
+                        else {                            
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var empId = $("#EmpId").val();
+                                PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/AddOthersdetails",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+
+                        $('#displayotherdetails').html("");
+                        $("#DocumentTypeId").val("").change();
+                        $("#errValid-DocumentTypeId").hide();
+                        $("#success_CreateOtherDetails_Popup").css('display', 'none !important');
+                        if (result.empId > 0) {
+
+                            Swal.fire({
+                                title: 'Added Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    $.each(result.otherDetails, function (key, value) {
+                                        if (value.validFrom != null) {
+                                            var obj = new Date(value.validFrom);
+                                            var yyyy = obj.getFullYear();
+                                            var mm = obj.getMonth() + 1;
+                                            var dd = obj.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else if (value.validTo != null && value.documentTypeId == 4) {
+                                            var validFrom = "";
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else {
+                                            var validFrom = '';
+                                            var validTo = '';
+                                        }
+
+                                        $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                    });
+                                };
+                            });
+                           
+                        }
+                        else {
+                           
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                var empId = $("#EmpId").val();
+                                PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+                            });
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+
+            }
+
+        }
+        else {
+            return false;
+        }
+        $("#DocumentTypeId option").removeAttr('selected', 'selected');
+        $("#DocumentTypeId option:first").attr('selected', 'selected');
+        $("#documentNumber").val('');
+        $("#DocumentName").val('');
+        $('#DocumentFilePath').val('');
+        $("#hide_documentName").val('');
+        $("#ValidFrom").val('');
+        $("#ValidTo").val('');
+        $("#hide_documentName").hide();
+        $("#btnUpdate").hide();
+        $("#btnAdd").show();
+        $("#errValid-DocumentTypeId").hide();
+        $("#datepicker5").datepicker('setDate', Date());
+        $("#datepicker6").datepicker('setDate', Date());
+    });
+
+    // Date Validation
+
+    function dateDifference(validFrom, validTo) {
+        var result = false;
+        var splitFrom = validFrom.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = validTo.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+    $('#displayotherdetails').on('click', '#EditBtn', function () {
+
+        $("#errValid-DocumentTypeId").text("");
+        $("#errValid-documentNumber").text(" ");
+        $("#errValid-DocumentFilePath").text("");
+        $("#errValid-Document").hide();
+        $("#displayDocumentName").text('');
+        $("#displayDocumentName").hide();
+        $("#success_CreateOtherDetails_Popup").hide();
+        $("#errValid-ValidFrom").text(" ");
+        $("#errValid-ValidTo").text(" ");
+        $("#hide_documentName").show();
+        $("#errValid-ErrorFileSize").text('');
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim();
+        var FourthCol = tr.find('td:eq(3)').text().trim();
+        var FifthCol = tr.find('td:eq(4)').text().trim();
+        $('#detailId').val(id);
+        var valueDocumentTypeId = $("#DocumentTypeId option:contains(" + FirstCol + ")").val();
+        //$('#EmpId').val(SecondCol);
+
+
+        $("#DocumentTypeId").val(valueDocumentTypeId).change();
+        $("#DocumentTypeId").prop('disabled', true);
+        $('#documentNumber').val(SecondCol);
+        $('#displayDocumentName').text((ThirdCol));
+        var detailId = id;
+        var url = "/Employees/GetOtherDetailsDocument"
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { detailId: detailId },
+            beforeSend: function () {
+                $('.loader').removeClass('d-none');
+            },
+            success: (Result) => {
+                $('.loader').addClass('d-none');
+
+                $('.displayOtherDetailsDoc').html("");
+                $.each(Result, function (key, value) {
+                    var img = "";
+                    var ext = value.split('.').pop();
+                    if (ext == "pdf") {
+                        img = "/images/Pdf-Icon.png";
+                    }
+                    else if (ext == "doc" || ext == "docx") {
+                        img = "/images/Doc-Icon.png";
+                    }
+                    else {
+                        img = "/images/Image-Icon.png";
+                    }
+                    $('.displayOtherDetailsDoc').append("<li><img class='mt-1' src='" + img + "' style='height: 40px;'><div style='display:none;'>" + value + "</div></li>");
+                });
+            }
+        });
+
+
+        if (FirstCol == "Passport") {
+            $("#errValid-DocumentTypeId").text("");
+            $("#errValid-documentNumber").text("");
+            // $('#ValidFrom').val((ThirdCol));
+            // $('#ValidTo').val((FourthCol));
+            $('#ValidFrom').val((FourthCol));
+            $('#ValidTo').val((FifthCol));
+
+            $("#datepicker5").datepicker('setDate', FourthCol);
+            $("#datepicker6").datepicker('setDate', FifthCol);
+            $('#validFrom').show();
+            $('#validTo').show();
+        }
+        else if (FirstCol == "Driving Licence") {
+            $("#errValid-DocumentTypeId").text("");
+            $("#errValid-documentNumber").text("");
+            $('#ValidTo').val((FifthCol));
+            $("#datepicker6").datepicker('setDate', FifthCol);
+            // $('#ValidFrom').val((FourthCol));
+            // $('#ValidTo').val((FifthCol));
+            // $('#validFrom').show();
+            $('#validTo').show();
+        }
+        else {
+            $('#validFrom').hide();
+            $('#validTo').hide();
+        }
+
+        $("#hide_documentName").show();
+        $("#displayDocumentName").show();
+        $("#btnUpdate").show();
+        $("#btnAdd").hide();
+
+    });
+
+    // Update Other Details
+
+    $('#btnUpdate').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-DocumentTypeId").text("");
+        $("#errValid-documentNumber").text(" ");
+        $("#errValid-DocumentFilePath").text("");
+        //$("#errValid-Document").hide();
+        $("#displayDocumentName").text('');
+        $("#displayDocumentName").hide();
+        $("#errVerify-ValidTo").hide();
+        $("#success_UpdateOtherDetails_Popup").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        $("#errValid-DocumentTypeId").hide();
+        $("#errValid-ErrorFileSize").hide();
+
+        if ($("#DocumentTypeId").val() == "") {
+            $("#errValid-DocumentTypeId").text("Document Type field is required");
+            $("#errValid-DocumentTypeId").show();
+            isValid = false;
+        }
+
+        if ($("#documentNumber").val() == "") {
+            $("#errValid-documentNumber").text("Document Number field is required");
+            isValid = false;
+        }
+
+        if ($("#DocumentTypeId").val() == 3) {
+
+            if ($("#ValidFrom").val() == "") {
+                $("#errValid-ValidFrom").text("Valid From field is required");
+                isValid = false;
+            }
+
+            if ($("#ValidTo").val() == "") {
+                $("#errValid-ValidTo").text("Valid To field is required");
+                isValid = false;
+            }
+        }
+        else if ($("#DocumentTypeId").val() == 4) {
+
+            if ($("#ValidTo").val() == "") {
+                $("#errValid-ValidTo").text("Valid To field is required");
+                isValid = false;
+            }
+        }
+
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        var detailId = $("#detailId").val();
+        if (detailId == 0) {
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+                $("#displayDocumentName").text('');
+                $("#errValid-ErrorFileSize").hide();
+                isValid = false;
+            }
+        }
+        else {
+            $('#displayDocumentName').show();
+        }
+
+        if (attachmentFilePath != "") { //filepath get
+            var ext = attachmentFilePath.split('.').pop(); // pdf or not check
+            if (ext == "pdf" || ext == "doc" || ext == "jpeg" || ext == "png" || ext == "jpg" || ext == "jfif" || ext == "bmp") {
+
+            } else {
+                $("#errValid-Document").show();
+                isValid = false;
+            }
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var detailId = $("#detailId").val();
+        var empId = $("#EmpId").val();
+        var documentTypeId = $("#DocumentTypeId").val();
+        var documentNumber = $("#documentNumber").val();
+        var validFrom = $("#ValidFrom").val();
+        var validTo = $("#ValidTo").val();
+        formData.append("DetailId", detailId);
+        formData.append("EmpId", empId);
+        formData.append("DocumentTypeId", documentTypeId);
+        formData.append("DocumentNumber", documentNumber);
+        formData.append("ValidFrom", validFrom);
+        formData.append("ValidTo", validTo);
+        formData.append("StrValidFrom", validFrom);
+        formData.append("StrValidTo", validTo);
+
+        if (isValid) {
+            var isValidDate = dateDifference(validFrom, validTo);
+            if (documentTypeId == 3) {
+                if (isValidDate) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Employees/UpdateOtherDetails",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: function (result) {
+                            $('#displayotherdetails').html("");
+                            $("#DocumentTypeId").val("").change();
+                            $("#errValid-DocumentTypeId").hide();
+                            $("#success_UpdateOtherDetails_Popup").css('display', 'none !important');
+                            if (result.empId > 0) {
+
+                                Swal.fire({
+                                    title: 'Updated Successfully',
+                                    text: "",
+                                    icon: 'success',
+                                    allowOutsideClick: false
+                                }).then((resultvalue) => {
+                                    if (resultvalue.isConfirmed) {
+                                        $.each(result.otherDetails, function (key, value) {
+
+                                            if (value.validFrom != null) {
+                                                var obj = new Date(value.validFrom);
+                                                var yyyy = obj.getFullYear();
+                                                var mm = obj.getMonth() + 1;
+                                                var dd = obj.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                                var valueValidTo = new Date(value.validTo);
+                                                var yyyy = valueValidTo.getFullYear();
+                                                var mm = valueValidTo.getMonth() + 1;
+                                                var dd = valueValidTo.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validTo = dd + '/' + mm + '/' + yyyy;
+                                            }
+                                            else if (value.validTo != null && value.documentTypeId == 4) {
+                                                var validFrom = "";
+                                                var valueValidTo = new Date(value.validTo);
+                                                var yyyy = valueValidTo.getFullYear();
+                                                var mm = valueValidTo.getMonth() + 1;
+                                                var dd = valueValidTo.getDate();
+                                                if (dd < 10) dd = '0' + dd;
+                                                if (mm < 10) mm = '0' + mm;
+                                                var validTo = dd + '/' + mm + '/' + yyyy;
+                                            }
+                                            else {
+                                                var validFrom = '';
+                                                var validTo = '';
+                                            }
+
+                                            $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                        });
+                                    };
+                                });                               
+                            }
+                            else {                                
+                                Swal.fire({
+                                    title: 'Something error',
+                                    text: "",
+                                    icon: 'error',
+                                    allowOutsideClick: false
+                                }).then((resultvalue) => {
+                                    var empId = $("#EmpId").val();
+                                    PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+                                });
+                            }
+                            $("#btnUpdate").hide();
+                            $("#btnAdd").show();
+
+                        },
+                        complete: function () {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-ValidTo").show();
+                    return false;
+                }
+
+            }
+            else if (documentTypeId == 4) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/UpdateOtherDetails",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+
+                        $('#displayotherdetails').html("");
+                        $("#DocumentTypeId").val("").change();
+                        $("#errValid-DocumentTypeId").hide();
+                        $("#success_CreateOtherDetails_Popup").css('display', 'none !important');
+                        if (result.empId > 0) {
+
+                            Swal.fire({
+                                title: 'Updated Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultvalue) => {
+                                if (resultvalue.isConfirmed) {
+                                    $.each(result.otherDetails, function (key, value) {
+                                        if (value.validFrom != null) {
+                                            var obj = new Date(value.validFrom);
+                                            var yyyy = obj.getFullYear();
+                                            var mm = obj.getMonth() + 1;
+                                            var dd = obj.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else if (value.validTo != null && value.documentTypeId == 4) {
+                                            var validFrom = "";
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else {
+                                            var validFrom = '';
+                                            var validTo = '';
+                                        }
+                                        $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                    });
+                                };
+                            });                            
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultvalue) => {
+                                var empId = $("#EmpId").val();
+                                PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/UpdateOtherDetails",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        $('#displayotherdetails').html("");
+                        $("#DocumentTypeId").val("").change();
+                        $("#errValid-DocumentTypeId").hide();
+                        $("#success_UpdateOtherDetails_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                $.each(result.otherDetails, function (key, value) {
+                                    if (value.validFrom != null) {
+                                        var obj = new Date(value.validFrom);
+                                        var yyyy = obj.getFullYear();
+                                        var mm = obj.getMonth() + 1;
+                                        var dd = obj.getDate();
+                                        if (dd < 10) dd = '0' + dd;
+                                        if (mm < 10) mm = '0' + mm;
+                                        var validFrom = dd + '/' + mm + '/' + yyyy;
+                                        var valueValidTo = new Date(value.validTo);
+                                        var yyyy = valueValidTo.getFullYear();
+                                        var mm = valueValidTo.getMonth() + 1;
+                                        var dd = valueValidTo.getDate();
+                                        if (dd < 10) dd = '0' + dd;
+                                        if (mm < 10) mm = '0' + mm;
+                                        var validTo = dd + '/' + mm + '/' + yyyy;
+                                    }
+                                    else if (value.validTo != null && value.documentTypeId == 4) {
+                                        var validFrom = "";
+                                        var valueValidTo = new Date(value.validTo);
+                                        var yyyy = valueValidTo.getFullYear();
+                                        var mm = valueValidTo.getMonth() + 1;
+                                        var dd = valueValidTo.getDate();
+                                        if (dd < 10) dd = '0' + dd;
+                                        if (mm < 10) mm = '0' + mm;
+                                        var validTo = dd + '/' + mm + '/' + yyyy;
+                                    }
+                                    else {
+                                        var validFrom = '';
+                                        var validTo = '';
+                                    }
+
+                                    $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                });
+                                $("#btnUpdate").hide();
+                                $("#btnAdd").show();
+                            };
+                        });                        
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        }
+        else {
+            return false;
+        }
+        $("#DocumentTypeId").prop('disabled', false);
+        $("#DocumentTypeId option").removeAttr('selected', 'selected');
+        $("#DocumentTypeId option[value='']").attr('selected', 'selected');
+        $("#documentNumber").val('');
+        $("#DocumentName").val('');
+        $('#DocumentFilePath').val('');
+        $("#hide_documentName").val('');
+        $("#ValidFrom").val('');
+        $("#ValidTo").val('');
+        $("#datepicker5").datepicker('setDate', Date());
+        $("#datepicker6").datepicker('setDate', Date());
+        $("#hide_documentName").hide();
+        $("#btnUpdate").hide();
+        $("#btnAdd").show();
+        $("#errValid-DocumentTypeId").hide();
+    });
+
+    // Delete Other Details
+
+    $('#displayotherdetails').on('click', '#btnDelete', function () {
+
+        $("#errValid-DocumentTypeId").text("");
+        $("#errValid-documentNumber").text(" ");
+        $("#errValid-DocumentFilePath").text("");
+        //$("#errValid-Document").hide();
+        $("#displayDocumentName").text('');
+        $("#displayDocumentName").hide();
+        $("#errVerify-ValidTo").hide();
+        $("#success_UpdateOtherDetails_Popup").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $("#hide_documentName").hide();
+        $("#errValid-DocumentTypeId").hide();
+        $("#errValid-ErrorFileSize").hide();
+        $("#success_DeleteOtherDetails_Popup").hide();
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var id = $(this).data("id")
+                var otherDetails = {
+                    DetailId: id,
+                    EmpId: $("#EmpId").val()
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/DeleteOtherDetails",
+                    data: otherDetails,
+                    success: (result) => {
+                        $('#displayotherdetails').html("");
+                        $("#success_DeleteOtherDetails_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Deleted Successfully!',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                if (result.otherDetails.length == 0) {
+                                    $('#displayotherdetails').append("<tr><td class='dataTables_empty' style = 'text-align:center;' colspan = '6' > No data available </td></tr>");
+                                }
+                                else {
+                                    $.each(result.otherDetails, function (key, value) {
+                                        if (value.validFrom != null) {
+                                            var obj = new Date(value.validFrom);
+                                            var yyyy = obj.getFullYear();
+                                            var mm = obj.getMonth() + 1;
+                                            var dd = obj.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validFrom = dd + '/' + mm + '/' + yyyy;
+
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else if (value.validTo != null && value.documentTypeId == 4) {
+                                            var validFrom = "";
+                                            var valueValidTo = new Date(value.validTo);
+                                            var yyyy = valueValidTo.getFullYear();
+                                            var mm = valueValidTo.getMonth() + 1;
+                                            var dd = valueValidTo.getDate();
+                                            if (dd < 10) dd = '0' + dd;
+                                            if (mm < 10) mm = '0' + mm;
+                                            var validTo = dd + '/' + mm + '/' + yyyy;
+                                        }
+                                        else {
+                                            var validFrom = '';
+                                            var validTo = '';
+                                        }
+
+                                        $('#displayotherdetails').append("<tr><td> " + value.documentTypeName + "</td><td> " + value.documentNumber + "</td><td style='display:none;'> " + value.documentName + "</td><td> " + validFrom + " </td><td> " + validTo + " </td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class= 'nk-tb-actions gx-1 my-n1' ><li class='me-n1' ><div class='dropdown' ><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown' > <em class='icon ni ni-more-h' > </em></a ><div class='dropdown-menu dropdown-menu-end' ><ul class='link-list-opt no-bdr' ><li><a href='javascript:void(0)' id='EditBtn' data-id='" + value.detailId + "'data-uan='" + value.uanNumber + "'> <em class='icon ni ni-edit' > </em><span>Edit</span > </a></li ><li><a href='javascript:void(0)' id='btnDelete' data-id='" + value.detailId + "' > <em class='icon ni ni-delete' > </em><span>Delete</span > </a></li ><li><a href='javascript:void(0)' id='btnDownload' data-id='" + value.detailId + "' > <em class='icon ni ni-download' > </em><span>Download</span > </a></li ></ul></div></div></li></ul></div></td></tr>");
+                                    });
+                                }
+                                $('.loader').addClass('d-none');
+                            };
+                        });                       
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $("#DocumentTypeId option").removeAttr('selected', 'selected');
+                $("#DocumentTypeId option[value='']").attr('selected', 'selected');
+                $("#documentNumber").val('');
+                $("#DocumentName").val('');
+                $("#displayDocumentName").text('');
+                $("#btnUpdate").hide();
+                $("#btnAdd").show();
+                $("#errValid-DocumentTypeId").hide();
+            }
+        })
+    });
+
+    $("#DocumentTypeId").change(function () {
+        var selectedText = $(this).find("option:selected").text();
+        var selectedValue = $(this).val();
+        if (selectedText == 'Passport') {
+            $("#validFrom").show();
+            $("#validTo").show();
+
+        }
+        else if (selectedText == 'DrivingLicence') {
+            $("#validFrom").hide();
+            $("#validTo").show();
+            $("#ValidFrom").val('');
+        }
+        else {
+            $("#validFrom").hide();
+            $("#validTo").hide();
+            $("#ValidFrom").val('');
+            $("#ValidTo").val('');
+        }
+    });
+
+    // Download Document
+
+    $('#displayotherdetails').on('click', '#btnDownload', function () {
+        var id = $(this).data("id")
+        window.location.href = "/Employees/DownloadOtherDetailsFile?detailId=" + id;
+        $('.loader').addClass('d-none');
+    });
+
+    $("#btnCloseCreateOtherDetails").click(function () {
+        $("#success_CreateOtherDetails_Popup").hide();
+    });
+
+    $("#btnCloseUpdateOtherDetails").click(function () {
+        $("#success_UpdateOtherDetails_Popup").hide();
+    });
+
+    $("#btnCloseDeleteOtherDetails").click(function () {
+        $("#success_DeleteOtherDetails_Popup").hide();
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

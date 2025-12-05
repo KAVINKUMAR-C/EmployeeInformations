@@ -1,0 +1,171 @@
+﻿@using EmployeeInformations.Model.APIModel;
+@using Microsoft.Extensions.Configuration
+@using EmployeeInformations.Common.Enums
+@model CandidatePrivilegesModel
+@{
+    ViewBag.Title = "CandidatePrivilege";
+    Layout = "_Layout";
+    int count = 0;
+}
+ 
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Candidate Privileges</h3>
+        </div><!-- .nk-block-head-content -->        
+    </div><!-- .nk-block-between -->
+</div><!-- .nk-block-head -->
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getJobApplyData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col col-w"><span class="sub-text">Scheduler Name</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">IsEnabled</span></th>
+                </tr>
+            </thead>
+            <tbody id="displayQualification">
+                @if (Model.candidatePrivileges.Count() > 0)
+                {
+                    @foreach (var module in Model.candidatePrivileges)
+                    {
+                        <tr class="candidate_permission nk-tb-item">
+                            <td class="nk-tb-col tb-col">
+                                <span class="text-primary" id="@module.CandidatescheduleId"> @module.SchedulerName </span>
+                            </td>
+
+                            <td class="nk-tb-col tb-col">
+                                @if (module.IsEnabled == true)
+                                {
+                                    <div class="custom-control custom-control-sm custom-checkbox">
+                                        <input type="checkbox" name="chkIsEnabledModule" checked class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule@(count)" value="1">
+                                        <label class="custom-control-label" for="chkIsEnabledModule@(count)"></label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="custom-control custom-control-sm custom-checkbox">
+                                        <input type="checkbox" name="chkIsEnabledModule" class="custom-control-input chkIsEnabledModule" id="chkIsEnabledModule@(count)" value="0">
+                                        <label class="custom-control-label" for="chkIsEnabledModule@(count)"></label>
+                                    </div>
+                                }
+                            </td>
+
+                        </tr>
+                        count++;
+
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-lg-12 d-flex mt-3 p-0">
+        <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+        <input type="button" class="btn btn-primary" id="btnSaveDasboard" value="Save" />
+    </div>
+</div>
+
+<div class="modal" id="success_Permission_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Access Category has been added Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnClosePermission">
+                <button type="button" class="btn btn-md btn-primary mr-auto" data-dismiss="modal">OK</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    $(function () {
+
+        $("#btnBack").click(function () {
+
+            window.location.href = "/WebsiteJob/CandidatePrivilege";
+
+        });
+
+
+        $('input[type=checkbox][name=chkIsEnabledModule]').change(function () {
+
+            if ($(this).is(':checked')) {
+
+                $(this).val("1");
+            }
+            else {
+                $(this).val("0");
+            }
+        });
+
+        $(document).ready(function () {          
+            $('#getJobApplyData').DataTable({
+                "bInfo": true,
+                "paging": true,
+                
+            });
+        });
+
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Update role permission
+
+    $("#btnSaveDasboard").click(function () {
+       
+        var rolePrivilegeList = [];
+        var formData = new FormData();
+        var dragColumns = document.querySelectorAll('.candidate_permission').length;
+        var val = 0;
+        for (var i = 0; i < dragColumns; i++) {
+
+            var candidatescheduleId = document.querySelectorAll('.candidate_permission')[i].cells[0].firstElementChild.id;
+            var isEnabled = document.querySelectorAll('.candidate_permission')[i].cells[1].firstElementChild.querySelector('.chkIsEnabledModule').value;
+
+            console.log("test : " + candidatescheduleId + "  " + isEnabled);
+            rolePrivilegeList.push({                
+                CandidatescheduleId: candidatescheduleId,
+                isEnabled: isEnabled,
+            });
+        }
+
+        formData.append("Candidate", JSON.stringify(rolePrivilegeList));
+        $('.loader').removeClass('d-none');
+        $.ajax({
+            type: "POST",
+            url: "/WebsiteJob/AddDashboardAccessCategoryByRole",
+            data: formData,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                $("#success_Permission_Popup").css('display', 'none !important');
+                swal.fire({
+                    title: "Added Successfully",
+                    text: "",
+                    icon: "success",
+                    allowOutsideClick: false  // This prevents closing on outside click
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var urlToRedirect = '@Url.Action("CandidatePrivilege", "WebsiteJob")';
+                        window.location.href = urlToRedirect;
+                    };
+                });
+
+                $('.loader').addClass('d-none');
+            }
+        });
+
+    });
+
+</script>

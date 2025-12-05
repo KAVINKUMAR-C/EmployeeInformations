@@ -1,0 +1,605 @@
+﻿@using EmployeeInformations.Model.ProjectSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ProjectAssignation
+
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Update Project Assignation</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row">
+                @Html.HiddenFor(m => m.EmpId)
+                @Html.HiddenFor(m =>m.Id)
+                @Html.HiddenFor(m => m.ProjectAssignationName.StrFmtProjectmanagerEmpId , new{id="strProjectManagerId"})
+                @Html.HiddenFor(m => m.ProjectAssignationName.StrFmtTeamLeadEmpId, new{id="strTeamLeadId"})
+                @Html.HiddenFor(m => m.ProjectAssignationName.StrFmtEmployeeEmpId, new{id="strEmployeeId"})
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Project<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m =>m.ProjectId, new SelectList(Model.ProjectDetails,"ProjectId","ProjectName"), "--Select ProjectName--",new{@class="form-control data-employee",id="ProjectId",@disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ProjectId,"",new{@class="error text-danger" , id="errValid-ProjectId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Developers<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m =>m.EmployeeId, new SelectList(Model.DropdownEmployee,"EmpId","FirstName"),new{@class="form-control",id="EmployeeId",multiple=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EmployeeId,"",new{@class="error text-danger" , id="errValid-EmployeeId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Team Lead<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m =>m.TeamLeadId, new SelectList(Model.DropdownTeamLeads,"EmpId","UserName"),new{@class="form-control",id="TeamLeadId",multiple=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.TeamLeadId,"",new{@class="error text-danger" , id="errValid-TeamLeadId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Project Manager<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m =>m.ProjectManagerId, new SelectList(Model.DropdownProjectManagers,"EmpId","UserName"),new{@class="form-control",id="ProjectManagerId",multiple=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ProjectManagerId,"",new{@class="error text-danger" , id="errValid-ProjectManagerId"})
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12 d-flex mt-3 p-0">
+                <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnProjectBack" value="Back" />
+                <input type="button" class="btn btn-primary" id="btnUpdateProjectAssignation" value="Save" />
+            </div>
+            <!-- Modal body -->
+        </form>
+    </div>
+</div>
+
+
+<div class="card card-bordered card-preview" id="txtSuccessMeg" data-simplebar>
+    <table class="table" id="getdata">
+        <thead>
+            <tr class="nk-tb-item table-header">
+                <th id="employees" class="dev-col-w"></th>
+                <th id="employeeNameForHeader" class="name-col-w"></th>
+                <th id="employeedepartment" class="dept-col-w"></th>
+                <th id="employeedesignation"></th>
+            </tr>
+        </thead>
+        <tbody id="displayQualification">
+
+            <tr>
+                <td class="nk-tb-col tb-col">
+                    <ul class="project-users g-1">
+                        <div class="user-avatar" title="">
+                            <span style="text-transform:uppercase;"></span>
+                        </div>
+
+                        <div class="user-avatar bg-light" title="">
+                            <img src="./ProfileImages/" alt="">
+                        </div>
+                    </ul>
+                </td>
+                <td>
+                    <div>
+                        <span id="employeeName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="employeedepartmentName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="employeedesignationName"></span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="card card-bordered card-preview" id="txtSuccessMeg" data-simplebar>
+    <table class="table" id="getdata">
+        <thead>
+            <tr class="nk-tb-item table-header">
+                <th id="teamlead" class="dev-col-w"></th>
+                <th id="teamleadNameForHeader" class="name-col-w"></th>
+                <th id="teamleadepartment" class="dept-col-w"></th>
+                <th id="teamleadesignation"></th>
+            </tr>
+        </thead>
+        <tbody id="displayteamlead">
+
+            <tr>
+                <td class="nk-tb-col tb-col">
+                    <ul class="project-users g-1">
+                        <div class="user-avatar" title="">
+                            <span style="text-transform:uppercase;"></span>
+                        </div>
+
+                        <div class="user-avatar bg-light" title="">
+                            <img src="./ProfileImages/" alt="">
+                        </div>
+                    </ul>
+                </td>
+                <td>
+                    <div>
+                        <span id="teamleadName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="teamleaddepartmentName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="teamleaddesignationName"></span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card card-bordered card-preview" id="txtSuccessMeg" data-simplebar>
+    <table class="table" id="getdata">
+        <thead>
+            <tr class="nk-tb-item table-header">
+                <th id="projectmanager" class="dev-col-w"></th>
+                <th id="managerNameForHeader" class="name-col-w"></th>
+                <th id="managerdepartment" class="dept-col-w"></th>
+                <th id="managerdesignation"></th>
+            </tr>
+        </thead>
+        <tbody id="displayprojectmanager">
+
+            <tr>
+                <td class="nk-tb-col tb-col">
+                    <ul class="project-users g-1">
+                        <div class="user-avatar" title="">
+                            <span style="text-transform:uppercase;"></span>
+                        </div>
+
+                        <div class="user-avatar bg-light" title="">
+                            <img src="./ProfileImages/" alt="">
+                        </div>
+                    </ul>
+                </td>
+                <td>
+                    <div>
+                        <span id="projectmanagerName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="managerdepartmentName"></span>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <span id="managerdesignationName"></span>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+<div class="modal" id="success_UpdateProject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Project Updated Successfully!
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateProject">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $("#EmployeeId").select2();
+        $("#TeamLeadId").select2();
+        $("#ProjectManagerId").select2();
+
+        var employeeId = $("#EmployeeId").select2();
+        $("#EmployeeId").select2().on("change", function () {
+            $("#errValid-EmployeeId").text("");
+        });
+
+
+
+        var allemployeeId = $("#strEmployeeId").val();
+        var employeeId = $("#EmployeeId").select2();
+        if (allemployeeId != null) {
+            var lengthemployeeId = allemployeeId.split(',').length;
+            var splitemployeeId = allemployeeId.split(',');
+
+            for (var i = 0; i < lengthemployeeId; i++) {
+                $("#EmployeeId option[value=" + splitemployeeId[i] + "]").attr('selected', 'selected').trigger("change");
+            }
+        }
+
+        var TeamLeadId = $("#TeamLeadId").select2();
+        $("#TeamLeadId").select2().on("change", function () {
+            $("#errValid-TeamLeadId").text("");
+        });
+
+
+        var allteamLeadId = $("#strTeamLeadId").val();
+        var teamLeadId = $("#TeamLeadId").select2();
+        if (allteamLeadId != null) {
+            var lengthteamLeadId = allteamLeadId.split(',').length;
+
+            var splitteamLeadId = allteamLeadId.split(',');
+            for (var i = 0; i < lengthteamLeadId; i++) {
+                $("#TeamLeadId option[value=" + splitteamLeadId[i] + "]").attr('selected', 'selected').trigger("change");
+            }
+        }
+
+        var TeamLeadId = $("#ProjectManagerId").select2();
+        $("#ProjectManagerId").select2().on("change", function () {
+            $("#errValid-ProjectManagerId").text("");
+        });
+
+        var allprojectManagerId = $("#strProjectManagerId").val();
+        var projectManagerId = $("#ProjectManagerId").select2();
+        if (allprojectManagerId != null) {
+            var lengthprojectManagerId = allprojectManagerId.split(',').length;
+            var splitprojectManagerId = allprojectManagerId.split(',');
+            for (var i = 0; i < lengthprojectManagerId; i++) {
+                $("#ProjectManagerId option[value=" + splitprojectManagerId[i] + "]").attr('selected', 'selected').trigger("change");
+            }
+        }
+
+        $("#EmployeeId").select2().on("change", function () {
+            $("#errValid-EmployeeId").text("");
+        });
+
+        $("#TeamLeadId").select2().on("change", function () {
+            $("#errValid-TeamLeadId").text("");
+        });
+
+        $("#ProjectManagerId").select2().on("change", function () {
+            $("#errValid-ProjectManagerId").text("");
+        });
+
+        $("#ProjectManagerId").change(function () {
+            $("#errValid-ProjectManagerId").text("");
+            if ($("#ProjectManagerId").val() == "") {
+                $("#errValid-ProjectManagerId").text("Project Manager field is required");
+            }
+        });
+
+        $("#TeamLeadId").change(function () {
+            $("#errValid-TeamLeadId").text("");
+            if ($("#TeamLeadId").val() == "") {
+                $("#errValid-TeamLeadId").text("Team Lead field is required");
+            }
+        });
+
+        $("#EmployeeId").change(function () {
+            $("#errValid-EmployeeId").text("");
+            if ($("#EmployeeId").val() == "") {
+                $("#errValid-EmployeeId").text("Developers field is required");
+            }
+        });
+        //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Nice Scroll Team lead, Project manager,Employees
+
+        $("#TeamLeadId,#ProjectManagerId,#EmployeeId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+    });
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Get project assignation details
+
+    var projectId = $("#ProjectId").val();
+    var formData = new FormData();
+    formData.append("ProjectId", projectId);
+
+
+    $.ajax({
+        type: "POST",
+        url: "/ProjectDetails/GetProjectAssignation",
+        data: formData,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+            $('.loader').removeClass('d-none');
+        },
+        success: function (Result) {
+
+            $('#displayQualification').html("");
+            $('#displayteamlead').html("");
+            $('#displayprojectmanager').html("");
+            if (Result.length != 0) {
+                //$('#ProjectId').text(Result[0].projectName);
+                $('#employeeNameForHeader').text("Name");
+                $('#employees').text("Developers");
+                $('#employeedepartment').text("Department");
+                $('#employeedesignation').text("Designation");
+                $.each(Result[0].employeeProfileImageNames, function (key, value) {
+                    if (value.employeeProfileImage == "") {
+                        $('#displayQualification').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + "><span style='text-transform:uppercase;'> " + value.sortUserName + " </span></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td><td><div><span id='employeedepartmentName'>" + value.department + "</span></div></td><td><div><span id='employeedesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                    else {
+                        $('#displayQualification').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + "><img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' ></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td><td><div><span id='employeedepartmentName'>" + value.department + "</span></div></td><td><div><span id='employeedesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                });
+
+                $('#teamleadNameForHeader').text("Name");
+                $('#teamlead').text("Team Lead");
+                $('#teamleadepartment').text("Department");
+                $('#teamleadesignation').text("Designation");
+                $.each(Result[0].teamLeadProfileImageNames, function (key, value) {
+                    if (value.employeeProfileImage == "") {
+                        $('#displayteamlead').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;'> " + value.sortUserName + "</span></div></td><td><div><span id='teamleadName'> " + value.userName + "</span></div></td><td><div><span id='teamleadepartment'>" + value.department + "</span></div></td><td><div><span id='teamleaddesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                    else {
+                        $('#displayteamlead').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='teamleadName'> " + value.userName + "</span></div></td><td><div><span id='teamleadepartment'>" + value.department + "</span></div></td><td><div><span id='teamleaddesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                });
+
+                $('#managerNameForHeader').text("Name");
+                $('#projectmanager').text("Project Manager");
+                $('#managerdepartment').text("Department");
+                $('#managerdesignation').text("Designation");
+                $.each(Result[0].projectManagerProfileImageNames, function (key, value) {
+                    if (value.employeeProfileImage == "") {
+                        $('#displayprojectmanager').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;' > " + value.sortUserName + " </span></div></td><td><div><span id='projectmanagerName'> " + value.userName + "</span></div></td><td><div><span id='managerdepartmentName'>" + value.department + "</span></div></td><td><div><span id='managerdesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                    else {
+                        $('#displayprojectmanager').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='projectmanagerName'> " + value.userName + "</span></div></td><td><div><span id='managerdepartmentName'>" + value.department + "</span></div></td><td><div><span id='managerdesignationName'>" + value.designation + "</span></div></td></tr>");
+                    }
+                });
+
+
+            }
+            else {
+                swal.fire({
+                    title: "Something error",
+                    text: "",
+                    icon: "error",
+                    allowOutsideClick: false  // This prevents closing on outside click
+                }).then((result) => {
+                    window.location.href = "/ProjectDetails/UpdateProjectAssignation";
+                });
+               
+            }
+
+        },
+        complete: function () {
+            $('.loader').addClass('d-none');
+        }
+
+    });
+
+    $("#ProjectId").change(function () {
+        $("#errValid-ProjectId").text("");
+        if ($("#ProjectId").val() == "") {
+            $("#errValid-ProjectId").text("Project field is required");
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Update Project Assignation
+
+    $("#btnUpdateProjectAssignation").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-ProjectId").text("");
+        $("#errValid-EmployeeId").text("");
+        $("#errValid-TeamLeadId").text("");
+        $("#errValid-ProjectManagerId").text("");
+
+        if ($("#ProjectId").val() == "") {
+            $("#errValid-ProjectId").text("Project field is required");
+            isValid = false;
+        }
+
+        if ($("#ProjectManagerId").val() == "") {
+            $("#errValid-ProjectManagerId").text("Project Manager field is required");
+            isValid = false;
+        }
+
+        if ($("#TeamLeadId").val() == "") {
+            $("#errValid-TeamLeadId").text("Team Lead field is required");
+            isValid = false;
+        }
+
+        if ($("#EmployeeId").val() == "") {
+            $("#errValid-EmployeeId").text("Developers field is required");
+            isValid = false;
+        }
+       
+        var empId = $("#EmpId").val();
+        var id = $("#Id").val();
+        var projectId = $("#ProjectId").val();
+        var employeeId = $("#EmployeeId").val();
+        var teamLeadId = $("#TeamLeadId").val();
+        var projectManagerId = $("#ProjectManagerId").val();
+
+        formData.append("EmpId", empId);
+        formData.append("Id", id);
+        formData.append("ProjectId", projectId);
+        formData.append("EmployeeId", employeeId);
+        formData.append("TeamLeadId", teamLeadId);
+        formData.append("ProjectManagerId", projectManagerId);
+
+        if (isValid) {
+            var url = "/ProjectDetails/UpdateProjectAssignation";
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (Result) {
+
+                    $("#success_CreateProjectAssignation_Popup").css('display', 'none !important');
+                    swal.fire({
+                        title: "Updated Successfully",
+                        text: "",
+                        icon: "success",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((result) => {
+                        if (result.isConfirmed > 0) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/ProjectDetails/GetProjectAssignation",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    $('.loader').removeClass('d-none');
+                                },
+                                success: function (Result) {
+
+                                    $('#displayQualification').html("");
+                                    $('#displayteamlead').html("");
+                                    $('#displayprojectmanager').html("");
+                                    if (Result.length != 0) {
+                                        //$('#ProjectId').text(Result[0].projectName);
+                                        $('#employeeNameForHeader').text("Name");
+                                        $('#employees').text("Developers");
+                                        $('#employeedepartment').text("Department");
+                                        $('#employeedesignation').text("Designation");
+                                        $.each(Result[0].employeeProfileImageNames, function (key, value) {
+                                            if (value.employeeProfileImage == "") {
+                                                $('#displayQualification').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + "><span style='text-transform:uppercase;'> " + value.sortUserName + " </span></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td><td><div><span id='employeedepartmentName'>" + value.department + "</span></div></td><td><div><span id='employeedesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                            else {
+                                                $('#displayQualification').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + "><img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' ></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td><td><div><span id='employeedepartmentName'>" + value.department + "</span></div></td><td><div><span id='employeedesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                        });
+
+                                        $('#teamleadNameForHeader').text("Name");
+                                        $('#teamlead').text("Team Lead");
+                                        $('#teamleadepartment').text("Department");
+                                        $('#teamleadesignation').text("Designation");
+                                        $.each(Result[0].teamLeadProfileImageNames, function (key, value) {
+                                            if (value.employeeProfileImage == "") {
+                                                $('#displayteamlead').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;'> " + value.sortUserName + "</span></div></td><td><div><span id='teamleadName'> " + value.userName + "</span></div></td><td><div><span id='teamleadepartment'>" + value.department + "</span></div></td><td><div><span id='teamleaddesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                            else {
+                                                $('#displayteamlead').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='teamleadName'> " + value.userName + "</span></div></td><td><div><span id='teamleadepartment'>" + value.department + "</span></div></td><td><div><span id='teamleaddesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                        });
+
+                                        $('#managerNameForHeader').text("Name");
+                                        $('#projectmanager').text("Project Manager");
+                                        $('#managerdepartment').text("Department");
+                                        $('#managerdesignation').text("Designation");
+                                        $.each(Result[0].projectManagerProfileImageNames, function (key, value) {
+                                            if (value.employeeProfileImage == "") {
+                                                $('#displayprojectmanager').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;' > " + value.sortUserName + " </span></div></td><td><div><span id='projectmanagerName'> " + value.userName + "</span></div></td><td><div><span id='managerdepartmentName'>" + value.department + "</span></div></td><td><div><span id='managerdesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                            else {
+                                                $('#displayprojectmanager').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='projectmanagerName'> " + value.userName + "</span></div></td><td><div><span id='managerdepartmentName'>" + value.department + "</span></div></td><td><div><span id='managerdesignationName'>" + value.designation + "</span></div></td></tr>");
+                                            }
+                                        });
+
+                                        //swal.fire("Updated Successfully", "", "success").then((Result) => {
+                                        //    if (Result.isConfirmed > 0) {
+                                        //        var urlToRedirect = '@Url.Action("UpdateProjectAssignation", "ProjectDetails")';
+                                        //        window.location.href = urlToRedirect;
+                                        //        // window.location.href = "/ProjectDetails/UpdateProjectAssignation";
+                                        //        //var urlToRedirect = '@Url.Action("Assignation", "ProjectDetails")';
+                                        //        //window.location.href = urlToRedirect;
+                                        //    };
+                                        //});
+
+                                    }
+                                    else {
+                                        swal.fire({
+                                            title: "Something error",
+                                            text: "",
+                                            icon: "error",
+                                            allowOutsideClick: false  // This prevents closing on outside click
+                                        }).then((resultValue) => {
+                                            window.location.href = "/ProjectDetails/UpdateProjectAssignation";
+                                        });                                       
+                                    }
+                                },
+                                complete: function () {
+                                    $('.loader').addClass('d-none');
+                                }
+
+                            });
+                        };
+                    });
+                    
+
+
+
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    $("#btnProjectBack").click(function () {
+        var urlToRedirect = '@Url.Action("Assignation","ProjectDetails")';
+        window.location.href = urlToRedirect;
+    });
+
+    $("#btnCloseUpdateProject").click(function () {
+        var urlToRedirect = '@Url.Action("UpdateProjectAssignation","ProjectDetails")';
+        window.location.href = urlToRedirect;
+    });
+
+</script>

@@ -1,0 +1,959 @@
+﻿@using EmployeeInformations.Model.MasterViewModel;
+@using EmployeeInformations.Common;
+@using EmployeeInformations.Common.Enums;
+@model AnnouncementViewModel
+@{
+    ViewBag.Title = "Announcement";
+    Layout = "_Layout";
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Announcement Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreateAnnouncement" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getAnnouncement">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="Assignee"><span class="sub-text">Assignee</span></th>
+                    <th class="nk-tb-col" data-id="AnnouncementName"><span class="sub-text"> Name</span></th>
+                    <th class="nk-tb-col" data-id="Description"><span class="sub-text"> Description</span></th>
+                    <th class="nk-tb-col" data-id="AnnouncementDate"><span class="sub-text"> Start Date </span></th>
+                    <th class="nk-tb-col" data-id="AnnouncementEndDate"><span class="sub-text"> End Date </span></th>
+                    <th class="nk-tb-col" data-id="ActiveStatus"><span class="sub-text">Status</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+
+                </tr>
+            </thead>
+
+        </table>
+    </div>
+</div>
+
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Announcement</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-lg-12">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Assignee<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.AnnouncementAssignee, Html.GetEnumSelectList<AnnouncementAssignee>(), "--Select Assignee--", new { @class = "form-control" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.AnnouncementAssignee, "", new { @class = "error text-danger", @id = "errValid-Assignee" })
+                    </div>
+                </div>
+
+                <div class="col-12" id="EmpIdDiv" style="display:none">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Employee Name</label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.ReportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employee Name--", new { @class = "form-control", @id = "EmpId", @multiple = true })
+                        </div>
+                        <span class="error text-danger" id="errValid-EmployeeName"></span>
+                    </div>
+                </div>
+
+                <div class="col-12" id="DepartmentDiv" style="display:none">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Department</label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.DepartmentsId, new SelectList(Model.Department, "DepartmentId", "DepartmentName"), "--Select Department--", new { @class = "form-control", @id = "DepartmentId", @multiple = true })
+                        </div>
+                        <span class="error text-danger" id="errValid-Department"></span>
+                    </div>
+                </div>
+
+                <div class="col-12" id="DesignationDiv" style="display:none">
+                    <div class="form-group emp-hol-yr">
+                        <label class="form-label">Designation</label>
+                        <div class="selectbox">
+                            @Html.DropDownListFor(m => m.DesignationsId, new SelectList(Model.Designation, "DesignationId", "DesignationName"), "--Select Designation--", new { @class = "form-control", @id = "DesignationId", @multiple = true })
+                        </div>
+                        <span class="error text-danger" id="errValid-Designation"></span>
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="AnnouncementName" />
+                            @Html.ValidationMessageFor(m => m.AnnouncementName, "", new { @class = "error text-danger", id = "errValid-AnnouncementName" })
+                            <span id="errVerify-AnnouncementName" style="display:none;" class="error text-danger">Name Already Exists! </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-AnnouncementName"></span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label"> Start Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="AnnounceMentDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="announcementdate">
+                            <span class="input-group-addon">
+                                <i class="icon ni ni-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errVerify-holidaydates"></span>
+                        <span id="errVerify-holidaydateCounts" style="display:none; color: #dc3545!important;">Date already exists! </span>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label"> End Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="EndDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="announcementEnddate">
+                            <span class="input-group-addon">
+                                <i class="icon ni ni-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errVerify-annoucementdate"></span>
+                        <span id="errVerify-dates" style="display:none;" class="error text-danger">Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-12" id="documentBlock">
+                    <div class="form-group">
+                        <label class="form-label" id="documentLable">Document</label>
+
+                        <div class="input-group custom-file-button">
+                            @Html.TextBoxFor(m => m.DocumentFilePath, "", new { type = "file", @class = "form-control", name = "file", multiple = "multiple" })
+                        </div>
+                        <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Description<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextArea("Description", null, new { cols = "5", rows = "5", @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.Description, "", new { @class = "error text-danger", id = "errValid-Description" })
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseAnnouncement" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteAnnouncement_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteAnnouncement">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="modal" id="Update_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Announcement</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-2">
+                    <label class="form-label my-auto">Name</label>
+                    <div class="form-group m-0">
+                        <label class="badge badge-sm bg-outline-primary ml-2 text-wrap text-start" id="AnnouncementNames"></label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="UpadteDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="update">
+                            <span class="input-group-addon">
+                                <i class="icon ni ni-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errVerify-fromDate"></span>
+                        <span id="errVerify-holidaydateCounts" style="display:none; color: #dc3545!important;">Date already exists! </span>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label"> End Date<span class="required" style="color: #FF0000">*</span></label>
+                            <div id="updatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                                <input type="text" class="form-control" id="updateEnddate">
+                                <span class="input-group-addon">
+                                    <i class="icon ni ni-calendar-alt"></i>
+                                </span>
+                            </div>
+                            <span class="error text-danger" id="errVerify-enddate"></span>
+                            <span id="errVerify-announcedate" style="display:none;" class="error text-danger">Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="chkIsActiveModule" class="custom-control-input chkIsActiveModule" id="chkIsActiveModule">
+                                <label class="custom-control-label" for="chkIsActiveModule">Status</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12 d-flex mt-3 p-0">
+                        <input type="button" class="btn btn-primary ml-auto mr-3" id="btnIsActive" value="Save" />
+                        <input type="button" class="btn btn-danger" id="btnCloseUpdate" value="Cancel" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // $(document).ready(function () {
+    //     $('#getAnnouncement').DataTable({
+    //         "bInfo": true,
+    //         "paging": true
+    //     });
+    // });
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        getAnnouncementDatas();
+
+        function getAnnouncementDatas() {
+            var table = $('#getAnnouncement').DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 1;
+            $('#getAnnouncement').DataTable({
+                serverSide: true,
+                processing: true,
+                pageLength: entries, // Page length
+                ajax: {
+                    url: "/Master/AnnouncementFilter",
+                    type: "GET",
+                    data: function (d) {
+                        //SearchFilter
+                        var announcementFilter = document.getElementById("getAnnouncement_filter");
+                        var announcementFilterSearch = announcementFilter.querySelector("input[type='search']");
+                        var announcementFilterinput = announcementFilterSearch.value;
+                        //PagingLength
+                        var announcementFilterData = document.getElementById("getAnnouncement_length");
+                        var page = announcementFilterData.querySelector("select");
+                        var announcementFilterCount = page.value;
+
+                        d.sSearch = announcementFilterinput;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || announcementFilterCount;
+                        d.sEcho = d.start;
+                        d.columnName = columnIndex;
+                        d.columnDirection = columnDirection;
+                    }
+                },
+                columns: [
+                    {
+                        data: 'assignee',
+                        render: function (data, type, row) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+                            return "<div class='user-card'> <div class='user-avatar " + className + " '><span style='text-transform:uppercase;'> " + (row.assignee)[0] + "</span></div><div class='user-info'>" + (row.assignee) + "</div></div>";
+                        }
+                    },
+
+                    {
+                        data: 'announcementName',
+                        render: function (data, type, row) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrids(count);
+                            count++;                          
+                            return "<a href='javascript:void(0)' id='viewEmployee' data-empid= '" + row.announcementId + "' ><div class='leave-reason'></div><span class=' " + className + "'>" + (row.announcementName) + "</span></a >";
+                        }
+                    },
+                    {
+                        data: 'description',
+                        render: function (data, type, row) {
+                             var trimNewValue = row.description.replace(/'/g, "").trim(); 
+                            return "<div class='leave-reason'><p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimNewValue + "'>" + row.description + "</p></div>";                           
+                        }
+                    },
+                    {
+                        data: 'announcementDate',
+                        render: function (data, type, row) {
+
+                            return "<span>" + dateFormat(row.announcementDate) + "</span>";
+
+                        }
+                    },
+                    {
+                        data: 'announcementEndDate',
+                        render: function (data, type, row) {
+
+                            return "<span>" + dateFormat(row.announcementEndDate) + "</span>";
+
+                        }
+                    },
+                    {
+                        data: 'activeStatus',
+                        render: function (data, type, row) {
+
+                            if (row.activeStatus=="Active") {
+                                return "<b class='badge badge-dot bg-success'>"+row.activeStatus+"</b>"
+                            }
+                            else {
+                                return "<b class='badge badge-dot bg-danger'>"+row.activeStatus+"</b>"
+                            }
+                        }
+                    },
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+
+                            var data = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'>" +
+
+                                "<li><a href='javascript:void(0)' class='btnUpdate' data-id= '" + row.announcementId + "' data-isactive= '" + row.isActive + "' data-name= '" + row.announcementName + "' data-date= '" + dateFormat(row.announcementDate) + "' data-enddate= '" + dateFormat(row.announcementEndDate) + "' ><em class='icon ni ni-edit'></em><span>Edit</span></a></li>" +
+                                "<li><a href='javascript:void(0)' id='btnDelete' data-id= '" + row.announcementId + "'><em class='icon ni ni-delete'></em><span>Delete</span></a></li>"
+
+                            if (row.filePath != null) {
+                                data += "<li><a href='javascript:void(0)' id='btnDownload' data-id= '" + row.announcementId + "' ><em class='icon ni ni-download'></em><span>Download</span></a></li>"
+                            }
+                            data += "</ul></div></div></li></ul></div>"
+                            return data;
+                        }
+                    },
+                ],
+                "createdRow": function (row, data) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+            });
+            // $('[data-bs-toggle="tooltip"]').tooltip();
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+        }
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+        $("#getAnnouncement_length").on('change', 'select', function () {
+            entries = parseInt($(this).val());
+            getAnnouncementDatas();
+        });
+        
+
+        function dateFormat(announcementDate) {
+
+            var dateObject = new Date(announcementDate);
+            var day = ("0" + dateObject.getDate()).slice(-2);
+            var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+            var year = dateObject.getFullYear();
+            var formattedDate = day + "/" + month + "/" + year;
+            return formattedDate;
+        }
+    });
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-orange";
+                break;
+            case 3:
+                className = "bg-info ";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+
+    function getClassNameForGrids(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "text-success";
+                break;
+            case 2:
+                className = "text-orange";
+                break;
+            case 3:
+                className = "text-info ";
+                break;
+            case 4:
+                className = "text-blue";
+                break;
+            case 5:
+                className = "text-pink";
+                break;
+            case 6:
+                className = "text-danger";
+                break;
+        }
+        return className;
+    }
+
+    $(document).ready(function () {
+
+        $("#CreateAnnouncement").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+
+        // Datepicker summary
+
+        var date = new Date();
+        date.setDate(date.getDate());
+
+        $("#AnnounceMentDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            startDate: date
+        });
+
+        $("#EndDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            startDate: date
+        });
+
+        $("#UpadteDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+
+        });
+
+
+        $("#updatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+    });
+
+    $("#btnCloseAnnouncement").click(function () {
+        $("#Create_Popup").hide();
+        var urlToRedirect = '@Url.Action("Announcement", "Master")';
+        window.location.href = urlToRedirect;
+    });
+
+    // Keyup summary
+
+    $("#AnnouncementName").keyup(function () {
+        var isValid = true;
+        $("#errValid-AnnouncementName").text("");
+        $("#errVerify-AnnouncementName").hide();
+
+        if ($("#AnnouncementName").val() == "") {
+
+            $("#errValid-AnnouncementName").text("Name field is required");
+            isValid = false;
+        }
+    });
+
+    $("#Description").keyup(function () {
+        $("#errValid-Description").text("");
+
+        if ($("#Description").val() == "") {
+            $("#errValid-Description").text("Description field is required");
+        }
+    });
+
+    // Change summary
+
+    $("#announcementdate").change(function () {
+        $("#errVerify-holidaydates").text("");
+        if ($("#announcementdate").val() == "") {
+            $("#errVerify-holidaydates").text("Start Date field is required");
+        }
+
+    });
+
+    $("#announcementEnddate").change(function () {
+        $("#errVerify-dates").hide();
+        $("#errVerify-annoucementdate").text("");
+        if ($("#announcementEnddate").val() == "") {
+            $("#errVerify-annoucementdate").text("End Date field is required");
+        }
+    });
+
+    $("#update").change(function () {
+        $("#errVerify-fromDate").text("");
+        if ($("#update").val() == "") {
+            $("#errVerify-fromDate").text("Start Date field is required");
+        }
+    });
+
+    $("#updateEnddate").change(function () {
+        $("#errVerify-announcedate").hide();
+        $("#errVerify-enddate").text("");
+        if ($("#updateEnddate").val() == "") {
+            $("#errVerify-enddate").text("End Date field is required");
+        }
+    });
+
+    $("#AnnouncementAssignee").change(function () {
+        $("#errValid-Assignee").text("");
+        if ($("#AnnouncementAssignee").val() == "") {
+            $("#errValid-Assignee").text("Assignee field is required");
+        }
+    });
+
+    $("#EmpId").select2();
+    $("#EmpId").select2().on("change", function () {
+    });
+    $("#DepartmentId").select2();
+    $("#DepartmentId").select2().on("change", function () {
+    });
+    $("#DesignationId").select2();
+    $("#DesignationId").select2().on("change", function () {
+    });
+
+
+    //----------------------------------------------------------------------------------------------------------------------------------
+
+    // Create Announcement
+
+    $("#btnCreate").click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-AnnouncementName").text("");
+        $("#errVerify-AnnouncementName").hide();
+        $("#errValid-Description").text("");
+        $("#errValid-Assignee").text("");
+        $("#errVerify-holidaydates").text("");
+        $("#errVerify-annoucementdate").text("");
+
+
+        if ($("#AnnouncementName").val() == "") {
+            $("#errValid-AnnouncementName").text("Name field is required");
+            isValid = false;
+        }
+
+        if ($("#Description").val() == "") {
+            $("#errValid-Description").text("Description field is required");
+            isValid = false;
+        }
+        if ($("#announcementdate").val() == "") {
+            $("#errVerify-holidaydates").text("Start Date field is required");
+            isValid = false;
+        }
+        if ($("#announcementEnddate").val() == "") {
+            $("#errVerify-annoucementdate").text("End Date field is required");
+            $("#errVerify-dates").hide();
+            isValid = false;
+        }
+        if ($("#AnnouncementAssignee").val() == "") {
+            $("#errValid-Assignee").text("Assignee field is required");
+            isValid = false;
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var announcementName = $("#AnnouncementName").val();
+        var description = $("#Description").val();
+        var date = $("#announcementdate").val();
+        var end = $("#announcementEnddate").val();
+        var empId = $("#EmpId").val();
+        var departmentId = $("#DepartmentId").val();
+        var designationId = $("#DesignationId").val();
+        var assignee = $("#AnnouncementAssignee").val();
+
+        var selectedText = $("#AnnouncementAssignee option:selected").text();
+        var selectedValue = $(this).val();
+
+        if (selectedText == "Employees") {
+            formData.append("EmpId", empId);
+        }
+        else if (selectedText == "Designation") {
+            formData.append("DesignationId", designationId);
+        }
+        else if (selectedText == "Department") {
+            formData.append("DepartmentId", departmentId);
+        }
+        formData.append("AnnouncementName", announcementName);
+        formData.append("Description", description);
+        formData.append("strAnnouncementDate", date);
+        formData.append("strAnnouncementEndDate", end);
+        formData.append("AnnouncementAssignee", assignee);
+
+        if (isValid) {
+            var isValidDate = dateDifference(date, end)
+            if (isValidDate) {
+                var url = "/Master/AddAnnouncements";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (Result) {
+                        $('.loader').addClass('d-none');
+                        $("#Create_Popup").css('display', 'none !important');
+                        $("#Create_Popup").modal('hide');
+    @*  if (Result.announcementNameCount == 1) {
+                            $("#errVerify-AnnouncementName").show();
+                            return false;
+                            } *@
+
+                                                            if (Result.announcementId > 0) {
+                            swal.fire({
+                                title: "Added Successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                if (resultValue.isConfirmed) {
+                                    window.location.href = "/Master/Announcement";
+                                };
+                            });
+
+                        } else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                window.location.href = "/Master/Announcement";
+                            });
+
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-dates").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete
+
+    $('#getAnnouncement').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var announcement = {
+                    AnnouncementId: id
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Master/DeleteAnnouncement",
+                    data: announcement,
+                    success: (result) => {
+                        if (result == true) {
+                            swal.fire({
+                                title: "Deleted Successfully!",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                window.location.href = "/Master/Announcement";
+                            });
+
+                        }
+                        else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                window.location.href = "/Master/Announcement";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });
+    //------------------------------------------------------------------------------------------------------------------------------
+
+    // Update Announcement
+
+    $('#getAnnouncement').on('click', '.btnUpdate', function () {
+
+        $("#Update_Popup").modal('show');
+        var announcementname = $(this).data("name");
+        var isActive = $(this).data("isactive");
+        var getDate = $(this).data("date");
+        var endDate = $(this).data("enddate");
+
+        $("#AnnouncementNames").text(announcementname);
+        $("#update").val(getDate);
+        $("#updateEnddate").val(endDate);
+        // $("#UpadteDatedatepicker").datepicker('setDate', getDate);
+        // $("#updatedatepicker").datepicker('setDate', endDate);
+        if (isActive == true) {
+            $('#chkIsActiveModule').prop('checked', true)
+        }
+        // isActive == 'true' ? $('#chkIsActiveModule').prop('checked', true) : $('#chkIsActiveModule').prop('checked', false);
+        $("#AnnouncementAction").val(isActive);
+        var announcementid = $(this).data("id");
+
+        $('#Update_Popup').on('click', '#btnIsActive', function () {
+
+            var isValid = true;
+            var date = $("#update").val();
+            var endDate = $("#updateEnddate").val();
+            var announcementName = $("#AnnouncementNames").text();
+            if (date == "") {
+                $("#errVerify-fromDate").text("Start Date field is required");
+                isValid = false;
+            }
+            if (endDate == "") {
+                $("#errVerify-enddate").text("End Date field is required");
+                isValid = false;
+            }
+            var AnnouncementAction = $('.chkIsActiveModule').prop('checked');
+            var announcement = {
+                AnnouncementId: announcementid,
+                IsActive: AnnouncementAction,
+                strAnnouncementDate: date,
+                strAnnouncementEndDate: endDate,
+                AnnouncementName: announcementName
+
+            };
+
+            $('.loader').removeClass('d-none');
+            if (isValid) {
+                var isValidDate = dateDifference(date, endDate);
+                if (isValidDate) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Master/UpdateAnnouncement",
+                        data: announcement,
+                        success: (Result) => {
+                            $('.loader').addClass('d-none');
+                            $("#Update_Popup").css('display', 'none !important');
+                            $("#UpadteDatedatepicker").hide();
+                            $("#updatedatepicker").hide();
+                            $("#Update_Popup").modal('hide');
+                            if (Result > 0) {
+                                swal.fire({
+                                    title: "Updated Successfully",
+                                    text: "",
+                                    icon: "success",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    $("#Update_Popup").modal('hide');
+                                    if (resultValue.isConfirmed) {
+                                        window.location.href = "/Master/Announcement";
+                                    };
+                                });
+
+                            }
+                            else {
+                                swal.fire({
+                                    title: "Something error",
+                                    text: "",
+                                    icon: "error",
+                                    allowOutsideClick: false  // This prevents closing on outside click
+                                }).then((resultValue) => {
+                                    window.location.href = "/Master/Announcement";
+                                });
+                            }
+                        },
+                        error: (Result) => {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-announcedate").show();
+                    return false;
+                }
+
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-holidaydate").text("Start field is required");
+                return false;
+            }
+
+        });
+
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    $("#btnCloseUpdate").click(function () {
+        $("#Update_Popup").hide();
+        window.location.href = "/Master/Announcement";
+    });
+
+    // Date validation
+
+    function dateDifference(date, endDate) {
+        var result = false;
+        var splitFrom = date.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = endDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+
+            result = true;
+        }
+        return result;
+    }
+    $(document).ready(function () {
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#Update_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+
+
+    $("#AnnouncementAssignee").change(function () {
+
+        var selectedText = $(this).find("option:selected").text();
+        var selectedValue = $(this).val();
+        if (selectedText == 'Employees') {
+            $("#EmpIdDiv").show();
+            $("#DesignationDiv").hide();
+            $("#DepartmentDiv").hide();
+        }
+        else if (selectedText == 'Designation') {
+            $("#DesignationDiv").show();
+            $("#DepartmentDiv").hide();
+            $("#EmpIdDiv").hide();
+        }
+        else if (selectedText == 'Department') {
+            $("#DepartmentDiv").show();
+            $("#DesignationDiv").hide();
+            $("#EmpIdDiv").hide();
+        }
+    });
+
+
+    $('#getAnnouncement').on('click', '#btnDownload', function () {
+        var id = $(this).data("id")
+        window.location.href = "/Master/DownloadAnnouncementFile?AnnouncementId=" + id;
+        $('.loader').addClass('d-none');
+    });
+
+
+</script>
+

@@ -1,0 +1,468 @@
+﻿@using EmployeeInformations.Model.ProjectSummaryViewModel;
+@model List<ProjectAssignationViewModel>
+@{
+    ViewBag.Title = "Assignation";
+    Layout = "_Layout";
+
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Project Assignation Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create","CreateProjectAssignation","ProjectDetails", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col"><span class="sub-text">Project Name</span></th>
+                    @*<th class="nk-tb-col tb-col"><span class="sub-text">Type Name</span></th> *@
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Developers</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Team Lead</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Project Manager</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col  py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Count() > 0)
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="nk-tb-item">
+
+                            <td class="nk-tb-col">
+                                <div class="user-card">
+                                    <div class="user-avatar @(item.ClassName)">
+                                        <span style="text-transform:uppercase;"> @item.ProjectName?.Substring(0,1)</span>
+                                    </div>
+                                    <div class="user-info">
+                                        <span class="tb-lead font-weight-bold">@item.ProjectName</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            @*<td class="nk-tb-col tb-col">
+                    <span>@item.Type </span>
+                    </td>*@
+
+                            @{
+                                int count = 1;
+                            }
+                            <td class="nk-tb-col tb-col">
+                                <ul class="project-users g-1">
+                                    @foreach (var emp in item.EmployeeProfileImageNames)
+                                    {
+                                        @if (count < 3)
+                                        {
+                                            <div class="user-card">
+                                                @if (emp.EmployeeProfileImage == "")
+                                                {
+                                                    <div class="user-avatar @(emp.ClassName)" title="@emp.UserName">
+                                                        <span style="text-transform:uppercase;"> @emp.SortUserName </span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="user-avatar bg-light" title="@emp.UserName">
+                                                        <img src="./ProfileImages/@emp.EmployeeProfileImage" alt="">
+                                                    </div>
+                                                }
+                                            </div>
+                                            @if (count == 2)
+                                            {
+                                                var total = item.EmployeeProfileImageNames.Count() - 2;
+                                                @if (total > 0)
+                                                {
+                                                    <div class="user-card" id="btnAsstetype" data-id="@item.ProjectId" data-employee="1">
+                                                        <div class="user-avatar bg-light">
+                                                            <span>+@(total)</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                        count++;
+                                    }
+                                </ul>
+                            </td>
+                            @{
+                                int counts = 1;
+                            }
+
+                            <td class="nk-tb-col tb-col">
+                                <ul class="project-users g-1">
+                                    @foreach (var emp in item.TeamLeadProfileImageNames)
+                                    {
+                                        @if (counts < 3)
+                                        {
+                                            <div class="user-card">
+                                                @if (emp.EmployeeProfileImage == "")
+                                                {
+                                                    <div class="user-avatar @(emp.ClassName)" title="@emp.UserName">
+                                                        <span style="text-transform:uppercase;"> @emp.SortUserName </span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="user-avatar bg-light" title="@emp.UserName">
+                                                        <img src="./ProfileImages/@emp.EmployeeProfileImage" alt="">
+                                                    </div>
+                                                }
+                                            </div>
+                                            @if (counts == 2)
+                                            {
+                                                var totalteam = item.TeamLeadProfileImageNames.Count() - 2;
+                                                @if (totalteam > 0)
+                                                {
+                                                    <div class="user-card" id="btnAsstetype" data-id="@item.ProjectId" data-employee="2">
+                                                        <div class="user-avatar bg-light">
+                                                            <span>+@(totalteam)</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                        counts++;
+                                    }
+                                </ul>
+
+                            </td>
+
+                            @{
+                                int counted = 1;
+                            }
+                            <td class="nk-tb-col tb-col">
+                                <ul class="project-users g-1">
+                                    @foreach (var emp in item.ProjectManagerProfileImageNames)
+                                    {
+                                        @if (counted < 3)
+                                        {
+                                            <div class="user-card">
+                                                @if (emp.EmployeeProfileImage == "")
+                                                {
+                                                    <div class="user-avatar @(emp.ClassName)" title="@emp.UserName">
+                                                        <span style="text-transform:uppercase;"> @emp.SortUserName </span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="user-avatar bg-light" title="@emp.UserName">
+                                                        <img src="./ProfileImages/@emp.EmployeeProfileImage" alt="">
+                                                    </div>
+                                                }
+                                            </div>
+                                            @if (counted == 2)
+                                            {
+                                                var totalManager = item.ProjectManagerProfileImageNames.Count() - 2;
+                                                @if (totalManager > 0)
+                                                {
+                                                    <div class="user-card" id="btnAsstetype" data-id="@item.ProjectId" data-employee="3">
+                                                        <div class="user-avatar bg-light">
+                                                            <span>+@(totalManager)</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                        counted++;
+                                    }
+                                </ul>
+                            </td>
+
+                            <td class="nk-tb-col tb-col">
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+
+                                                <div class="dropdown-menu dropdown-menu-end">
+
+                                                    <ul class="link-list-opt no-bdr">
+                                                        @* <li><a href="javascript:void(0)" class="btnViewProject" data-id="@item.ProjectId"><em class="icon ni ni-eye"></em><span>View</span></a></li>*@
+                                                        <li><a href="javascript:void(0)" class="btnUpdate" data-id="@item.ProjectId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.ProjectId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="Asstetype_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header assign-header d-flex">
+                <h5 class="modal-title">View</h5>
+                <span class="assign-close-btn"> <i class="ti-close"></i></span>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body project-modal-body" id="txtSuccessMeg" data-simplebar>
+                <div>
+                    <div class="col-12 d-flex mb-2">
+                        <label class="form-label my-auto">Project Name</label>
+                        <div class="form-group m-0">
+                            <label class="badge badge-sm bg-outline-primary ml-2" id="ProjectId"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table modal-body-table" id="getdata">
+                    <thead class="popup-table-head">
+                        <tr>
+                            <th id="employees"></th>
+                            <th id="employeeNameForHeader"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="displayQualification">
+
+                        <tr>
+                            <td class="nk-tb-col tb-col">
+                                <ul class="project-users g-1">
+                                    <div class="user-avatar" title="">
+                                        <span style="text-transform:uppercase;"></span>
+                                    </div>
+
+                                    <div class="user-avatar bg-light" title="">
+                                        <img src="./ProfileImages/" alt="">
+                                    </div>
+                                </ul>
+                            </td>
+                            <td>
+                                <div>
+                                    <span id="employeeName"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteProject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Deleted Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteProject">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#getdata').DataTable({
+            "bInfo": true,
+            "paging": true
+        });
+    });
+
+    $('.btnUpdate').click(function () {
+        var projectId = $(this).data('id');
+        PageUtil.goToContent("/ProjectDetails/EditProjectAssignation?projectId=" + projectId);
+    });
+
+
+    $("#btnCancel").click(function () {
+        $("#Asstetype_Popup").hide();
+        window.location.href = "/ProjectDetails/Assignation";
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete Project Assignation
+
+    $('#getdata').on('click', '#btnDelete', function () {
+
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var projectId = $(this).data('id');
+                var project = {
+                    ProjectId: projectId
+                };
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/ProjectDetails/DeleteProjectAssignation",
+                    data: project,
+                    success: (Result) => {
+                        if (Result == true) {
+                            swal.fire({
+                                title: "Deleted Successfully!",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                window.location.href = "/ProjectDetails/Assignation";
+                            });
+                           
+                        }
+                        else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((resultValue) => {
+                                window.location.href = "/ProjectDetails/Assignation";
+                            });
+                            
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        });
+
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //View Employees
+
+    $('#getdata').on('click', '#btnAsstetype', function () {
+
+        var id = $(this).data("id");
+        var employee = $(this).data("employee");
+        var formData = new FormData();
+        formData.append("ProjectId", id);
+        $.ajax({
+            type: "POST",
+            url: "/ProjectDetails/GetProjectAssignation",
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function () {
+                $('.loader').removeClass('d-none');
+            },
+            success: function (Result) {
+                $("#Asstetype_Popup").modal('show');
+                $('#displayQualification').html("");
+                if (Result.length != 0) {
+                    $('#ProjectId').text(Result[0].projectName);
+                    $('#employeeNameForHeader').text("Name");
+
+
+                    if (employee == 1) {
+                        $('#employees').text("Developers");
+                        // var emp1 = Result[0].employeeProfileImage.map(function (value) {
+                         $.each(Result[0].employeeProfileImageNames, function (key, value) {
+                            if (value.employeeProfileImage == "") {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + "><span style='text-transform:uppercase;'> " + value.sortUserName + " </span></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                            else {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + "><img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' ></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                        });
+                    }
+                    else if (employee == 2) {
+                        $('#employees').text("Team Lead");
+
+                        //var emp2 = Result[0].teamLeadProfileImageNames.map(function (value) {
+                         $.each(Result[0].teamLeadProfileImageNames, function (key, value) {
+                            if (value.employeeProfileImage == "") {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;'> " + value.sortUserName + "</span></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                            else {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                        });
+                    }
+                    else if (employee == 3) {
+                        $('#employees').text("Project Manager");
+                        //var emp2 = Result[0].projectManagerProfileImageNames.map(function (value) {
+                        $.each(Result[0].projectManagerProfileImageNames, function (key, value) {
+                            if (value.employeeProfileImage == "") {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar " + value.className + "' title = " + value.userName + " ><span style='text-transform:uppercase;' > " + value.sortUserName + " </span></div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                            else {
+                                $('#displayQualification').append("<tr><td><div class='user-avatar bg-light' title = " + value.userName + " > <img src='./ProfileImages/" + value.employeeProfileImage + "' alt = '' > </div></td><td><div><span id='employeeName'> " + value.userName + "</span></div></td></tr>");
+                            }
+                        });
+                    }
+
+                }
+                else {
+                    swal.fire({
+                        title: "Something error",
+                        text: "",
+                        icon: "error",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((result) => {
+                        window.location.href = "/ProjectDetails/Assignation";
+                    });
+                    
+                }
+            },
+            complete: function () {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+
+
+    $(".assign-close-btn").click(function () {
+        $("#Asstetype_Popup").modal('hide');
+    });
+    $(document).ready(function () {
+        $('#Asstetype_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+</script>

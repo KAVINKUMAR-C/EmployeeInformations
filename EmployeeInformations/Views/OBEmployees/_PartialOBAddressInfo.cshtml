@@ -1,0 +1,615 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBAddressInfo
+@{
+
+    var sessionRoleId = Context.Session.GetInt32("RoleId");
+}
+
+<form>
+
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="d-flex mb-1 title data-head">
+        <h6>Permanent Address</h6>
+    </div>
+    <div class="row p-3 pb-0">
+        @Html.HiddenFor(m => m.EmpId)
+        @Html.HiddenFor(m => m.AddressId)
+        @Html.HiddenFor(m =>m.IsActive)
+        @Html.HiddenFor(m =>m.CompanyId)
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 1<span class="required" style="color: #FF0000">*</span></label>
+                @Html.TextBoxFor(m => m.Address1, new { @class = "form-control"  })
+                @Html.ValidationMessageFor(m=>m.Address1,"",new{@class="error text-danger",id="errValid-Address1"})
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Address Line 2<span class="required" style="color: #FF0000">*</span></label>
+                @Html.TextBoxFor(m => m.Address2, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m=>m.Address2,"",new{@class="error text-danger",id="errValid-Address2"})
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Country<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.CountryId,new SelectList(Model.country,"CountryId","Name","CCA2"),"--Select Country--",new{@class="form-control ",id="Country"})
+                </div>
+                @Html.ValidationMessageFor(m=>m.CountryId,"",new{@class="error text-danger",id="errValid-Country"})
+            </div>
+
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">State<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.StateId,new SelectList(Model.states,"StateId","StateName"),"--Select State--",new{@class="form-control ",id="state",@disabled=true})
+                </div>
+                @Html.ValidationMessageFor(m =>m.StateId,"",new{@class="error text-danger",id="errValid-State"})
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">City<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.CityId,new SelectList(Model.cities,"CityId","CityName"),"--Select City--",new{@class="form-control",id="city",@disabled=true})
+                </div>
+                @Html.ValidationMessageFor(m=>m.CityId,"",new{@class="error text-danger",id="errValid-City"})
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Pin Code<span class="required" style="color: #FF0000">*</span></label>
+                @if (Model.Pincode == 0)
+                {
+                    <input type="text" id="Pincode" class="form-control" placeholder="Enter the Pin Code" value="" />
+                }
+                else
+                {
+                    @Html.TextBoxFor(m => m.Pincode, new { @class = "form-control" })
+                }
+                @Html.ValidationMessageFor(m => m.Pincode,"",new{@class="error text-danger",id="errValid-Pincode"})
+            </div>
+        </div>
+
+    </div>
+    <div class="row px-3">
+        <div class="col-12">
+            <div class="alert alert-light alert-icon"><em class="icon ni ni-alert-circle"></em>Address Info SameAs Secondary Address Info</div>
+        </div>
+        <div class="col-12 my-3">
+            @if (Model.IsActive)
+            {
+                <div class="custom-control custom-control-sm custom-checkbox">
+                    <input type="checkbox" checked class="custom-control-input" id="SameAs" name="chkIsEnabledModule" value="0">
+                    <label class="custom-control-label" for="SameAs"><b>Same As Above</b></label>
+                </div>
+              
+            }
+            else
+            {
+                <div class="custom-control custom-control-sm custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="SameAs" name="chkIsEnabledModule" value="0">
+                    <label class="custom-control-label" for="SameAs"><b>Same As Above</b></label>
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+</form>
+
+<div class="modal" id="success_CreateAddress_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Address Created Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseCreateAddress">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<form>
+
+    <div>
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="card-title title mb-0 data-head">
+            <h6>Current Address</h6>
+        </div>
+        <div class="row p-3 pb-0">
+            @Html.HiddenFor(m => m.EmpId)
+            @Html.HiddenFor(m => m.AddressId)
+            @Html.HiddenFor(m =>m.IsActive)
+            @Html.HiddenFor(m =>m.CompanyId)
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Address Line 1</label>
+                    @Html.TextBoxFor(m => m.SecondaryAddress1, new { @class = "form-control"  })
+                    @Html.ValidationMessageFor(m=>m.SecondaryAddress1,"",new{@class="error text-danger",id="errValid-SecondaryAddress1"})
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Address Line 2</label>
+                    @Html.TextBoxFor(m => m.SecondaryAddress2, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m=>m.SecondaryAddress2,"",new{@class="error text-danger",id="errValid-SecondaryAddress2"})
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Country</label>
+                    <div>
+                        @Html.DropDownListFor(m => m.SecondaryCountryId,new SelectList(Model.country,"CountryId","Name","CCA2"),"--Select Country--",new{@class="form-control "})
+                    </div>
+                    @Html.ValidationMessageFor(m=>m.SecondaryCountryId,"",new{@class="error text-danger",id="errValid-SecondaryCountryId"})
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <div>
+                        @Html.DropDownListFor(m => m.SecondaryStateId,new SelectList(Model.Secondarystates,"StateId","StateName"),"--Select State--",new{@class="form-control ",id="states",@disabled=true})
+                    </div>
+                    @Html.ValidationMessageFor(m =>m.SecondaryStateId,"",new{@class="error text-danger",id="errValid-SecondaryStateId"})
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <div>
+                        @Html.DropDownListFor(m => m.SecondaryCityId,new SelectList(Model.Secondarycities,"CityId","CityName"),"--Select City--",new{@class="form-control",id="citys",@disabled=true})
+                    </div>
+                    @Html.ValidationMessageFor(m=>m.SecondaryCityId,"",new{@class="error text-danger",id="errValid-SecondaryCityId"})
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Pin Code</label>
+                    @if (Model.SecondaryPincode == 0)
+                    {
+                        <input type="text" id="SecondaryPincode" class="form-control" placeholder="Enter the Pincode" value="" />
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.SecondaryPincode, new { @class = "form-control" })
+                    }
+                    @Html.ValidationMessageFor(m => m.SecondaryPincode,"",new{@class="error text-danger",id="errValid-SecondaryPincode"})
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row px-3">
+    <div class="col-lg-12 d-flex mb-3">
+        <input type="button" class="btn btn-secondary" id="btnAddressBack" value="Back" />
+        <input type="button" class="btn btn-primary ml-auto" id="btnCreateAddress" value="Next" />
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+
+        $('.selectedwizard li').removeClass('current');
+        $("#step3").addClass('current');
+
+
+    });
+
+    $('#SameAs').click(function () {
+        if ($(this).is(':checked')) {
+
+            $(this).val("1");
+        }
+        else {
+            $(this).val("0");
+        }
+    });
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Nice scroll For Country
+
+    $("#Country,#state,#city,#SecondaryCountryId,#states,#citys").select2().on("select2:open", function () {
+        $('.select2-results__options').niceScroll({
+            cursorcolor: "#4e5e7a",
+            cursorwidth: "5px",
+            autohidemode: false,
+            cursorborder: "1px solid #4e5e7a",
+            horizrailenabled: false,
+        });
+    });
+
+    // KeyUp Summary
+    $("#Address1").keyup(function () {
+        $("#errValid-Address1").text(" ");
+        if ($("#Address1").val() == "") {
+            $("#errValid-Address1").text("Address Line1 field is required");
+        }
+    });
+
+    $("#Address2").keyup(function () {
+        $("#errValid-Address2").text(" ");
+        if ($("#Address2").val() == "") {
+            $("#errValid-Address2").text("Address Line2 field is required");
+        }
+    });
+
+    //change Summary
+    $("#state").change(function () {
+        $("#errValid-State").text(" ");
+        if ($("#state :selected").val() == "0" || $("#state :selected").val() == '') {
+            $("#errValid-State").text("State field is required");
+        }
+    });
+
+    $("#city").change(function () {
+        $("#errValid-City").text(" ");
+        if ($("#city :selected").val() == "0" || $("#city :selected").val() == '') {
+            $("#errValid-City").text("City field is required");
+        }
+    });
+
+    $("#Pincode").keyup(function () {
+        $("#errValid-Pincode").text(" ");
+        if ($("#Pincode").val() == "") {
+            $("#errValid-Pincode").text("Pin Code field is required");
+        }
+    });
+
+    $("#Country").change(function () {
+        $("#errValid-Country").text(" ");
+        if ($("#Country").val() == "") {
+            $("#errValid-Country").text("Country field is required");
+        }
+    });
+
+    //Click Summary
+    $("#btnAddressBack").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/OBEmployees/CreateProfile?empId=" + empId);
+    });
+
+    // Pincode allow numbers only
+
+    $("#Pincode").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Create Address
+
+    $('#btnCreateAddress').click(function () {
+
+        var isValid = true;
+
+        $("#errValid-Address1").text(" ");
+        $("#errValid-Address2").text(" ");
+        $("#errValid-State").text(" ");
+        $("#errValid-City").text(" ");
+        $("#errValid-Country").text(" ");
+        $("#errValid-Pincode").text(" ");
+
+
+        if ($("#Address1").val() == "") {
+            $("#errValid-Address1").text("Address Line1 field is required");
+            isValid = false;
+        }
+
+        if ($("#Address2").val() == "") {
+            $("#errValid-Address2").text("Address Line2 field is required");
+            isValid = false;
+        }
+
+        if ($("#state :selected").val() == "0" || $("#state :selected").val() == '') {
+            $("#errValid-State").text("State field is required");
+            isValid = false;
+        }
+
+        if ($("#city :selected").val() == "0" || $("#city :selected").val() == '') {
+            $("#errValid-City").text("City field is required");
+            isValid = false;
+        }
+
+        if ($("#Country :selected").val() == "0" || $("#Country :selected").val() == '') {
+            $("#errValid-Country").text("Country field is required");
+            isValid = false;
+        }
+
+        if ($("#Pincode").val() == "") {
+            $("#errValid-Pincode").text("Pin Code field is required");
+            isValid = false;
+        }
+
+        var empId = $("#EmpId").val();
+        var addressId = $("#AddressId").val();
+        var address1 = $("#Address1").val();
+        var address2 = $("#Address2").val();
+        var state = $("#state").val();
+        var city = $("#city").val();
+        var country = $("#Country").val();
+        var pincode = $("#Pincode").val();
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+
+
+        var secondaryAddress1 = $("#SecondaryAddress1").val();
+        var secondaryAddress2 = $("#SecondaryAddress2").val();
+        var states = $("#states").val();
+        var citys = $("#citys").val();
+        var countrys = $("#SecondaryCountryId").val();
+        var secondaryPincode = $("#SecondaryPincode").val();
+
+        var addressInfo = {
+            EmpId: empId,
+            AddressId: addressId,
+            Address1: address1,
+            Address2: address2,
+            StateId: state,
+            CityId: city,
+            CountryId: country,
+            Pincode: pincode,
+            SecondaryAddress1: secondaryAddress1,
+            SecondaryAddress2: secondaryAddress2,
+            SecondaryStateId: states,
+            SecondaryCityId: citys,
+            SecondaryCountryId: countrys,
+            SecondaryPincode: secondaryPincode,
+            IsActive: checkbox
+
+
+        };
+
+        var url = "/OBEmployees/AddAddressInfo";
+        if (isValid) {
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: addressInfo,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result > 0) {
+                        PageUtil.goTo("/OBEmployees/CreateOtherDetails?empId=" + result);
+                    }
+                    else{
+                        swal.fire({
+                            title: "Something error",
+                            text: "",
+                            icon: "error",
+                            allowOutsideClick: false  // This prevents closing on outside click
+                        }).then((resultValue) => {
+                            PageUtil.goTo("/OBEmployees/CreateOtherDetails?empId=" + result);
+                        });
+                       
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+
+    // Country based state loading
+
+    $("#Country").change(function () {
+        var countryId = $('#Country').val()
+        var stateId = $("#state").val();
+        $("#state").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/OBEmployees/GetByCountryId?countryId=" + countryId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $("#city").prop('disabled', false);
+                    $('#state').val('');
+                    $('#city').val('');
+                    $("#state").prop('disabled', true);
+                    $("#city").prop('disabled', true);
+                }
+                else {
+                    $('#state').html('')
+                    $("#errValid-State").text(" ");
+                    $('#state').append($('<option> ' + "--Select State--" + ' </option>').val("0").html("--Select State--"));
+                    $.each(Result, function (id, option) {
+                        $('#state').append($('<option> ' + option.stateName + ' </option>').val(option.stateId).html(option.stateName));
+                    });
+
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+
+    // State based City loading
+
+    $("#state").change(function () {
+        
+        var StateId = $('#state').val()
+        $("#city").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/OBEmployees/GetByStateId?StateId=" + StateId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $("#city").prop('disabled', false);
+                    $('#city').val('');
+                    $("#city").prop('disabled', true);
+                }
+                else {
+                    $("#errValid-City").text(" ");
+                    $('#city').html('');
+                    $('#city').append($('<option> ' + "--Select City--" + ' </option>').val("0").html("--Select City--"));
+
+                    $.each(Result, function (id, option) {
+                        $('#city').append($('<option> ' + option.cityName + ' </option>').val(option.cityId).html(option.cityName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+    // Country based state loading
+
+    $("#SecondaryCountryId").change(function () {
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+        if (checkbox == true) {
+            var countryId = $('#Country').val();
+            var stateId = $('#state').val();
+        }
+        else {
+            var countryId = $('#SecondaryCountryId').val();
+        }
+        $("#states").prop('disabled', false);
+
+        $('#SecondaryCountryId').val(countryId).attr('selected');
+        $.ajax({
+            type: "Get",
+            url: "/Employees/GetByCountryId?countryId=" + countryId,
+            success: (Result) => {
+         
+                if (Result.length == 0) {
+                    $("#citys").prop('disabled', false);
+                    $('#states').empty();
+                    $('#citys').empty();
+                    $("#states").prop('disabled', true);
+                    $("#citys").prop('disabled', true);
+                }
+                else {
+                    $('#states').html('')
+                    $("#errValid-SecondaryStateId").text(" ");
+                    $('#states').append($('<option> ' + "--Select State--" + ' </option>').val("0").html("--Select State--"));
+                    $.each(Result, function (id, option) {
+                        $('#states').append($('<option> ' + option.stateName + ' </option>').val(option.stateId).html(option.stateName));
+                    });
+                    if (checkbox == 1) {
+                        $('#states').val(stateId).attr('selected');
+                        $("#states").prop('disabled', true);
+                    }
+
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+
+    });
+
+    // State based City loading
+
+    $("#states").change(function () {
+
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+
+        if (checkbox == true) {
+            var stateId = $("#state").val();
+            var cityId = $('#city').val();
+        }
+        else {
+            var stateId = $("#states").val();
+        }
+        $("#citys").prop('disabled', false);
+
+        $.ajax({
+            type: "Get",
+            url: "/OBEmployees/GetByStateId?stateId=" + stateId,
+            success: (Result) => {
+
+                if (Result.length == 0) {
+                    $("#citys").prop('disabled', false);
+                    $('#citys').val('');
+                    $("#citys").prop('disabled', true);
+                }
+                else {
+                    $("#errValid-MailingAddressCity").text(" ");
+                    $('#citys').html('');
+                    $('#citys').append($('<option> ' + "--Select City--" + ' </option>').val("0").html("--Select City--"));
+
+                    $.each(Result, function (id, option) {
+                        $('#citys').append($('<option> ' + option.cityName + ' </option>').val(option.cityId).html(option.cityName));
+                    });
+                    if (checkbox == 1) {
+                        $('#citys').val(cityId).prop('selected', true);
+                        $("#citys").prop('disabled', true);
+                    }
+
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+
+    });
+
+    // Permanent Address SameAs Current Address binding
+
+    $('#SameAs').click(function () {
+        $('#SecondaryAddress1').val('');
+        $('#SecondaryAddress2').val('');
+        $('#states').empty();
+        $('#citys').empty();
+        $('#SecondaryPincode').text('');
+
+        var id = $(this).data("id")
+        var address1 = $("#Address1").val();
+        var address2 = $("#Address2").val();
+        var state = $("#state").val();
+        var city = $("#city").val();
+        var country = $("#Country").val();
+        var pincode = $("#Pincode").val();
+        var initialCountry = "";
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+        if (checkbox == true) {
+            $('#SecondaryAddress1').val(address1);
+            $('#SecondaryAddress2').val(address2);
+            $('#SecondaryCountryId').val(country).change();
+            $('#states').val(state).change();
+            $('#SecondaryPincode').val(pincode);
+        }
+        else {
+            $('#SecondaryAddress1').val('');
+            $('#SecondaryAddress2').val('');
+            $('#SecondaryCountryId').val(initialCountry).change();
+            $('#states').val("");
+            $('#SecondaryPincode').val('');
+        }
+
+    });
+
+</script>
+
+
+
+

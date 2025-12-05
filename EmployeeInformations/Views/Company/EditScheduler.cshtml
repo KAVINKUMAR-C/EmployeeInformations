@@ -1,0 +1,22 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel;
+@using Microsoft.AspNetCore.Http;
+@model MailScheduler
+@{
+    var roleId = Context.Session.GetInt32("SchedulerId");
+}
+
+
+<div id="bind-MailSchedulermodal-content">
+</div>
+
+<input type="hidden" id="txt-SchedulerId" value="@Model.SchedulerId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+      
+        var schedulerId = $("#txt-SchedulerId").val();
+        PageUtil.goToMailScheduler("/Company/UpdateMailScheduler?SchedulerId=" + schedulerId);
+    });
+
+</script>

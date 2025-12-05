@@ -1,0 +1,417 @@
+﻿@using EmployeeInformations.Model.APIModel
+
+@model WebsiteCandidateScheduleViewModel
+@{
+    ViewBag.Title = "WebsiteCandidateSchedule";
+    Layout = "_Layout";
+    int count = 0;
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Website Candidate Schedule</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto btn-sm" id="CreateModule" value="Create" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div><!-- .nk-block-head -->
+
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getJobApplyData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col col-w"><span class="sub-text">Schedule Name</span></th>
+                    <th class="nk-tb-col tb-col col-w"><span class="sub-text">IsActive</span></th>
+                    <th class="nk-tb-col tb-col col-w"><span class="sub-text">Action</span></th>
+
+                </tr>
+            </thead>
+            <tbody id="displayQualification">
+                @foreach (var item in Model.websiteCandidateSchedules)
+                {
+
+                    <tr class="nk-tb-item">
+
+                        <td class="nk-tb-col tb-col">
+                            <span class="badge badge-dim bg-primary">@item.ScheduleName</span>
+                        </td>
+
+                        @if (item.IsActive)
+                        {
+                            <td class="nk-tb-col tb-col">
+                                <b class="badge badge-dot bg-success">Active</b>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="nk-tb-col tb-col">
+                                <b class="badge badge-dot bg-danger">In Active</b>
+                            </td>
+                        }
+                        <td class="nk-tb-col tb-col">
+
+                            <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                <ul class="nk-tb-actions gx-1 my-n1">
+                                    <li class="me-n1">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <ul class="link-list-opt no-bdr">
+
+                                                    <li><a href="javascript:void(0)" class="btnEdit" data-id="@item.CandidateScheduleId" data-name="@item.ScheduleName" data-isactive="@item.IsActive"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                    <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.CandidateScheduleId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+
+                    </tr>
+                    count++;
+
+                    <!-- .nk-tb-item  -->
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Schedule Name</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+
+                <div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Schedule Name<span class="required" style="color: #FF0000">*</span></label>
+                            <input type="text" class="form-control" id="scheduleName" />
+                            @Html.ValidationMessageFor(m => m.ScheduleName, "", new { @class = "error text-danger", id = "errValid-Name" })
+                            <span id="errVerify-scheduleName" style="display:none;" class="error text-danger">Schedule Name already exists! </span>
+                            <span class="error text-danger" id="errValid-sheduleName"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnCreate" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseModule" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* edit *@
+<div class="modal" id="Update_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Status</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-2">
+                    <div class="form-group m-0">
+                        <label class="form-label">Schedule Name</label>
+                        <div class="form-group m-0">
+                            <lable class="badge badge-sm bg-outline-primary ml-2" id="shedulename"> </lable>
+                        </div>                      
+                    </div>
+                </div>
+
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="custom-control custom-control-sm custom-checkbox">
+                            <input type="checkbox" name="chkIsActiveModule" class="custom-control-input chkIsActiveModule" id="chkIsActiveModule">
+                            <label class="custom-control-label" for="chkIsActiveModule">Status</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnIsActive" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseUpdate" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("#CreateModule").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+        $(document).ready(function () {
+            $('#getJobApplyData').DataTable({
+                "bInfo": true,
+                "paging": true
+            });
+        });
+    });
+
+    $("#btnCloseModule").click(function () {
+        $("#scheduleName").val("");
+        $("#errVerify-scheduleName").hide();
+        $("#errValid-Name").text("");
+        $("#Create_Popup").modal('hide');
+    });
+
+    $("#btnCloseUpdate").click(function () {
+        $("#errValid-editsheduleName").text("");
+        $("#shedulename").val("");
+        $("#Update_Popup").modal('hide');
+
+    });
+
+    $("#scheduleName").keyup(function () {      
+        $("#errValid-Name").text("");
+        $("#errVerify-scheduleName").hide();
+        if ($("#scheduleName").val() == "") {
+            $("#errValid-Name").text("Schedule Name field is required");
+        }
+    });
+
+    $("#shedulename").keyup(function () {
+        $("#errValid-editsheduleName").text("");       
+        if ($("#shedulename").val() == "") {
+            $("#errValid-editsheduleName").text("Schedule Name field is required");
+        }
+    });
+
+    @* create *@
+
+        $("#btnCreate").click(function () {
+           
+            var isValid = true;
+            var formData = new FormData();          
+            $("#errValid-Name").text("");
+            $("#errVerify-scheduleName").hide();
+
+            if ($("#scheduleName").val() == "") {
+
+                $("#errValid-Name").text("Schedule Name field is required");
+                isValid = false;
+            }
+
+            var schedulename = $("#scheduleName").val();
+            formData.append("ScheduleName", schedulename);
+            var CandidatescheduleName = {
+                ScheduleName: schedulename
+            };
+
+            if (isValid) {
+
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/WebsiteJob/CreateWebsiteSchedule",
+                    data: CandidatescheduleName,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+                        if (Result.candidateScheduleCount == 1) {
+                            $('.loader').addClass('d-none');
+                            $("#errVerify-scheduleName").show();
+                            return false;
+                        }
+                        else {
+                            if (Result.candidateScheduleId > 0) {
+                                $("#Create_Popup").hide();
+                                swal.fire({
+                                    title: "Added Successfully",
+                                    text: "",
+                                    icon: "success",
+                                    allowOutsideClick: false
+                                }).then((resultValue) => {
+                                    if (resultValue.isConfirmed) {
+                                        window.location.href = "/WebsiteJob/CandidateSchedule";
+                                    };
+                                });
+                            }
+                            else {
+                                swal.fire({
+                                    title: "Something error",
+                                    text: "",
+                                    icon: "error",
+                                    allowOutsideClick: false
+                                }).then((resultValue) => {
+                                    window.location.href = "/WebsiteJob/CandidateSchedule";
+                                });
+
+                            }
+                        }
+                       
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-scheduleName").hide();
+                $("#errValid-Name").show();
+                return false;
+            }
+
+        });
+    var sname;
+    var isActive;
+    var canid;
+    var isValid;
+    $('#getJobApplyData').on('click', '.btnEdit', function () {
+      
+        $("#Update_Popup").modal('show');
+        sname = $(this).data("name");
+        isActive = $(this).data("isactive");
+        canid = $(this).data("id");
+        $("#shedulename").text(sname);        
+        isActive == 'True' ? $(".chkIsActiveModule").prop("checked", true) : $(".chkIsActiveModule").prop("checked", false);
+        $("#chkIsActiveModule").val(isActive);
+
+    });
+    $('#Update_Popup').on('click', '#btnIsActive', function () {
+      
+        var shname = $("#shedulename").text();       
+        var checkAction = $('#chkIsActiveModule').prop('checked');
+        var CandidatescheduleName = {
+            CandidatescheduleId: canid,
+            ScheduleName: shname,
+            IsActive: checkAction,
+
+        };
+        
+        $('.loader').removeClass('d-none');
+      
+            $.ajax({
+                type: "POST",
+                url: "/WebsiteJob/UpdateWebsiteSchedule",
+                data: CandidatescheduleName,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (Result) => {
+                    $("#Update_Popup").hide();
+                    if (Result > 0) {
+                        swal.fire({
+                            title: "Updated Successfully",
+                            text: "",
+                            icon: "success",
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                window.location.href = "/WebsiteJob/CandidateSchedule";
+                            };
+                        });
+
+                    } else {
+                        swal.fire({
+                            title: "Something error",
+                            text: "",
+                            icon: "error",
+                            allowOutsideClick: false  
+                        }).then((resultValue) => {
+                            window.location.href = "/WebsiteJob/CandidateSchedule";
+                        });
+
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+
+            });
+       
+    });
+
+    $('#getJobApplyData').on('click', '#btnDelete', function () {
+
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var CandidatescheduleName = {
+                    candidateId: id,
+                };
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/WebsiteJob/DeleteWebsiteSchedule",
+                    data: CandidatescheduleName,
+                    success: (Result) => {
+                        if (Result > 0) {
+                            swal.fire({
+                                title: "Deleted Successfully!",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/WebsiteJob/CandidateSchedule";
+                            });
+                        }
+                        else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/WebsiteJob/CandidateSchedule";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });
+    $(document).ready(function () {
+        
+        $('#Create_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#Update_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+
+
+</script>

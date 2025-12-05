@@ -1,0 +1,458 @@
+﻿@using EmployeeInformations.Model.APIModel;
+@model WebsiteJobViewModel
+@{
+    ViewBag.Title = "Create Website Job";
+    Layout = "_Layout";
+}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Create Website Job</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner leave-datatable">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="tab-content">
+                <div class="tab-pane in active">
+                    <div class="row">
+                        <input type="hidden" id="strFmtSkill" value="@Model.StrFmtSkillId" />
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Job Code</label>
+                                @Html.TextBoxFor(m => m.JobCode, new { @class = "form-control", @disabled = true })
+                                @Html.ValidationMessageFor(m => m.JobCode, "", new { @class = "error text-danger", id = "errValid-JobCode" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Job Name<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextBoxFor(m => m.JobName, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.JobName, "", new { @class = "error text-danger", id = "errValid-JobName" })
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Designation</label>
+                                @Html.TextBoxFor(m => m.Designation, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Designation, "", new { @class = "error text-danger", id = "errValid-Designation" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Qualification<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextBoxFor(m => m.Qualification, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Qualification, "", new { @class = "error text-danger", id = "errValid-Qualification" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Experience<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextBoxFor(m => m.Experience, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Experience, "", new { @class = "error text-danger", id = "errValid-Experience" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Job Type</label>
+                                @Html.TextBoxFor(m => m.JobType, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.JobType, "", new { @class = "error text-danger", id = "errValid-JobType" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">No Of Positions<span class="required" style="color: #FF0000">*</span></label>
+                                @if (Model.NoOfPositions == 0)
+                                {
+                                    <input type="text" id="NoOfPositions" class="form-control" placeholder="Enter the No Of Positions" value="" />
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(m => m.NoOfPositions, new { @class = "form-control" })
+                                }
+                                @Html.ValidationMessageFor(m => m.NoOfPositions, "", new { @class = "error text-danger", id = "errValid-NoOfPositions" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Location<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextBoxFor(m => m.Location, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.Location, "", new { @class = "error text-danger", id = "errValid-Location" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 autocomplete">
+                            <div class="form-group emp-hol-yr">
+                                <label class="form-label">Skill Sets<span class="required" style="color: #FF0000">*</span></label>
+                                @*@Html.TextBoxFor(m => m.reportingPeople, new { @class = "form-control"})
+                                @Html.DropDownList("Reporter", Model.reportingPeople , new { @multiple = "multiple" })*@
+                                <div class="selectbox">
+                                    @Html.DropDownListFor(m => m.SkillId, new SelectList(Model.skillSet, "SkillId", "SkillName"), "Please select", new { @class = "form-control", id = "skills", multiple = true })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.SkillId, "", new { @class = "error text-danger", id = "errValid-Skills" })
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Description<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextAreaFor(m => m.JobDescription, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.JobDescription, "", new { @class = "error text-danger", id = "errValid-JobDescription" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="form-label">Summary<span class="required" style="color: #FF0000">*</span></label>
+                                @Html.TextAreaFor(m => m.JobSummary, new { @class = "form-control" })
+                                @Html.ValidationMessageFor(m => m.JobSummary, "", new { @class = "error text-danger", id = "errValid-JobSummary" })
+                            </div>
+                        </div>
+
+
+
+                        @*<div class="col-lg-3">
+                        <div class="form-group">
+                        <label>RelevantExperience</label>
+                        @Html.TextBoxFor(m => m.RelevantExperience, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(m => m.RelevantExperience,"",new{@class="error text-danger" , id="errValid-RelevantExperience"})
+                        </div>
+                        </div>*@
+
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnCreateWebsiteJob" value="Save" />
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div class="modal" id="success_CreateWebsiteJob_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Website Job Created Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseWebsiteJob">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.ckeditor.com/4.19.1/standard/ckeditor.js"></script>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var report = $("#skills").select2();
+        $("#skills").select2().on("change", function () {
+
+            $("#errValid-Skills").text("")
+        });
+        //-------------------------------------------------------------------------------------------------------------------
+
+        // nice scroll
+        $("#skills").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+        //------------------------------------------------------------------------------------------------------------------
+
+        CKEDITOR.replace('JobSummary');
+
+        CKEDITOR.instances['JobSummary'].on('contentDom', function () {
+            this.document.on('keyup', function (event) {
+                //your code
+                $("#errValid-JobSummary").text("");
+            });
+        });
+
+        $('#btnBack').click(function () {
+            var urlToRedirect = '@Url.Action("WebsiteJobPost", "WebsiteJob")';
+            window.location.href = urlToRedirect;
+        });
+    });
+    //-----------------------------------------------------------------------------------------------------------------------
+
+    //KeyUp Summary
+
+    $("#JobCode").keyup(function () {
+        $("#errValid-JobCode").text("");
+        if ($("#JobCode").val() == "") {
+            $("#errValid-JobCode").text("Job Code field is required");
+        }
+    });
+
+    $("#JobDescription").keyup(function () {
+        $("#errValid-JobDescription").text("");
+        if ($("#JobDescription").val() == "") {
+            $("#errValid-JobDescription").text("Description field is required");
+        }
+    });
+
+    //$("#Designation").keyup(function () {
+    //    $("#errValid-Designation").text("");
+    //    if($("#Designation").val() == "")
+    //    {
+    //        $("#errValid-Designation").text("Designation field is required");
+    //    }
+    //});
+
+    $("#Qualification").keyup(function () {
+        $("#errValid-Qualification").text("");
+        if ($("#Qualification").val() == "") {
+            $("#errValid-Qualification").text("Qualification field is required");
+        }
+    });
+
+
+    $("#Experience").keyup(function () {
+        $("#errValid-Experience").text("");
+        if ($("#Experience").val() == "") {
+            $("#errValid-Experience").text("Experience field is required");
+        }
+    });
+
+    //$("#JobType").keyup(function () {
+    //    $("#errValid-JobType").text("");
+    //    if ($("#JobType").val() == "") {
+    //        $("#errValid-JobType").text("JobType field is required");
+    //    }
+    //});
+
+    $("#JobName").keyup(function () {
+        $("#errValid-JobName").text("");
+        if ($("#JobName").val() == "") {
+            $("#errValid-JobName").text("Job Name field is required");
+        }
+
+    });
+
+    $("#NoOfPositions").keyup(function () {
+        $("#errValid-NoOfPositions").text("");
+        if ($("#NoOfPositions").val() == "") {
+            $("#errValid-NoOfPositions").text("No Of Positions field is required");
+        }
+    });
+
+    $("#Location").keyup(function () {
+        $("#errValid-Location").text("");
+
+        if ($("#Location").val() == "") {
+            $("#errValid-Location").text("Location field is required");
+        }
+    });
+
+    $("#JobSummary").keyup(function () {
+        $("#errValid-JobSummary").text("");
+
+        var jobSummary = CKEDITOR.instances.JobSummary.getData();
+        if (jobSummary == "") {
+            $("#errValid-JobSummary").text("Summary field is required");
+        }
+    });
+
+    //$("#RelevantExperience").keyup(function () {
+    //    if ($("#RelevantExperience").val() == "") {
+    //        $("#errValid-RelevantExperience").text("RelevantExperience field is required");
+    //    }
+    //});
+    //---------------------------------------------------------------------------------------------------------------------------------
+
+    // Create Website Job
+
+    $("#btnCreateWebsiteJob").click(function () {
+
+        var formData = new FormData();
+
+        var isValid = true;
+        $("#errValid-JobCode").text("");
+        $("#errValid-JobName").text("");
+        $("#errValid-JobDescription").text("");
+        $("#errValid-Designation").text("");
+        $("#errValid-Qualification").text("");
+        $("#errValid-Experience").text("");
+        $("#errValid-JobType").text("");
+        $("#errValid-NoOfPositions").text("");
+        $("#errValid-Location").text("");
+        // $("#errValid-RelevantExperience").text("");
+        $("#errValid-JobSummary").text("");
+        $("#errValid-Skills").hide();
+
+        var jobSummary = CKEDITOR.instances.JobSummary.getData();
+
+
+        var skill = $('#skills').find(':selected').length;
+
+        if (skill == 0) {
+            $("#errValid-Skills").text("Skill sets field is required");
+            $("#errValid-Skills").show();
+            isValid = false;
+        }
+
+        if ($("#JobCode").val() == "") {
+            $("#errValid-JobCode").text("Job Code field is required");
+            isValid = false;
+        }
+
+        if ($("#JobName").val() == "") {
+            $("#errValid-JobName").text("Job Name field is required");
+            isValid = false;
+        }
+
+        if ($("#JobDescription").val() == "") {
+            $("#errValid-JobDescription").text("Description field is required");
+            isValid = false;
+        }
+
+        //if($("#Designation").val() == "")
+        //{
+        //    $("#errValid-Designation").text("Designation field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#Qualification").val() == "") {
+            $("#errValid-Qualification").text("Qualification field is required");
+            isValid = false;
+        }
+
+        if ($("#Experience").val() == "") {
+            $("#errValid-Experience").text("Experience field is required");
+            isValid = false;
+        }
+
+        //if ($("#JobType").val() == "") {
+        //    $("#errValid-JobType").text("JobType field is required");
+        //    isValid = false;
+        //}
+        if ($("#NoOfPositions").val() == "") {
+            $("#errValid-NoOfPositions").text("No Of Positions field is required");
+            isValid = false;
+        }
+
+        if ($("#Location").val() == "") {
+            $("#errValid-Location").text("Location field is required");
+            isValid = false;
+        }
+
+        //if ($("#RelevantExperience").val() == "") {
+        //    $("#errValid-RelevantExperience").text("RelevantExperience field is required");
+        //    isValid = false;
+        //}
+
+        if (jobSummary == "") {
+            $("#errValid-JobSummary").text("Summary field is required");
+            isValid = false;
+        }
+
+        var jobCode = $("#JobCode").val();
+        var jobName = $("#JobName").val();
+        var jobDescription = $("#JobDescription").val();
+        var designation = $("#Designation").val();
+        var qualification = $('#Qualification').val();
+        var experience = $("#Experience").val();
+        var jobType = $('#JobType').val();
+        var noOfPositions = $("#NoOfPositions").val();
+        var location = $("#Location").val();
+        var skills = $("#skills option:selected").text();
+        var selected = $('#skills').find(':selected').length;
+        for (var i = 0; i < selected; i++) {
+            var sel = $('#skills').find(':selected')[i].innerText;
+            formData.append("SkillNames", sel);
+        }
+
+        //var relevantExperience = $("#RelevantExperience").val();
+        //var websiteJobViewModel = {
+        //    JobCode: jobCode,
+        //    JobName: jobName,
+        //    JobDescription: jobDescription,
+        //    Designation: designation,
+        //    Qualification: qualification,
+        //    Experience : experience,
+        //    JobType: jobType,
+        //    NoOfPositions : noOfPositions,
+        //    Location: location,
+        //    JobSummary : jobSummary
+        //};
+
+        formData.append("JobCode", jobCode);
+        formData.append("JobName", jobName);
+        formData.append("JobDescription", jobDescription);
+        formData.append("Designation", designation);
+        formData.append("Qualification", qualification);
+        formData.append("Experience", experience);
+        formData.append("JobType", jobType);
+        formData.append("NoOfPositions", noOfPositions);
+        formData.append("Location", location);
+        formData.append("JobSummary", jobSummary);
+        // formData.append("RelevantExperience", relevantExperience);
+        if (isValid) {
+            var url = "/WebsiteJob/CreateWebsiteJobPost";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    $("#success_CreateWebsiteJob_Popup").css('display', 'none !important');
+                    swal.fire({
+                        title: "Added Successfully",
+                        text: "",
+                        icon: "success",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((resultValue) => {
+                        if (resultValue.isConfirmed > 0) {
+                            var urlToRedirect = '@Url.Action("WebsiteJobPost", "WebsiteJob")';
+                            window.location.href = urlToRedirect;
+                        };
+                    });
+
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+
+            return false;
+        }
+
+    });
+    //----------------------------------------------------------------------------------------------------------------------------
+
+</script>

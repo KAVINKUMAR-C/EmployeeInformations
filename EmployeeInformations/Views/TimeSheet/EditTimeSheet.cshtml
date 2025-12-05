@@ -1,0 +1,22 @@
+﻿@using EmployeeInformations.Model.TimesheetSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model TimeSheet
+@{
+    var roleId = Context.Session.GetInt32("TimeSheetId");
+}
+
+
+<div id="bind-TimeSheetmodal-content">
+</div>
+
+<input type="hidden" id="txt-TimeSheetId" value="@Model.TimeSheetId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+      
+        var timeSheetId = $("#txt-TimeSheetId").val();
+        PageUtil.goToTimeSheet("/TimeSheet/UpdateTimeSheet?TimeSheetId=" + timeSheetId);
+    });
+
+</script>

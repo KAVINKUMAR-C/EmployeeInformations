@@ -1,0 +1,67 @@
+﻿@using EmployeeInformations.Model.BenefitViewModel;
+@model EmployeeMedicalBenefit
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">View Medical Benefit</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back","BenefitTab","Benefit", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto mr-2" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+
+
+    <div class="card card-bordered card-preview view-block">
+        <div class="card-inner">
+            <form>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Employee Name</label>
+                            <label class="view-text">@Model.EmployeeName</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Scheme</label>
+                            <label class="view-text">@Model.Scheme</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Category</label>
+                            <label class="view-text">@Model.Category</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Cost</label>
+                            <label class="view-text">@Model.Cost</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Member</label>
+                            <label class="view-text">@Model.Member</label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label w-100">Membership Number</label>
+                            <label class="view-text">@Model.MembershipNumber</label>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

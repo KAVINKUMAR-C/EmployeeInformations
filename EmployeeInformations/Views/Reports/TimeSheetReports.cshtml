@@ -1,0 +1,692 @@
+﻿@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common
+@using EmployeeInformations.Common.Enums;
+@using EmployeeInformations.Model.ReportsViewModel
+@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model TimeSheetReports
+@{
+    ViewBag.Title = "TimeSheetReports";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.HolidayModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">TimeSheet Log Report</h3>
+        </div><!-- .nk-block-head-content -->
+
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<form autocomplete="off">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="row">
+
+        <div class="col-lg-2  col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Employees</label>
+                <div>
+                    @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.ReportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId" })
+                </div>
+                @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeId" })
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Project Name</label>
+                <div>
+                    @Html.DropDownListFor(m => m.ProjectId, new SelectList(Model.ProjectNames, "ProjectId", "ProjectName"), "--Select Project--", new { @class = "form-control", id = "ProjectId" })
+                </div>
+                @Html.ValidationMessageFor(m => m.ProjectId, "", new { @class = "error text-danger", id = "errValid-ProjectName" })
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+            <div class="form-group">
+                <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveFromDate" placeholder="Enter Start Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveFromDate"></span>
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6" id="leaveToDatedatepickerblock">
+            <div class="form-group">
+                <label class="form-label" id="leaveToLabel">End Date<span class="required" style="color: #FF0000">*</span></label>
+                <div id="leaveToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    <input type="text" class="form-control" id="leaveToDate" placeholder="Enter End Date">
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                <span class="error text-danger" id="errValid-LeaveToDate"></span>
+                <span id="errVerify-leaveToDate" style="display:none;" class="error text-danger"> Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+                <span id="errVerify-leaveCountDate" style="display:none;" class="error text-danger"> <b>Your Not Eligible For Take Leave!</b> </span>
+            </div>
+        </div>
+
+        <div class="col timesheet-report-btn pb-1">
+            <button type="button" class=" ml-auto mr-3 btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+        </div>
+        <div class="col d-flex timesheet-report-btn justify-content-end pb-1">
+            <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="genpdf"><img src="./images/pdf.png" /></button>
+            <button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployeeLeave" /><i class="ti-download"></i></button>
+
+        </div>
+    </div>
+</form>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="timesheetReportDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getTimeSheetReportData">
+            
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="EmployeeId"><span class="sub-text">Employee Id</span></th>
+                    <th class="nk-tb-col tb-col" data-id="ProjectName"><span class="sub-text">Project Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="TaskName"><span class="sub-text">Task Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="StartDate"><span class="sub-text">Start Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="StartTime"><span class="sub-text">Start Time</span></th>
+                    <th class="nk-tb-col tb-col" data-id="EndTime"><span class="sub-text">End Time</span></th>
+                    <th class="nk-tb-col tb-col" data-id="Status"><span class="sub-text">Status</span></th>
+                </tr>
+            </thead>
+            
+        </table>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // $(document).ready(function () {
+
+    //     $.fn.dataTable.moment('DD/MM/YYYY');
+
+    //     $('#getTimeSheetReportData').DataTable({
+    //         "bInfo": true,
+    //         "paging": true,
+    //         order: [
+    //             [4, "desc"]
+    //         ],
+    //     });
+    // });
+
+    $(document).ready(function () {
+
+        $("#leaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#leaveToDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#EmployeeId").select2().on("change", function () {
+            var employeeIds = $("#EmployeeId").val();
+            $.ajax({
+                type: "Get",
+                url: "/Reports/GetByEmployeeIdForProject?employeeIds=" + employeeIds,
+                success: (Result) => {
+                    $('#ProjectId').html('')
+                    if (Result.projectNames.length > 0 || Result.projectNames != "" || Result.projectNames != null) {
+                        $.each(Result.projectNames, function (id, option) {
+
+                            $('#ProjectId').append($('<option> ' + option.projectId + ' </option>').val(option.projectId).html(option.projectName));
+
+                        });
+                    }
+                },
+                error: (Result) => {
+                    alert("Error occured!!")
+                }
+            });
+        });
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Nice scroll
+
+        $("#EmployeeId,#ProjectId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+    });
+
+    //Change Summary
+
+    $("#EmployeeId").change(function () {
+        var isValid = true;
+        $("#errValid-EmployeeId").text("");
+        if ($("#EmployeeId").val() == "") {
+            $("#errValid-EmployeeId").text("Employees field is required");
+            $("#errValid-ProjectName").text("Project field is required");
+            isValid = false;
+        }
+        else {
+            $("#errValid-EmployeeId").text("");
+            $("#errValid-ProjectName").text("");
+        }
+    });
+
+
+    $("#ProjectId").change(function () {
+        var isValid = true;
+        $("#errValid-ProjectName").text("");
+        if ($("#ProjectId").val() == "") {
+            $("#errValid-ProjectName").text("Project field is required");
+            isValid = false;
+        }
+        else {
+            $("#errValid-ProjectName").text("");
+        }
+    });
+
+    $("#leaveFromDate").change(function () {
+
+        $("#errValid-LeaveFromDate").text("");
+        if ($("#leaveFromDate").val() == "") {
+            $("#errValid-LeaveFromDate").text("Start Date field is required");
+        }
+        else {
+            $("#errValid-LeaveFromDate").text("");
+        }
+    });
+
+    $("#leaveToDate").change(function () {
+
+        $("#errValid-LeaveToDate").text("");
+        if ($("#leaveToDate").val() == "") {
+            $("#errValid-LeaveToDate").text("End Date field is required");
+            $("#errVerify-leaveToDate").hide();
+            $("#errVerify-leaveCountDate").hide();
+        }
+        else {
+            $("#errValid-LeaveToDate").text("");
+        }
+    });
+
+    // Filter Leave
+
+    // $('#getTimeSheetReportData').DataTable({
+    //     $("#getTimeSheetReportData").on("click", "#btnFilterLeave", function () {
+    //         // $("#btnFilterLeave").click(function () {
+
+    //         //var url = "/Reports/FilterEmployeeByTimeSheet";
+    //         // $.ajax({
+    //         //     url: "/Reports/FilterEmployeeByTimeSheet",
+    //         //     type: "POST",
+    //         //     data: BindPendingTimeSheetReportData()
+    //         //     // d.sSearch = $("#btnFilterLeave").val();
+    //         // });
+
+    //         var EmployeeId = $("#EmployeeId").val();
+    //         var StartTime = $("#leaveFromDate").val();
+    //         var EndTime = $("#leaveToDate").val();
+    //         var ProjectId = $("#ProjectId").val();
+
+    //         var formData = new FormData();
+    //         formData.append("EmployeeId", EmployeeId);
+    //         formData.append("StartTime", StartTime);
+    //         formData.append("EndTime", EndTime);
+    //         formData.append("ProjectId", ProjectId);
+
+    //         $.ajax({
+    //             processing: true,
+    //             serverSide: true,
+    //             type: "GET",
+    //             url: "/Reports/FilterEmployeeByTimeSheet",
+    //             data: function (d) {
+    //                 d.iDisplayStart = d.iDisplayStart || 0;
+    //                 d.iDisplayLength = d.iDisplayLength || 10;
+    //             }
+    //         });
+    //     });
+    // });
+
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        TimeSheetReportData();
+
+        function TimeSheetReportData() {
+            var table = $('#getTimeSheetReportData').DataTable();
+            if (table) {
+                table.destroy();
+            }
+            $('#getTimeSheetReportData').DataTable({
+
+                serverSide: true,
+                processing: true,
+                pageLength: entries, // Page length
+                ajax: {
+                    url: "/Reports/FilterEmployeeByTimeSheet",
+                    type: "GET",
+                    data: function (d) {
+                        //SearchFilter
+                        var timesheetReportFilter = document.getElementById("getTimeSheetReportData_filter");
+                        var timesheetReportSearch = timesheetReportFilter.querySelector("input[type='search']");
+                        var inputSearch = timesheetReportSearch.value;
+                        //PagingLength
+                        var timeSheetFilter = document.getElementById("getTimeSheetReportData_length");
+                        var page = timeSheetFilter.querySelector("select");
+                        var timeSheetFiltercount = page.value;
+
+                        var EmployeeId = $("#EmployeeId").val();
+                        var StartTime = $("#leaveFromDate").val();
+                        var EndTime = $("#leaveToDate").val();
+                        var ProjectId = $("#ProjectId").val();
+                        d.EmployeeId = EmployeeId;
+                        d.StartTime = StartTime;
+                        d.EndTime = EndTime;
+                        d.ProjectId = ProjectId;
+                        d.sSearch = inputSearch;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || timeSheetFiltercount;
+                        d.sEcho = d.start;
+                        d.columnName = columnIndex;
+                        d.columnDirection = columnDirection;
+                    }
+                },
+                columns: [
+                    {
+                        data: 'employeeName',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-gray'>" + (row.employeeName) + "</b>";
+                        }
+                    },
+                    {
+                        data: 'employeeId',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-primary'>" + (row.employeeUserId) + "</b>";
+                        }
+                    },
+                    {
+                        data: 'projectName',
+                        render: function (data, type, row) {
+                            return "<span class='badge badge-dim bg-primary'>" + (row.projectName) + "</span>"
+                        }
+                    },
+                    {
+                        data: 'taskName',
+                        render: function (data, type, row) {
+                            var trimtaskName = row.taskName.trim();
+                            return "<div class='leave-reason'> <p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimtaskName + "'>" + row.taskName + "</p></div></td></tr>";
+                        }
+                    },
+                    {
+                        data: 'startdate',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-gray'>" + dateFormat(row.startdate) + "</b>";
+                        }
+                    },
+                    {
+                        data: 'startTime',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-gray'>" + startTime(row.startTime) + "</b>";
+                        }
+                    },
+                    {
+                        data: 'endTime',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-gray'>" + endTime(row.endTime) + "</b>";
+                        }
+                    },
+                    {
+                        data: 'status',
+                         render: function (data, type, row) {
+                            var timeSheetStatusclr = "";
+                            if (row.status == 1) {
+                                 timeSheetStatusClr = "bg-warning";
+                            }
+                            else if (row.status == 2) {
+                                timeSheetStatusClr = "bg-info";
+                            }
+                            else if (row.status == 3) {
+                                 timeSheetStatusClr = "bg-success";
+                            }
+                              return "<b class='badge badge-sm badge-dot has-bg " + timeSheetStatusClr + " d-sm-inline-flex'>" + row.timeSheetStatus + "</b>";
+                        }
+                    },
+                ],
+                createdRow: function (row, data) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+
+            });
+            $(document).ready(function () {
+                // $('[data-bs-toggle="tooltip"]').tooltip();
+                $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+            });
+        }
+
+        $("#btnFilterLeave").click(function () {                 
+            var isValid = true;
+            $("#errVerify-leaveToDate").hide();
+            if ($("#leaveFromDate").val() == '') {
+                $("#errValid-LeaveFromDate").text("Start Date field is required");
+                isValid = false;
+            }
+
+            if ($("#leaveToDate").val() == '') {
+                $("#errValid-LeaveToDate").text("End Date field is required");
+
+                isValid = false;
+            }
+            if(isValid){
+                var SDate = $("#leaveFromDate").val();
+                var EDate = $("#leaveToDate").val();
+                var isValidDate = dateDifference(SDate, EDate);
+                if (!isValidDate) {
+                    $("#errVerify-leaveToDate").show();
+                }
+                else {
+                    $('#getTimeSheetReportData').DataTable().ajax.reload(); // Reload DataTable on button click
+                    $("#errVerify-leaveToDate").hide();
+                }
+            }
+            else{
+                return false;
+            }
+            
+        });
+       
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+    });
+    
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Download Timesheet
+
+    $('#DownloadEmployeeLeave').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+
+        $("#errValid-EmployeeId").text("");
+        $("#errVerify-leaveToDate").hide();
+
+        if ($("#leaveFromDate").val() == '') {
+            $("#errValid-LeaveFromDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#leaveToDate").val() == '') {
+            $("#errValid-LeaveToDate").text("End Date field is required");
+            isValid = false;
+        }
+        var sortedCol = $('#getTimeSheetReportData').dataTable().fnSettings().aaSorting[0][0];
+        var sortedDir = $('#getTimeSheetReportData').dataTable().fnSettings().aaSorting[0][1];
+        var employeeId = $("#EmployeeId").val();
+        var projectId = $("#ProjectId").val();
+        var startTime = $("#leaveFromDate").val();
+        var endTime = $("#leaveToDate").val();
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("StartTime", startTime);
+        formData.append("EndTime", endTime);
+        formData.append("ProjectId", projectId);
+        formData.append("StartDatecol", sortedCol);
+        formData.append("StartDateOrder", sortedDir);
+
+        if (isValid) {
+
+            var isValidDate = dateDifference(startTime, endTime);
+            if (isValidDate) {
+                var url = "/Reports/DownloadExcelForTimeSheet";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Reports/DownloadTimeSheet?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $('.loader').addClass('d-none');
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // pdf Generate
+
+    $('#genpdf').click(function () {
+        debugger;
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-LeaveFromDate").text("");
+        $("#errValid-LeaveToDate").text("");
+
+        $("#errValid-EmployeeId").text("");
+        $("#errVerify-leaveToDate").hide();
+
+        if ($("#leaveFromDate").val() == '') {
+            $("#errValid-LeaveFromDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#leaveToDate").val() == '') {
+            $("#errValid-LeaveToDate").text("End Date field is required");
+            isValid = false;
+        }
+
+        var sortedCol = $('#getTimeSheetReportData').dataTable().fnSettings().aaSorting[0][0];
+        var sortedDir = $('#getTimeSheetReportData').dataTable().fnSettings().aaSorting[0][1];
+        var employeeId = $("#EmployeeId").val();
+        var projectId = $("#ProjectId").val();
+        var startTime = $("#leaveFromDate").val();
+        var endTime = $("#leaveToDate").val();
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("StartTime", startTime);
+        formData.append("EndTime", endTime);
+        formData.append("ProjectId", projectId);
+        formData.append("StartDatecol", sortedCol);
+        formData.append("StartDateOrder", sortedDir);
+
+        if (isValid) {
+
+            var isValidDate = dateDifference(startTime, endTime);
+            if (isValidDate) {
+                var url = "/Reports/CreatePdfTimeSheet";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Reports/DownloadTimeSheetPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $('.loader').addClass('d-none');
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-leaveToDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Date Validation
+
+    function dateDifference(SDate, EDate) {
+        var result = false;
+        var splitFrom = SDate.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = EDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+
+            result = true;
+        }
+        return result;
+    }
+   
+
+    function dateFormat(startdate) {
+
+        var dateObject = new Date(startdate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+   
+    function startTime(startTime) {
+        var dateObject = new Date(startTime);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var hours = ("0" + dateObject.getHours()).slice(-2);
+        var minutes = ("0" + dateObject.getMinutes()).slice(-2);
+        var seconds = ("0" + dateObject.getSeconds()).slice(-2);
+        var ampm = dateObject.getHours() >= 12 ? 'PM' : 'AM';
+         if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours == 0) {
+            hours = 12;
+        }
+        var formattedDate = hours + ":" + minutes + ":" + seconds + " " + ampm;
+        
+        return formattedDate;
+    }
+  
+    function endTime(endTime) {
+        var dateObject = new Date(endTime);
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        var seconds = dateObject.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours from 24-hour to 12-hour format
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours == 0) {
+            hours = 12;
+        }
+
+        // Add leading zeros to minutes and seconds
+        minutes = ("0" + minutes).slice(-2);
+        seconds = ("0" + seconds).slice(-2);
+
+        var formattedDate = hours + ":" + minutes + ":" + seconds + " " + ampm;
+        return formattedDate;
+    }
+    $('#btnImportData').click(function () {
+        window.location.href = "/Reports/ManualLog";
+    });
+
+
+</script>

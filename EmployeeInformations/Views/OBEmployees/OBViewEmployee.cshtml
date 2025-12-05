@@ -1,0 +1,150 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBEmployees
+@{
+    Layout = "_Layout";
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+<div class="emp-view-block">
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">View Employee</h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @if (roleId == 1 || roleId == 2)
+                {
+                    @Html.ActionLink("Back","OBEmployeeInfo","OBEmployees", null, new { @class = "btn btn-secondary ml-auto mr-0" })
+                }
+                else
+                {
+                    @Html.ActionLink("Back","EditEmployees","OBEmployees", null, new { @class = "btn btn-secondary ml-auto mr-0" })
+                }
+
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+    @*<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+
+    </div>
+    </div>
+    *@
+    <input type="hidden" id="txt-empId" value="@Model.EmpId" />
+
+    <div class="nk-content p-0 card-aside-block">
+        <div class="container-fluid p-0">
+            <div class="nk-content-inner">
+                <div class="nk-content-body">
+                    <div class="nk-block">
+                        <div class="card">
+                            <div class="card-aside-wrap">
+                                <div class="card-inner p-0 card-inner-lg" id="bind-employee-viewmodel">
+                                </div>
+                                <div class="card-aside card-aside-left user-aside toggle-slide" data-toggle-body="true" data-content="userAside" data-toggle-screen="lg" data-toggle-overlay="true">
+                                    <div class="card-inner-group" data-simplebar>
+                                        <div class="card-inner p-3 border-0">
+                                            <div class="user-card">
+                                                <div class="user-avatar bg-light">
+                                                    @if (Model.EmployeeProfileImage == "")
+                                                    {
+                                                        <span>@Model.EmployeeSortName</span>  <span></span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="/ProfileImages/@(Model.EmployeeProfileImage)">
+                                                    }
+                                                </div>
+                                                <div class="user-info">
+                                                    <span class="lead-text">@Model.FirstName @Model.LastName</span>
+                                                    <span class="sub-text">@Model.OfficeEmail</span>
+                                                </div>
+                                            </div><!-- .user-card -->
+                                        </div><!-- .card-inner -->
+
+                                        <div class="user-account-info py-0">
+                                        </div>
+
+                                        <div class="card-inner p-0">
+                                           
+                                            <ul class="link-list-menu viewActive">
+                                                <li class="employeePersonalInfo active"><a href="javascript:void(0)"><em class="icon ti-user"></em><span>Personal Information</span></a></li>
+                                                <li class="empProfileInfo"><a href="javascript:void(0)"><em class="icon ti-id-badge"></em><span>Profile Information</span></a></li>
+                                                <li class="empAddressInfo"><a href="javascript:void(0)"><em class="icon ti-location-pin"></em><span>Address Information</span></a></li>
+                                                <li class="empOtherDetails"><a href="javascript:void(0)"><em class="icon ti-book"></em><span>Other Details</span></a></li>
+                                                <li class="empQualificationInfo"><a href="javascript:void(0)"><em class="icon ti-bookmark-alt"></em><span>Qualification Information</span></a></li>
+                                                <li class="empExperieneInfo"><a href="javascript:void(0)"><em class="icon ti-briefcase"></em><span>Experience Information</span></a></li>
+                                                <li class="empBankDetails"><a href="javascript:void(0)"><em class="icon ti-files"></em><span>Bank Details</span></a></li>
+                                                @* @if(Model.BenefitId > 0)
+                                                {
+                                                <li class="empBenefitDetails"><a href="javascript:void(0)"><em class="icon ti-files"></em><span>Benefits</span></a></li>
+                                                }*@
+                                            </ul>
+                                        </div><!-- .card-inner -->
+                                    </div><!-- .card-inner-group -->
+                                </div><!-- card-aside -->
+
+                            </div><!-- .card-aside-wrap -->
+                        </div><!-- .card -->
+                    </div><!-- .nk-block -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewEmployeeInfo?EmpId=" + empId);
+
+    });
+
+    // Click summary
+
+    $('.employeePersonalInfo').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewEmployeeInfo?EmpId=" + empId);
+    });
+
+    $('.empProfileInfo').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewProfileInfo?empId=" + empId);
+    });
+
+    $('.empAddressInfo').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewAddressInfo?empId=" + empId);
+    });
+
+    $('.empOtherDetails').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewOtherDetails?empId=" + empId);
+    });
+
+    $('.empQualificationInfo').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewQualification?empId=" + empId);
+    });
+
+    $('.empExperieneInfo').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewExperience?empId=" + empId);
+    });
+
+    $('.empBankDetails').click(function () {
+        var empId = $("#txt-empId").val();
+        PageUtil.goToViewEmployee("/OBEmployees/OBViewBankDetails?empId=" + empId);
+    });
+
+    //$('.empBenefitDetails').click(function () {
+    //    var empId = $("#txt-empId").val();
+    //    PageUtil.goToViewEmployee("/Employees/ViewBenefits?empId=" + empId);
+    //});
+
+</script>

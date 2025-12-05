@@ -1,0 +1,1005 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.ExpensesViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model ExpensesViewModel
+@{
+    ViewBag.Title = "Expenses";
+    Layout = "_Layout";
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.ExpenseModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Expense Details</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getExpensesData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="employeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col" data-id="expenseTitle"><span class="sub-text">Title</span></th>
+                    <th class="nk-tb-col" data-id="fromDate"><span class="sub-text">From Date</span></th>
+                    <th class="nk-tb-col" data-id="toDate"><span class="sub-text">To Date</span></th>
+                    <th class="nk-tb-col" data-id="amount"><span class="sub-text">Amount</span></th>
+                    <th class="nk-tb-col" data-id="reason"><span class="sub-text">Reason</span></th>
+                    <th class="nk-tb-col" data-id="isApproved"><span class="sub-text">Status</span></th>
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+
+                    }
+                </tr>
+            </thead>            
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteClient_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Deleted Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteClient">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_Approved_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Approved Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseApproved">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="success_ApprovedExpense_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approved Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-3">
+                    <div class="col-lg-3 col-md-4 col-sm-4 mr-3">
+                        <label>Employee Name</label>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label id="employeeName" class="badge badge-sm bg-outline-primary"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group mb-0">
+                        <label>Reason</label><span id="mustReason" style="color:red"></span>
+                        @Html.TextArea("ApprovedReason", null, new { cols = "5", rows = "5"})
+                        <span class="error text-danger" id="errValid-ReasonApproved">Reason field is Required</span>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex">
+                <input type="button" class="btn btn-primary ml-auto mr-3" id="btnapproved" value="Approve" />
+                <input type="button" class="btn btn-danger" id="btnCloseApprove" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_PaidExpense_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Paid Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-3">
+                    <div class="col-lg-3 col-md-4 col-sm-4 mr-3">
+                        <label>Employee Name</label>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label id="employeename" class="badge badge-sm bg-outline-primary"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Reason</label><span id="mustReason" style="color:red"></span>
+                        @Html.TextArea("PaidReason", null, new{cols= "5", rows= "5"})
+                        <span class="error text-danger" id="errValid-ReasonPaid">Reason field is Required</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex">
+                <input type="button" class="btn btn-primary ml-auto mr-3" id="btnpaid" value="Paid" />
+                <input type="button" class="btn btn-danger" id="btnClosePaid" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_Reject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-3">
+                    <div class="col-lg-3 col-md-4 col-sm-4 mr-3">
+                        <label>Employee Name</label>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label id="pendingEmployeeName" class="badge badge-sm bg-outline-primary"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Reason<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextArea("PendingRejectReason", null, new{cols= "5", rows= "5"})
+                        <span class="error text-danger" id="errPendingValid-Reason">Reason field is Required</span>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex">
+                <input type="button" class="btn btn-primary ml-auto mr-3" id="btnreject" value="Reject" />
+                <input type="button" class="btn btn-danger" id="btnCloseReject" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="successApprove_Reject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reject Detail</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex mb-3">
+                    <div class="col-lg-3 col-md-4 col-sm-4 mr-3">
+                        <label>Employee Name</label>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label id="approveEmployeeName" class="badge badge-sm bg-outline-primary"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Reason<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextArea("RejectReason", null, new { cols = "5", rows = "5" })
+                        <span class="error text-danger" id="errApproveValid-Reason">Reason field is Required</span>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="modal-footer d-flex">
+                <input type="button" class="btn btn-primary ml-auto mr-3" id="btnapprovereject" value="Reject" />
+                <input type="button" class="btn btn-danger" id="btnApproveCloseReject" value="Cancel" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_ReasonReject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Rejected Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseReasonReject">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_Delete_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDelete">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+
+    $(document).ready(function () {
+
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindExpenseAdminData();
+
+        function BindExpenseAdminData() {
+            var table = $("#getExpensesData").DataTable();
+
+            if (table) {
+                table.destroy();
+            }
+            $('#getExpensesData').DataTable({
+
+                serverSide: true,
+                processing: true,
+                pageLength: entries,
+                ajax: {
+                    url: "/Expenses/GetExpenses",
+                    type: 'Get',
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getExpensesData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var leaveEntry = document.getElementById("getExpensesData_length"); //get entries div id
+                        var entrySelect = leaveEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue; // Pass search query
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.ColumnName = columnIndex;
+                        d.ColumnDirection = columnDirection;
+
+                    }
+                },
+
+                columns: [
+                    {
+
+                        data: 'employeeName',
+                        render: function (data, type, row, meta) {
+
+                            return (row.employeeStatus == true ?
+                                "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + row.empId + "><span class='badge badge-dim bg-danger'>" + row.employeeName + "</span></a>" :
+                                "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + row.empId + "><span class='badge badge-dim bg-primary'>" + row.employeeName + "</span></a>")
+
+                        }
+                    },
+
+                    {
+                        data: 'title',
+                        render: function (data, type, row) {
+                            return "<span class='font-weight-bold'>" + row.expenseTitle + "</span>"
+                        }
+                    },
+
+                    {
+                        data: 'fromDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateFormat(row.fromDate) + "</span>"
+                        }
+                    },
+
+                    {
+                        data: 'toDate',
+                        render: function (data, type, row) {
+                            return "<span>" + dateFormat(row.toDate) + "</span>"
+                        }
+                    },
+
+                    {
+                        data: 'amount',
+                        render: function (data, type, row) {
+                            return "<span class='badge badge-dim bg-info'>" + parseFloat(row.amount).toFixed(2) + "</span>"
+                        }
+                    },
+
+                    {
+                        data: 'reason',
+                        render: function (data, type, row) {
+                            if (row.reason == null) { row.reason = "" } else { var trimNewValue = row.reason.replace(/'/g, "").trim(); }
+                            return "<div class='leave-reason'><p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimNewValue + "'>" + row.reason + "</p></div>"
+                        }
+                    },
+
+                    {
+                        data: 'approvalStatus',
+                        render: function (data, type, row) {
+
+                            var approvalStatusClr = "";
+                            if (row.isApproved == 1 || row.isApproved == 3) {
+                                approvalStatusClr = "bg-success";
+                            }
+                            else if (row.isApproved == 0) {
+                                approvalStatusClr = "bg-warning";
+                            }
+                            else if (row.isApproved == 2 || row.isApproved == 4) {
+                                approvalStatusClr = "bg-danger";
+                            }
+                            return "<b class='badge badge-sm badge-dot has-bg " + approvalStatusClr + " d-sm-inline-flex'>" + row.approvalStatus + "</b>"
+                        }
+
+                    },
+
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+                            debugger;
+                            var html = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='btnViewLeaveDetail' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-eye'></em><span>View</span></a></li>";
+
+                            if (@loginRoleId == 1) {
+                                if (row.isApproved == 1) {
+                                    html += "<li><a href='javascript:void(0)' id='btnAmountApproved' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Paid</span></a></li>" +
+                                        "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                }    
+                                if (row.isApproved == 0) {
+                                    html += "<li><a href='javascript:void(0)' id='btnLeaveApproved' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Approve</span></a></li>" +
+                                        "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                }
+                            } 
+                            else if (@loginRoleId == 4) {
+                                if (row.isApproved == 0) {
+                                    html += "<li><a href='javascript:void(0)' id='btnLeaveApproved' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Approve</span></a></li>" +
+                                        "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                }
+                            }
+                            else if (@loginRoleId == 2) {
+                                if (row.empId == @loginEmpId) {
+                                    if (row.isApproved == 0) {
+                                        html += "<li><a href='javascript:void(0)' id='EditBtn' data-id=" + row.expenseId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li>" +
+                                            "<li><a href='javascript:void(0)' id='btnDelete' data-id=" + row.expenseId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li>";
+                                    }
+                                }
+                                else {
+                                    if (row.isApproved == 0) {
+                                        html += "<li><a href='javascript:void(0)' id='btnLeaveApproved' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Approve</span></a></li>" +
+                                            "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                    }
+                                    if (row.isApproved == 1) {
+                                        html += "<li><a href='javascript:void(0)' id='btnAmountApproved' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Paid</span></a></li>" +
+                                            "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.expenseId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                    }
+                                }
+                            }
+                            else {
+                                if (row.empId == @loginEmpId) {
+                                    if (row.isApproved == 0) {
+                                        html += "<li><a href='javascript:void(0)' id='EditBtn' data-id=" + row.expenseId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li>" +
+                                            "<li><a href='javascript:void(0)' id='btnDelete' data-id=" + row.expenseId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li>";
+                                    }
+                                } 
+                            }
+
+                            html += "</ul></div></div></li></ul></div>";
+                            return html;
+                        }
+
+                    },
+                ],
+
+                "columnDefs": [
+                    { "width": "300px", "targets": [0, 1, 2, 3, 4, 5] },
+                    { "width": "200px", "targets": [6] }
+                    // { 'sortable': false, 'targets': [7] }
+                ],
+
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+
+            });
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+            // $('[data-bs-toggle="tooltip"]').tooltip();
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+    }); 
+
+    function dateFormat(startDate) {
+
+        var dateObject = new Date(startDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+
+        
+    $('#btnBack').click(function () {
+        var urlToRedirect = '@Url.Action("Expenses", "Expenses")';
+        window.location.href = urlToRedirect;
+    });
+
+    $('#getExpensesData').on('click', '#viewEmployee', function () {
+        var empId = $(this).data('empid');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+
+    $('#btnCancel').click(function () {
+        var urlToRedirect = '@Url.Action("Expenses", "Expenses")';
+        window.location.href = urlToRedirect;
+    });
+
+    $('#getExpensesData').on('click', '#EditBtn', function () {
+        var expenseId = $(this).data("id");
+        PageUtil.goToContent("/Expenses/EditExpenses?expenseId=" + expenseId);
+    }); 
+
+    // $("#RejectReason").keyup(function () {
+    //     $("#errApproveValid-Reason").text("");
+    //     if ($("#RejectReason").val().trim() === "") {
+    //         $("#errApproveValid-Reason").text("Reason field is required");
+    //     }
+    // });
+
+    // $("#PaidReason").keyup(function () {
+    //     $("#errValid-ReasonPaid").text("");
+    //     if ($("#PaidReason").val().trim() === "") {
+    //         $("#errValid-ReasonPaid").text("Reason field is required");
+    //     }
+    // });
+
+    // $("#PendingRejectReason").keyup(function () {
+    //     $("#errPendingValid-Reason").text("");
+    //     if ($("#PendingRejectReason").val().trim() === "") {
+    //         $("#errPendingValid-Reason").text("Reason field is required");
+    //     }
+    // });
+
+
+    // Delete Expense
+
+    $('#getExpensesData').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var expenseId = $(this).data("id");
+                var expenses = {
+                    ExpenseId: expenseId
+                };
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Expenses/DeleteExpenses",
+                    data: expenses,
+                    success: (Result) => {
+
+                        if (Result = true) {
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Expenses/Expenses";
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Expenses/Expenses";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        });
+    });
+    //------------------------------------------------------------------------------------------------------------------------------
+
+    // Expense Approval
+
+    $('#getExpensesData').on('click', '#btnLeaveApproved', function () {
+        Swal.fire({
+            title: 'Are you sure want to Approve?',
+            //  text: "You are Approve this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                $("#success_ApprovedExpense_Popup").modal('show');
+                $("#errValid-ReasonApproved").text("");
+                var employeename = $(this).data("empname");
+                $("#employeeName").text(employeename);
+                var id = $(this).data("id");
+                var empid = $(this).data("empid");
+                $("#success_ApprovedExpense_Popup").on('click', "#btnapproved", function () {
+                    var isValid = true;
+                    var reason = $("#ApprovedReason").val();
+                    var expenses = {
+                        ExpenseId: id,
+                        reason: reason
+                    };
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/Expenses/ApprovedExpense",
+                            data: expenses,
+                            success: (Result) => {
+                                if (Result = true) {
+                                    // $("#success_Approved_Popup").show();
+                                    $("#success_ApprovedExpense_Popup").hide();
+                                    $("#success_Approved_Popup").hide();
+                                    // $("#btnCloseApproved").css('display', 'none !important');
+                                    Swal.fire({
+                                        title: 'Approved Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "/Expenses/Expenses";
+                                        };
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Expenses/Expenses";
+                                    });
+                                }
+
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+
+
+
+                });
+                $("#btnCloseApprove").click(function () {
+                    window.location.href = "/Expenses/Expenses";
+                })
+
+            }
+
+        })
+    });
+
+    // Expense Reject
+
+    $('#getExpensesData').on('click', '#rejectLeaveBtn', function () {
+        Swal.fire({
+            title: 'Are you sure want to Reject?',
+            //text: "You are Reject this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //$('#success_Reject_Popup').show();
+                 $("#mustReason").text("*");
+
+                $("#errPendingValid-Reason").text("");
+                $("#success_Reject_Popup").modal('show');
+                 $("#RejectReason").keyup(function () {
+                    $("#errApproveValid-Reason").text("");
+                    if ($("#RejectReason").val().trim() === "") {
+                        $("#errApproveValid-Reason").text("Reason field is required");
+                    }
+                });
+                 $("#PendingRejectReason").keyup(function () {
+                    $("#eerrPendingValid-Reason").text("");
+                    if ($("#PendingRejectReason").val().trim() === "") {
+                        $("#errPendingValid-Reason").text("Reason field is required");
+                    }
+                });
+                var employeename = $(this).data("empname");
+                $("#pendingEmployeeName").text(employeename);
+                var id = $(this).data("id");
+                $('#success_Reject_Popup').on('click', '#btnreject', function () {
+                    var isValid = true;
+                    if ($("#PendingRejectReason").val() == "") {
+                        $("#errPendingValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+                     if ($("#RejectReason").val().trim() === "") {
+                        $("#errApproveValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+
+                    var reason = $("#PendingRejectReason").val();
+                    var expenses = {
+                        ExpenseId: id,
+                        Reason: reason
+                    };
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/Expenses/RejectExpense",
+                            data: expenses,
+                            success: (Result) => {
+                                if (Result = 1) {
+                                    $('#success_Reject_Popup').hide();
+                                    $("#success_ReasonReject_Popup").hide();
+                                    Swal.fire({
+                                        title: 'Rejected Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "/Expenses/Expenses";
+                                        };
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Expenses/Expenses";
+                                    });
+                                }
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+
+                })
+
+                $("#btnCloseReject").click(function () {
+                    window.location.href = "/Expenses/Expenses";
+                })
+
+            }
+        })
+    });
+
+    // Amount approval
+
+    $('#getExpensesData').on('click', '#btnAmountApproved', function () {
+        Swal.fire({
+            title: 'Are you sure to update as Paid?',
+            //  text: "You are Approve this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $("#success_PaidExpense_Popup").modal('show');
+                $("#errValid-ReasonPaid").text("");
+                var expenseId = $(this).data("id");
+                var empid = $(this).data("empid");
+                var employeeName = $(this).data("empname");
+                $("#employeename").text(employeeName);
+                $("#success_PaidExpense_Popup").on('click', "#btnpaid", function () {
+                    var isValid = true;
+                    var reason = $("#PaidReason").val();
+                   
+                    var expenses = {
+                        ExpenseId: expenseId,
+                        Reason: reason
+                    };
+
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/Expenses/AmountApprovedExpense",
+                            data: expenses,
+                            success: (Result) => {
+                                if (Result = true) {
+                                    Swal.fire({
+                                        title: 'Paid Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            var urlToRedirect = '@Url.Action("Expenses", "Expenses")';
+                                            window.location.href = urlToRedirect;
+                                        };
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Expenses/Expenses";
+                                    });
+                                }
+                                // $("#btnCloseApproved").css('display', 'none !important');
+
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+                });
+                $("#btnClosePaid").click(function () {
+                    window.location.href = "/Expenses/Expenses";
+                })
+            }
+        });
+    });
+
+    // Amount Reject
+
+    $('#getExpensesData').on('click', '#rejectAmountBtn', function () {
+        Swal.fire({
+            title: 'Are you sure want to Reject?',
+            //  text: "You are Approve this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $("#errApproveValid-Reason").text("");
+                $("#successApprove_Reject_Popup").modal('show');
+                var expenseId = $(this).data("id");
+                var empid = $(this).data("empid");
+                var employeename = $(this).data("empname");
+                $("#approveEmployeeName").text(employeename);
+                $('#successApprove_Reject_Popup').on('click', '#btnapprovereject', function () {
+                    var isValid = true;
+                    if ($("#RejectReason").val().trim() === "") {
+                        $("#errApproveValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+
+                    var reason = $("#RejectReason").val();
+                    var expenses = {
+                        ExpenseId: expenseId,
+                        Reason: reason
+                    };
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/Expenses/AmountRejectExpense",
+                            data: expenses,
+                            success: (Result) => {
+                                if (Result = true) {
+                                    $("#successApprove_Reject_Popup").hide();
+                                    Swal.fire({
+                                        title: 'Rejected Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location.href = "/Expenses/Expenses";
+                                        };
+                                    });
+                                    // swal.fire("Rejected Successfully", "", "").then((result) => {
+
+                                    // });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Something error',
+                                        text: "",
+                                        icon: 'error',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/Expenses/Expenses";
+                                    });
+                                }
+
+
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+
+
+                })
+
+                $("#btnApproveCloseReject").click(function () {
+                    window.location.href = "/Expenses/Expenses";
+                })
+
+            }
+        });
+    });
+
+
+    $('#getExpensesData').on('click', '#btnViewLeaveDetail', function () {
+        var expenseId = $(this).data("id");
+        PageUtil.goToContent("/Expenses/ViewExpense?expenseId=" + expenseId);
+    });
+    $(document).ready(function () {
+        $('#success_ApprovedExpense_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#success_PaidExpense_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#success_Reject_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+        $('#successApprove_Reject_Popup').modal({
+            backdrop: 'static',
+            keyboard: false
+        })
+    });
+</script>
+
+
+@* old code
+        ---------------------------------------------------------------------------------- *@
+
+@* <script>
+
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+        $('#getExpensesData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            //"orderSequence": [4, 1, 2, 3, 0],
+            // "order": [
+            //     {
+            //         "orderData": [6],
+            //         // "type": "num",
+            //         // "targets": 0,
+            //         //"orderSequence": [0, 1, 3, 2, 4]
+            //     }
+            // ]
+            // "bInfo": true,
+            // // "paging": true,
+            // "columnDefs": [
+            //     { targets: 6, type: '0' }
+            // ],
+            // order: [
+            //     [6, "orderSequence"]
+            // ],
+            "columnDefs": [
+                {
+                    targets: 6,
+                    type: 'numeric',
+                    orderSequence: [0, 1, 3, 2, 4]
+                }
+            ],
+            order: false
+            // order: [
+            //     [6, "desc"]
+            // ]
+
+        });
+    }); *@

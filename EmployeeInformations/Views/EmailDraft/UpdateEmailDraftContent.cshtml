@@ -1,0 +1,358 @@
+﻿@using EmployeeInformations.Model.EmailDraftViewModel;
+@using Microsoft.AspNetCore.Http;
+@model EmailDraftContent
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Email Content</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+            <form>
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @Html.HiddenFor(m => m.Id)
+                    @Html.HiddenFor(m => m.EmailDraftTypeId)
+                    @Html.HiddenFor(m => m.CompanyId)
+                    <input type="hidden" id="strFmtEmail" value="@Model.strFmtEmailId" />
+                     <div class="col-lg-12">
+                        <div class="form-label">
+                            <label class="form-label">Draft Variable</label>
+                            @Html.TextBoxFor(m => m.DraftVariable, new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.DraftVariable,"",new{@class="error text-danger" , id="errValid-DraftVariable"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Email Draft Type<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.EmailDraftTypeName, new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.EmailDraftTypeName,"",new{@class="error text-danger errMsg-Draft"})
+                        </div>
+                    </div>
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Subject<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.Subject, new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.Subject,"",new{@class="error text-danger",id="errValid-Subject"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Dispaly Name<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.DisplayName, new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.DisplayName,"",new{@class="error text-danger",id="errValid-DisplayName"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 autocomplete">
+                        <div class="form-group emp-hol-yr">
+                            <label class="form-label">Email</label>
+                            <div class="selectbox">
+                                @Html.DropDownListFor(m => m.Email,new SelectList(Model.sendEmails,"EmailListId","EmailId"),"--Select Email--",new{@class="form-control ",id="Emails",multiple=true})
+                            </div>
+                            @Html.ValidationMessageFor(m =>m.Email,"",new{@class="error text-danger",id="errValid-Email"})
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label class="form-label">Draft Body<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextAreaFor(m => m.DraftBody, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.DraftBody,"",new{@class="error text-danger" , id="errValid-DraftBody"})
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnCreateEmailDraft" value="Save" />
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_Msg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> EmailDraftContent updated Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseEmployee">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="~/scripts/ckeditor.js" asp-append-version="true"></script>
+
+<script type="text/javascript">
+
+
+
+    $(document).ready(function () {
+       
+        CKEDITOR.replace('DraftBody', {
+            allowedContent:true,
+        });
+
+        CKEDITOR.on('instanceReady', function (e) {
+            // First time
+            e.editor.document.getBody().setStyle('background-color', '#8590a5'); 
+            // in case the user switches to source and back
+            e.editor.on('contentDom', function () {
+                e.editor.document.getBody().setStyle('background-color', '#212c4a');
+            });
+        });
+
+        
+        
+        //var color = new CKEDITOR.tools.color('red');
+        //console.log(color.getHexWithAlpha());
+
+        //var color = new CKEDITOR.tools.color('rgb( 225, 225, 225 )');
+        //console.log(color.getHex());
+
+        //CKEDITOR.addCss('.cke_editable { background-color: black; color: white }');
+
+       // CKEDITOR.addCss(".cke_editable{cursor:text; font-size: 25px; color: #FFFFFF;background-color: #006991;}");
+
+        
+
+        CKEDITOR.instances['DraftBody'].on('contentDom', function () {
+            this.document.on('keyup', function (event) {
+                //your code
+                $("#errValid-DraftBody").text("");
+            });
+        });     
+
+        $("#btnBack").click(function () {
+            var urlToRedirect = '@Url.Action("EmailDraftType","EmailDraft")';
+            window.location.href = urlToRedirect;
+        });
+
+       
+        var sendEmails = $("#Emails").select2();
+        $("#Emails").select2().on("change", function () {
+            $("#errValid-Email").text("")
+        });
+
+        // Nice scroll
+
+        $("#Emails").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        
+        var strFmtEmail = $("#strFmtEmail").val();
+        if (typeof (strFmtEmail) != 'undefined') {
+            if (strFmtEmail != "") {
+                var lengthEmail = strFmtEmail.split(',').length;
+                var splitEmail = strFmtEmail.split(',');
+                for (var i = 0; i < lengthEmail; i++) {
+                    var valueEmails = $("#Emails option:contains(" + splitEmail[i] + ")").val();
+
+                    $("#Emails option[value=" + valueEmails + "]").attr('selected', 'selected').trigger("change");
+                }
+            }
+        }
+
+        //$("#Emails").change(function () {
+        //    $("#errValid-Email").text("")
+        //    if ($("#Emails option:selected").text() == '') {
+        //        $("#errValid-Email").text("Email field is required");
+        //    }
+        //    else {
+        //        $("#errValid-Email").text("")
+        //    }
+        //});
+
+        
+
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // keyup summary
+
+    $("#Subject").keyup(function () {
+        $("#errValid-Subject").text("");
+
+        if ($("#Subject").val() == "") {
+            $("#errValid-Subject").text("Subject field is required");
+        }
+    });
+
+    $("#DraftVariable").keyup(function () {
+        $("#errValid-DraftVariable").text("");
+
+        if ($("#DraftVariable").val() == "") {
+            $("#errValid-DraftVariable").text("Draft Variable field is required");
+        }
+    });
+
+    $("#DisplayName").keyup(function () {
+        $("#errValid-DisplayName").text("");
+
+        if ($("#DisplayName").val() == "") {
+            $("#errValid-DisplayName").text("Display Name field is required");
+        }
+    });
+
+    $("#EmailDraftTypeName").keyup(function () {
+        $(".errMsg-Draft").text("");
+        if ($("#EmailDraftTypeName").val() == "") {
+            $(".errMsg-Draft").text("Email Draft Type field is required");
+
+        }
+    });
+
+    $("#DraftBody").keyup(function () {
+        $("#errValid-DraftBody").text("");
+
+        var draftBody = CKEDITOR.instances.JobSummary.getData();
+        if (draftBody == "") {
+            $("#errValid-DraftBody").text("JobSummary field is required");
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // create Email draft
+
+    $("#btnCreateEmailDraft").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-Id").text("");
+        $("#errValid-Subject").text("");
+        $("#errValid-DraftVariable").text("");
+        $("#errValid-DraftBody").text("");
+        $("#errValid-DisplayName").text("");
+        $("#errValid-Email").text("");
+
+        var draftBody = CKEDITOR.instances.DraftBody.getData();
+
+        if ($("#Subject").val() == "") {
+            $("#errValid-Subject").text("Subject field is required");
+            isValid = false;
+        }
+
+        if ($("#DraftVariable").val() == "") {
+            $("#errValid-DraftVariable").text("Draft Variable field is required");
+            isValid = false;
+        }
+        if ($("#EmailDraftTypeName").val() == "") {
+            $(".errMsg-Draft").text("Email Draft Type field is required");
+            isValid = false;
+         }
+
+        if ($("#DisplayName").val() == "") {
+            $("#errValid-DisplayName").text("Display Name field is required");
+            isValid = false;
+        }
+
+        if (draftBody == "") {
+            $("#errValid-DraftBody").text("Draft Body field is required");
+            isValid = false;
+        }
+
+        //if ($("#Emails").val() == "") {
+        //    $("#errValid-Email").text("Email field is required");
+        //    isValid = false;
+        //}
+
+
+        
+        var emailDraftTypeId = $("#EmailDraftTypeId").val();
+        var id = $("#Id").val();
+        var companyId = $("#CompanyId").val();
+        var subject = $("#Subject").val();
+        var draftVariable = $("#DraftVariable").val();
+        var displayName = $("#DisplayName").val();
+
+        var strEmails = "";
+
+        var emails = $('#Emails').select2('data');
+        var selectemails = emails.length;
+        for (var i = 0; i < selectemails; i++){
+            var ems = emails[i].text + ",";
+            strEmails += ems;
+        }       
+         
+        
+        // var draftBody = $("#DraftBody").val();
+
+        formData.append("EmailDraftTypeId", emailDraftTypeId);
+        formData.append("Id", id);
+        formData.append("CompanyId", companyId);
+        formData.append("Subject", subject);
+        formData.append("DraftVariable", draftVariable);
+        formData.append("DisplayName", displayName);
+        formData.append("DraftBody", draftBody);
+        formData.append("Email", strEmails);
+
+        if (isValid) {
+
+            var url = "/EmailDraft/CreateEmailDraftContent";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result > 0) {
+                        Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            window.location.href = "/EmailDraft/EmailDraftType";
+                        });                       
+                    }else{
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            window.location.href = "/EmailDraft/EmailDraftType";
+                        });                       
+                    }                   
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+
+</script>

@@ -1,0 +1,63 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.DashboardViewModel;
+@model TopFiveLeaveWfhView
+@{   
+    ViewBag.Title = "LeaveWorkFromHome";
+    Layout = "_Layout";   
+}
+ 
+        <div class="nk-block-head nk-block-head-sm">
+            <div class="nk-block-between">
+                <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Leave Work From Home</h3>
+                </div><!-- .nk-block-head-content -->
+                <div class="d-flex mb-1">
+                    <input type="button" class="btn btn-primary ml-auto mt-auto mb-auto" id="CreateModule" value="Create" />
+                </div>
+            </div><!-- .nk-block-between -->
+        </div>
+
+         <div class="card card-bordered card-preview">
+            <div class="card-inner">
+                <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false" id="getModule">
+                    <thead>
+                        <tr class="nk-tb-item">
+                            <th class="nk-tb-col"><span class="sub-text">Today</span></th>
+                            <th class="nk-tb-col"><span class="sub-text">Date</span></th>                            
+                        </tr>
+                    </thead>
+              <tbody>
+
+                @foreach (var value in Model.Leave)
+                {
+                    <tr class="nk-tb-item">
+                        <td class="nk-tb-col tb-col">
+                            <div class="nk-tb-col">
+                                <div class="user-card">
+                                    <div class="user-avatar @(value.LeaveColor )">
+                                        <span style="text-transform:uppercase;"> @value.EmployeeName?.Substring(0,1)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info">
+                                <div class="title font-weight-bold">
+                                    @(value.EmployeeName)
+                                </div>
+                                <div class="count">
+                                    @(value.LeaveType)
+                                </div>
+                            </div>
+                        </td>                        
+                        <td class="nk-tb-col tb-col">
+                            <div class="total">
+                                <div class="text-purple font-weight-bold">@value.LeaveDate.ToString(Constant.DateFormat)</div>
+                            </div>
+                        </td>                                             
+                    </tr>
+                }
+              </tbody>
+            </table>
+
+          </div>
+
+        </div>

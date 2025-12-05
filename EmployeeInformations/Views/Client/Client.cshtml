@@ -1,0 +1,294 @@
+﻿@using EmployeeInformations.Model.ClientSummaryViewModel;
+@using EmployeeInformations.Common
+@model List<ClientViewModel>
+@{
+    ViewBag.Title = "Client";
+    Layout = "_Layout";
+}
+
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Customer Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create","CreateClient","Client", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getClientData">
+
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="ClientName"><span class="sub-text">Customer Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="ClientCompany"><span class="sub-text">Customer Company</span></th>
+                    <th class="nk-tb-col tb-col" data-id="ClientDetails"><span class="sub-text">Details</span></th>
+                    <th class="nk-tb-col tb-col" data-id="Email"><span class="sub-text">Email</span></th>
+                    <th class="nk-tb-col tb-col" data-id="PhoneNumber"><span class="sub-text">Phone Number</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteClient_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Deleted Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteClient">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    // $(document).ready(function () {
+    //     $('#getClientData').DataTable({
+    //         "bInfo": true,
+    //         "paging": true
+    //     });
+    // });
+    $(document).ready(function () {
+        var count = 1;
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        getClientDatas();
+
+        function getClientDatas() {
+            var table = $('#getClientData').DataTable();
+            if (table) {
+                table.destroy();
+            }
+
+            $('#getClientData').DataTable({
+                serverSide: true,
+                processing: true,
+                pageLength: entries, // Page length
+                ajax: {
+                    url: "/Client/ClientFilter",
+                    type: "GET",
+                    data: function (d) {
+                        //SearchFilter
+                        var clientFilter = document.getElementById("getClientData_filter");
+                        var clientSearch = clientFilter.querySelector("input[type='search']");
+                        var clientValue = clientSearch.value;
+                        //PagingLength
+                        var clientData = document.getElementById("getClientData_length");
+                        var page = clientData.querySelector("select");
+                        var clientDataCount = page.value;
+
+                        d.sSearch = clientValue;
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || clientDataCount;
+                        d.sEcho = d.start;
+                        d.columnName = columnIndex;
+                        d.columnDirection = columnDirection;
+                    }
+                },
+                columns: [
+                    {
+                        data: 'clientName',
+                        render: function (data, type, row) {
+                            if (count > 6)
+                                count = 1;
+                            var className = GetClassNameForGrid(count);
+                            count++;
+
+                            return "<div class='user-card'>" + "<div class='user-avatar " + className + "'><span style='text-transform:uppercase'>" + (row.clientName)[0] + "</span></div>" +
+                                "<div class='user-info'><span class='tb-lead font-weight-bold'>" + row.clientName + "</span></div></div>";
+
+                        }
+                    },
+                    {
+                        data: 'clientCompany',
+                        render: function (data, type, row) {
+                            return " <span class='badge badge-dim bg-primary' style='font-weight: bold;'>" + row.clientCompany + "</span>"
+                        }
+                    },
+                    {
+                        data: 'clientDetails',
+                        render: function (data, type, row) {
+                            return " <div class='leave-reason'><p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title= '" + row.clientDetails + "'>" + row.clientDetails + "</p></div>"
+                        }
+                    },
+                    {
+                        data: 'email',
+                        render: function (data, type, row) {
+                            return "<span>" + row.email + " </span>"
+                        }
+                    },
+                    {
+                        data: 'phoneNumber',
+                        render: function (data, type, row) {
+                            return (row.phoneNumber == null) ? "" : "<span>" + row.phoneNumber + "</span>"
+                        }
+                    },
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+                            var data = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'>"
+
+                            data += "<ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnView' data-id= '" + row.clientId + "'><em class='icon ni ni-eye'></em><span>View</span></a></li>"
+
+                            data += "<li><a href='javascript:void(0)' class='btnUpdate' data-id='" + row.clientId + "'><em class='icon ni ni-edit'></em><span>Edit</span></a></li>"
+
+                            data += "<li><a href='javascript:void(0)' id='btnDelete' data-id='" + row.clientId + "'><em class='icon ni ni-delete'></em><span>Delete</span></a></li>"
+
+                            data += "</ul></div></div></li></ul></div>"
+                            return data;
+                        }
+                    },
+                ],
+                "createdRow": function (row, data) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                }
+            });
+            // $('[data-bs-toggle="tooltip"]').tooltip();
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+    });
+
+    $('#getClientData').on('click', '.btnUpdate', function () {
+        var clientId = $(this).data('id');
+        PageUtil.goToContent("/Client/EditClient?ClientId=" + clientId);
+    });
+    
+    $('#getClientData').on('click', '.btnView', function () {
+        var clientId = $(this).data('id');
+        PageUtil.goToContent("/Client/ViewClient?ClientId=" + clientId);
+    });
+
+    function GetClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete Client
+
+    $('#getClientData').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var client = {
+                    ClientId: id
+                };
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Client/DeleteClient",
+                    data: client,
+                    success: (Result) => {
+                       
+                        if (Result == true) {     
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                    window.location.href = "/Client/Client";
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Client/Client";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (result) => {
+                        $('.loader').addClass('d-none');
+                    }
+
+                });
+            }
+        });
+
+    });
+
+ </script>

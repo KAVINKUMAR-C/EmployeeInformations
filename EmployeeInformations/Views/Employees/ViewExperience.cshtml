@@ -1,0 +1,83 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.EmployeesViewModel
+@model ExperienceViewModel
+
+<div class="card-title mb-4">
+    <h6 class="title">Experience Information</h6>
+</div>
+<div class="tab-pane px-3">
+    <div class="card my-4 boxshadow-none edit-page table-card" data-simplebar>
+        <table class="table" id="getexperiencedata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Previous Company</th>
+                    <th>Date of Joining</th>
+                    <th>Date of Relieving</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Experiences.Count() > 0)
+                {
+                    foreach (var item in Model.Experiences)
+                    {
+                        <tr>
+                            <td>
+                                @item.PreviousCompany
+                            </td>
+
+                            <td>
+                                @item.DateOfJoining.ToString(Constant.DateFormat)
+                            </td>
+
+                            <td>
+                                @item.DateOfRelieving.ToString(Constant.DateFormat)
+                            </td>
+                            <td>
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.ExperienceId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="text-danger" style="text-align:center;" colspan="4">No record found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<script>
+
+    $('.viewActive li').removeClass('active');
+    $(".empExperieneInfo").addClass('active');
+
+    // Download Document
+
+    $('#getexperiencedata').on('click', '#btnDownload', function() {
+        var experienceId = $(this).data("id");
+
+        window.location.href = "/Employees/DownloadExperienceFile?experienceId=" + experienceId;
+        $('.loader').addClass('d-none');
+    });
+     
+
+</script>

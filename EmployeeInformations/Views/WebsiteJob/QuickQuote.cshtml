@@ -1,0 +1,125 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.APIModel;
+@model List<WebsiteQuickQuoteViewModel>
+@{
+    ViewBag.Title = "QuickQuote";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Quick Quote Details</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="quickquote">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col tb-col"><span class="sub-text"> Name</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">ERFN</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Company Name</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Phone Number </span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Service Name </span></th>
+                   @* <th class="nk-tb-col tb-col-md" style="display:none;"><span class="sub-text">File Name </span></th>*@
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Applied Date </span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Proposal Type</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Download</span></th>
+                </tr>
+            </thead>
+            <tbody id="getquickquote">
+                @if(Model.Count() > 0)
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col">
+                                <div class="user-card">
+                                    <div class="user-avatar bg-primary">
+                                        @if (!string.IsNullOrEmpty(item.FirstName) && !string.IsNullOrEmpty(item.LastName))
+                                        {
+                                            <span style="text-transform:uppercase;">@item.FirstName?.Substring(0,1)@item.LastName?.Substring(0,1) </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="text-transform:uppercase;">@item.FirstName?.Substring(0,1) </span>
+                                        }
+                                    </div>
+                                    <div class="user-info">
+                                    <div class="user-info">
+                                        <span class="tb-lead font-weight-bold">@item.FirstName @item.LastName</span>                                      
+                                    </div>
+                                    <span>@item.Email</span>
+                                    </div>
+                                </div>                               
+                                
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary">@item.ERFN</b>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.CompanyName</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.PhoneNumber</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span class="badge badge-dim bg-primary">@item.ServicesName</span>
+                            </td>
+                            @*<td class="nk-tb-col tb-col-mb" style="display:none;">
+                    <span>@item.FilepathName</span>
+                    </td>*@
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.ApplyDate?.ToString(Constant.DateFormat)</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.ProposalName</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <p class="d-flex action-btn m-0">
+                                    <span class="btn btn-icon btn-sm btn-outline-primary btnDownload" data-job-path="@item.FilePath"><em class="icon ni ni-download"></em></span>
+                                </p>
+                            </td>
+                        </tr>
+                        <!-- .nk-tb-item  -->
+                    }
+                }               
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+
+    // Download 
+
+    $(document).ready(function () {      
+        $('#getquickquote').on('click', '.btnDownload', function () {
+            var filePath = $(this).data("job-path")
+            window.location.href = "/WebsiteJob/DownloadFile?FilePath=" + filePath;
+            $('.loader').addClass('d-none');
+        });
+    });
+    //-----------------------------------------------------------------------------------------------------------
+
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#quickquote').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [
+                [5, "desc"]
+            ],
+        });
+    });
+    //----------------------------------------------------------------------------------------------------------
+
+</script>

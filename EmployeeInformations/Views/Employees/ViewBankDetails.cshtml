@@ -1,0 +1,65 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel
+@using Microsoft.AspNetCore.Http;
+@model BankDetails
+
+<form>
+  
+    <div class="card-title mb-4">
+        <h6 class="title">Bank Details</h6>
+    </div>
+
+    <div class="row p-3">
+          <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Account Holder Name</label>
+                <div>
+                    <label class="form">@Model.AccountHolderName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Account Number</label>
+                <div>
+                    <label class="form">@Model.AccountNumber</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Bank Name</label>
+                <div>
+                    <label class="form">@Model.BankName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">IFSC Code</label>
+                <div>
+                    <label class="form">@Model.IFSCCode</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Branch Name</label>
+                <div>
+                    <label class="form">@Model.BranchName</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+
+      $('.viewActive li').removeClass('active');
+    $(".empBankDetails").addClass('active');
+
+</script>

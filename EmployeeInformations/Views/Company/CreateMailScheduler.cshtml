@@ -1,0 +1,584 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel;
+@using EmployeeInformations.Common.Enums;
+@model MailSchedulerViewModels
+@{
+    ViewBag.Title = "CreateMailScheduler";
+    Layout = "_Layout";
+}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Create Mail Scheduler</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                <input type="hidden" class="form-control" id="SchedulerId" value="@Model.SchedulerId">
+
+                <div class="col-lg-2 col-md-6 ">
+                    <div class="form-group">
+                        <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                        <input type="text" class="form-control" id="reportName">
+                        <span class="error text-danger" id="errValid-reportName"></span>
+                        <span class="error text-danger" id="errVerify-SendEmailExist" style="display:none">Already Excist!</span>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 autocomplete">
+                    <div class="form-group">
+                        <label class="form-label">Draft Type<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.EmailDraftId, Html.GetEnumSelectList<MailSchedulerDraft>(), "--Select Draft Type--", new { @class = "form-control", id = "draft" })
+                        </div>
+                        <span class="error text-danger" id="errValid-EmailDraftId"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 " id="displayDate">
+                    <div class="form-group">
+                        <label class="form-label">Send Date<span class="required" style="color: #FF0000">*</span></label>
+                        <div id="leaveFromDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="FromDate">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-FromDate"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 ">
+                    <div class="row">
+                        <div class="col" id="hidden_fromTime">
+                            <div class="form-group">
+
+                                <label class="form-label">Send Time<span class="required" style="color: #FF0000">*</span></label>
+                                <div class="input-group" id="drp_FromTime">
+                                    <input type="text" id="fromTime" value="@Model.MailTime" class="form-control" />
+                                    @*<span class="input-group-addon">
+                                        <i class="icon ti-alarm-clock"></i>
+                                        </span>*@
+                                </div>
+                                <span class="error text-danger" id="errValid-fromTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 ">
+                    <div class="form-group">
+                        <label class="form-label">Recipients<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.DropdownEmployee, "EmpId", "FirstName"), "--Select Recipients--", new { @class = "form-control", id = "EmployeeId", multiple = true })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeId" })
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6  autocomplete">
+                    <div class="form-group">
+                        <label class="form-label">Occurrence<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.DurationId, Html.GetEnumSelectList<EmployeeInformations.Common.Enums.Duration>(), "--Select Occurrence--", new { @class = "form-control", id = "occurrence" })
+                        </div>
+                        <span class="error text-danger" id="errValid-DurationId"></span>
+                    </div>
+                    <div class="col-12" id="days" style="display:none">
+                        <div class="form-group">
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-1" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-1">Sun</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-2" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-2">Mon</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-3" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-3">Tue</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-4" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-4">Wed</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-5" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-5">Thu</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-6" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-6">Fri</label>
+                            </div>
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" name="locationthemes" id="checkbox-7" class="custom-control-input chkIsActive" />
+                                <label class="custom-control-label" for="checkbox-7">Sat</label>
+                            </div>
+                            <span class="error text-danger" id="errValid-Checkbox" style="display:none">Day field is required!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <div class="custom-control custom-control-sm custom-checkbox">
+                            <input type="checkbox" name="chkIsActive" class="custom-control-input chkIsActive" id="chkIsActive">
+                            <label class="custom-control-label" for="chkIsActive">Is Attachment</label>
+                        </div>
+                    </div>
+                    <span class="error text-danger" id="errValid-Attachment"></span>
+                </div>
+
+                <div class="col-lg-2 col-md-6  autocomplete" style="display:none" id="fileFormatStatus">
+                    <div class="form-group">
+                        <label class="form-label">File Format<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.FileFormat, Html.GetEnumSelectList<EmployeeInformations.Common.Enums.FileFormats>(), "--Select File Format--", new { @class = "form-control", id = "format" })
+                        </div>
+                        <span class="error text-danger" id="errValid-FileFormat"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnAdd" value="Save" />
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $("#btnBack").click(function () {
+        var urlToRedirect = '@Url.Action("MailScheduler","Company")';
+        window.location.href = urlToRedirect;
+    });
+
+    $(document).ready(function () {
+
+        $("#errValid-reportName").text("");
+        $("#errValid-FromDate").text("");
+        $("#errValid-fromTime").text("");
+        $("#errValid-EmployeeId").text("");
+        $("#errValid-DurationId").text("");
+        $("#errValid-FileFormat").text("");
+        $("#errValid-Attachment").text("");
+
+        $("#fromTime").val('');
+
+        $("#FromDate").val('');
+
+
+        $("#leaveFromDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+
+
+        $('#fromTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function (time) {
+                $("#errValid-fromTime").text("");
+                if ($(this).val() == "") {
+                    $("#errValid-fromTime").text("Send Time field is required");
+                }
+            }
+        });
+
+        $("#chkIsActive").click(function () {
+            var statusonoff = $("#chkIsActive").is(':checked');
+
+            if (statusonoff == "") {
+                $("#fileFormatStatus").hide();
+            }
+            else if (statusonoff == false) {
+                $("#fileFormatStatus").hide();
+            }
+            else if (statusonoff == true) {
+                $("#fileFormatStatus").show();
+            }
+        });
+
+
+        //Change Summary
+
+        $("#FromDate").change(function () {
+            $("#errValid-FromDate").text("");
+            if ($("#FromDate").val() == "") {
+                $("#errValid-FromDate").text("Send Date field is required");
+            }
+            else {
+                $("#errValid-FromDate").text("");
+            }
+        });
+
+        $("#format ").change(function () {
+            $("#errValid-FileFormat").text("");
+            if ($("#format").val() == "" || $("#format").val() =="0") {
+                $("#errValid-FileFormat").text("File Format field is required");
+        }
+
+        });
+
+        $("#occurrence").change(function () {
+            var durationval = $("#occurrence").val();
+            $("#errValid-DurationId").text("");
+            $("#days").hide();
+            if (durationval == "") {
+                $("#days").hide();
+                $("#errValid-DurationId").text("Occurrence field is required");
+            }
+            else if (durationval == 2) {
+                $("#days").hide();
+                // $("#displayDate").show();
+                $("#errValid-DurationId").text("");
+            }
+            else if (durationval == 5) {
+                $("#days").show();
+                // $("#displayDate").hide();
+                $("#errValid-DurationId").text("");
+            }
+        });
+
+        $("#EmployeeId").select2().on("change", function () {
+            var employeeIds = $("#EmployeeId").val();
+            if (employeeIds[0] == "") {
+                $.ajax({
+                    type: "Get",
+                    url: "/ProjectDetails/GetByEmployeeId?employeeIds=" + employeeIds[0],
+                    success: (Result) => {
+                        if (Result.length != 0) {
+                            $('#EmployeeId').html('')
+                            $('#EmployeeId').append($('<option> ' + "" + ' </option>').val("").html("--Select Employees--"));
+                            $("#EmployeeId option:selected").val("");
+
+                            var res =Result.map(function (option) {
+                            // $.each(Result, function (id, option) {
+
+                                $('#EmployeeId').append($('<option> ' + option.empId + ' </option>').val(option.empId).html(option.firstName));
+
+                            });
+                        }
+                        else {
+                            $('#EmployeeId').html('')
+                        }
+                    },
+                    error: (Result) => {
+                        alert("Error occured!!")
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "Get",
+                    url: "/ProjectDetails/GetByEmployeeId?employeeIds=" + employeeIds,
+                    success: (Result) => {
+                        if (Result.length != 0) {
+                            $('#TeamLeadId').html('')
+
+                            $.each(Result, function (id, option) {
+
+                                $('#TeamLeadId').append($('<option> ' + option.empId + ' </option>').val(option.empId).html(option.userName));
+
+                            });
+                        }
+                        else {
+                            $('#TeamLeadId').html('')
+                        }
+                    },
+                    error: (Result) => {
+                        alert("Error occured!!")
+                    }
+
+                });
+            }
+        });
+
+        // Nice scroll
+
+        $("#EmployeeId,#draft,#occurrence,#format").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+    });
+
+
+
+    $("#EmployeeId").change(function () {
+        $("#errValid-EmployeeId").text("")
+
+        if ($("#EmployeeId option:selected").text() == '') {
+            $("#errValid-EmployeeId").text("Recipients field is required");
+        }
+        else {
+            $("#errValid-EmployeeId").text("")
+        }
+
+    });
+
+    $("#draft").change(function () {
+        $("#errValid-EmailDraftId").text("");
+        if ($("#draft").val() == '') {
+            $("#errValid-EmailDraftId").text("Draft Type field is required");
+        }
+        else {
+            $("#errValid-EmailDraftId").text("");
+        }
+    })
+
+    $("#reportName").keyup(function () {
+        $("#errValid-reportName").text(" ");
+        if ($("#reportName").val() == "") {
+            $("#errValid-reportName").text("Name field is required");
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Create MailScheduler
+
+    $("#btnAdd").click(function () {
+        
+        var formData = new FormData();
+        var isValid = true;
+        var status = [];
+        var listStatus = [];
+
+        var fileFormatId = 0;
+
+        $("#errValid-reportName").text("");
+        $("#errValid-FromDate").text("");
+        $("#errValid-fromTime").text("");
+        $("#errValid-EmployeeId").text("");
+        $("#errValid-DurationId").text("");
+        $("#errValid-FileFormat").text("");
+        $("#errValid-Attachment").text("");
+        $("#errValid-Checkbox").hide();
+
+        if ($("#reportName").val() == "") {
+            $("#errValid-reportName").text("Name field is required");
+            isValid = false;
+        }
+
+        if ($("#FromDate").val() == "") {
+            $("#errValid-FromDate").text("Send Date field is required");
+            isValid = false;
+        }
+
+        if ($("#draft").val() == "") {
+            $("#errValid-EmailDraftId").text("Draft Type field is required");
+            isValid = false;
+        }
+
+        if ($("#fromTime").val() == "") {
+            $("#errValid-fromTime").text("Send Time field is required");
+            isValid = false;
+        }
+
+        if ($("#EmployeeId").val() == "") {
+            $("#errValid-EmployeeId").text("Recipients field is required");
+            isValid = false;
+        }
+
+        if ($("#occurrence :selected").val() == "0" || $("#occurrence :selected").val() == "") {
+            $("#errValid-DurationId").text("Occurrence field is required");
+            isValid = false;
+        }
+        var statusonoff = $("#chkIsActive").is(':checked');
+
+        if (statusonoff == true) {
+            if ($("#format option:selected").val() == "0"|| $("#format option:selected").val() == "" ) {
+                $("#errValid-FileFormat").text("File Format field is required");
+                isValid = false;
+            }
+            else {
+                fileFormatId = $("#format").val();
+            }
+        }
+
+        [].forEach.call(document.querySelectorAll('input[name="locationthemes"]'), function (cb) {
+            if (cb.checked == false) {
+                status.push(0);
+            }
+            else {
+                status.push(1);
+                listStatus.push(1);
+            }
+        });
+
+        if ($("#occurrence option:selected").val() == 5) {
+            if (listStatus.length > 0) {
+                $("#errValid-Checkbox").hide();
+            }
+            else {
+                $("#errValid-Checkbox").show();
+                isValid = false;
+            }
+        }
+
+        if ($("#occurrence option:selected").val() == 3) {
+            if (statusonoff == true) {
+                $("#errValid-Attachment").text("");
+            }
+            else {
+                $("#errValid-Attachment").text("Attachment field is required");
+                isValid = false;
+            }
+        }
+        else if ($("#occurrence option:selected").val() == 4) {
+            if (statusonoff == true) {
+                $("#errValid-Attachment").text("");
+            }
+            else {
+                $("#errValid-Attachment").text("Attachment field is required");
+                isValid = false;
+            }
+
+
+            if ($("#format :selected").val() == "0" || $("#format :selected").val()== "") {
+                $("#errValid-FileFormat").text("File Format field is required");
+                isValid = false;
+            }
+        }
+        else if ($("#occurrence option:selected").val() == 5) {
+            if (statusonoff == true) {
+                $("#errValid-Attachment").text("");
+            }
+            else {
+                $("#errValid-Attachment").text("Attachment field is required");
+                isValid = false;
+            }
+
+            if ($("#format option:selected").val() == '') {
+                $("#errValid-FileFormat").text("File Format field is required");
+                isValid = false;
+            }
+
+        }
+
+
+        var schedulerId = $("#SchedulerId").val();
+        var reportName = $("#reportName").val();
+        var fromDate = $("#FromDate").val();
+        var fromTime = $("#fromTime").val();
+        var employeeId = $("#EmployeeId").val();
+        var draftId = $("#draft").val();
+        var durationId = $("#occurrence option:selected").val();
+        var fileFormat = fileFormatId;
+
+        var mailScheduler = {
+            SchedulerId: schedulerId,
+            ReportName: reportName,
+            DurationId: durationId,
+            StrMailDate: fromDate,
+            StrMailTime: fromTime,
+            EmployeeId: employeeId,
+            EmailDraftId: draftId,
+            FileFormat: fileFormat,
+            SendigStatus: status,
+        };
+
+        if (isValid) {
+
+            $.ajax({
+                type: "POST",
+                url: "/Company/CreateMailScheduler",
+                data: mailScheduler,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result == true) {
+                        Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                var urlToRedirect = '@Url.Action("MailScheduler", "Company")';
+                                window.location.href = urlToRedirect;
+                            };
+                        });
+                    }
+                    else {
+                        alert("fail");
+                    }
+
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+
+
+
+            //$.ajax({
+            //    type: "POST",
+            //    url: "/Company/GetByMailSettingsId",
+            //    contentType: false,
+            //    processData: false,
+            //    data: formData,
+            //    beforeSend: function () {
+            //        $('.loader').removeClass('d-none');
+            //    },
+            //    success: function (result) {
+
+            //        if (result == 0) {
+            //            $.ajax({
+            //                type: "POST",
+            //            url: "/Company/CreateMailScheduler",
+            //                data: companyMailSettings,
+            //                beforeSend: function () {
+            //                    $('.loader').removeClass('d-none');
+            //                },
+            //                success: function (result) {
+            //                        if (result == true) {
+            //                        swal.fire("Added Successfully", "", "success").then((result) => {
+            //                            if (result.isConfirmed) {
+            //                                var urlToRedirect = '@Url.Action("MailSettings","Company")';
+            //                                window.location.href = urlToRedirect;
+            //                            };
+            //                        });
+            //                        }
+            //                        else
+            //                        {
+            //                            alert("fail");
+            //                        }
+
+            //                },
+            //                complete: function () {
+            //                    $('.loader').addClass('d-none');
+            //                }
+            //            });
+            //        }
+            //        else {
+            //            $('.loader').addClass('d-none');
+            //            $("#errVerify-SendEmailExist").show();
+            //            return false;
+            //        }
+            //    },
+            //    complete: function () {
+            //        // $('.loader').addClass('d-none');
+            //    }
+            //});
+
+        }
+        else {
+            return false;
+        }
+    });
+
+</script>

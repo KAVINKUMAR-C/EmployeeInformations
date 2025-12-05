@@ -1,0 +1,101 @@
+﻿@using EmployeeInformations.Model.OnboardingViewModel;
+@using Microsoft.AspNetCore.Http;
+@model OBViewEmployee
+
+<form>
+    <div class="card-title mb-0">
+        <h6 class="title">Employees</h6>
+    </div>
+
+    <div class="row p-3">
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <div>
+                    <label class="form">@Model.FirstName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <div>
+                    <label class="form">@Model.LastName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Father Name</label>
+                <div>
+                    <label class="form">@Model.FatherName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Office Email</label>
+                <div>
+                    <label class="form">@Model.OfficeEmail</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Personal Email</label>
+                <div>
+                    <label class="form">@Model.PersonalEmail</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Designation</label>
+                <div>
+                    <label class="form">@Model.Designation</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Department</label>
+                <div>
+                    <label class="form">@Model.Department</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Skill Sets</label>
+                <div>
+                    <label class="form">@Model.SkillName</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Reporting Person</label>
+                <div>
+                    <label class="form">@Model.ReportingPerson</label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+
+    $('.viewActive li').removeClass('active');
+    $(".employeePersonalInfo").addClass('active');
+
+</script>

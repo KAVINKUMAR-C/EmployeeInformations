@@ -1,0 +1,288 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.CompanyViewModel;
+@model List<Company>
+@{
+    ViewBag.Title = "Company";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Company Details</h3>
+        </div><!-- .nk-block-head-content -->
+        <div class="d-flex mb-1">
+            @Html.ActionLink("Create","CreateCompany","Company", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm" })
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getCompany">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="CompanyName"><span class="sub-text">Name</span></th>
+                    <th class="nk-tb-col" data-id="CompanyPhoneNumber"><span class="sub-text">Phone Number</span></th>
+                    <th class="nk-tb-col" data-id="Industry"><span class="sub-text">Industry</span></th>
+                    <th class="nk-tb-col" data-id="ContactPersonName"><span class="sub-text">Contact Person</span></th>
+                    <th class="nk-tb-col" data-id="CompanyEmail"><span class="sub-text">Email</span></th>
+                    @*<th class="nk-tb-col"><span class="sub-text">Phone Number</span></th>*@
+                    @*<th class="nk-tb-col"><span class="sub-text">Physical Address State</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">Physical Address City</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">Mailing Address State</span></th>
+                    <th class="nk-tb-col"><span class="sub-text">Mailing Address City</span></th>*@
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+                    @*<th class="nk-tb-col nk-tb-col-tools">
+                        <div class="nk-tb-col py-0 border-0">
+                            <ul class="nk-tb-actions gx-1 my-n1">
+                                <li class="me-n1">
+                                    <div class="dropdown">
+                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                    </div>
+                                </li>
+                            </ul>
+                            Action
+                        </div>
+                    </th>*@
+                </tr>
+            </thead>
+
+            
+        </table>
+    </div>
+</div>
+
+
+
+
+<div class="modal" id="success_DeleteCompany_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Deleted Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDelete">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+ <script>
+
+    $(document).ready(function () {     
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindCompanyData();
+        function BindCompanyData() {
+            var table = $("#getCompany").DataTable();
+            if (table) {
+                table.destroy();
+            }
+            var count = 0;
+
+            $('#getCompany').DataTable({
+                serverSide: true,
+                processing: true,
+
+                ajax: {
+                    url: "/Company/GetAllCompany",
+                    type: 'Get',
+                    data: function (d) {
+
+                        var searchFilter = document.getElementById("getCompany_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var companyEntry = document.getElementById("getCompany_length"); //get entries div id
+                        var entrySelect = companyEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        // Pass pagination parameters
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+                    }
+                },
+
+                columns: [
+                    {
+                        data: 'name',
+                        render: function (data, type, row) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+                            return "<div class='user-card'><div class='user-avatar " + className + "'><span style='text-transform:uppercase'> " + row.companyName[0] + "</span></div><div class='user-info'><div class='user-info'><span class='tb-lead font-weight-bold'>" + row.companyName + "</span></div><span> " + row.companyEmail + "</span></div></div>";                           
+                        }
+                    },
+                    {
+                        data: 'phoneNumber',
+                        render: function (data, type, row) {
+                            return "<span>"+row.companyPhoneNumber+"</span>";
+                        }
+                    },
+                    {
+                        data: 'industry',
+                        render: function (data, type, row) {
+                            return "<span>" + row.industry + "</span>";
+                        }
+                    },
+                    {
+                        data: 'contactPerson',
+                        render: function (data, type, row) {
+                            return "<span class='badge badge-dim bg-primary'>"+row.contactPersonName+"</span>";
+                        }
+                    },
+                    {
+                        data: 'email',
+                        render: function (data, type, row) {
+                            return "<span>"+row.contactPersonEmail+"</span>";
+                        }
+                    },
+                    {
+                        data:'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+                            return "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' class='btnView' data-id=" + row.companyId + "><em class='icon ni ni-eye'></em><span>View</span></a></li><li><a href='javascript:void(0)' class='btnUpdate' data-id=" + row.companyId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + row.companyId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' class='btnCompanySetting' data-id=" + row.companyId + "><em class='icon ni ni-edit'></em><span>CompanySetting</span></a></li></ul></div></div></li></ul></div>";                           
+                        }
+                    }
+                    
+                ],
+                "columnDefs": [
+                    { "width": "300px", "targets": [0, 1, 2, 3, 4, 5] },
+                ],
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+            });
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+
+    });
+
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+
+    $('#getCompany').on('click', '.btnUpdate', function () {    
+        var companyId = $(this).data('id');
+        PageUtil.goToContent("/Company/EditCompany?CompanyId=" + companyId);
+    });
+   
+    $('#getCompany').on('click', '.btnCompanySetting', function () {
+            var companyId = $(this).data('id');
+        PageUtil.goToContent("/Company/EditCompanySetting?CompanyId=" + companyId);
+    });
+
+    
+    $('#getCompany').on('click', '.btnView', function () {
+        var companyId = $(this).data('id');
+        PageUtil.goToContent("/Company/ViewCompany?CompanyId=" + companyId);
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete
+
+    $('#getCompany').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var company = {
+                    CompanyId: id
+                };
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/Company/DeleteCompany",
+                    data: company,
+                    success: (Result) => {
+                        if (Result == true) {   
+                            Swal.fire({
+                                title: 'Deleted Successfully!',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Company/Company";
+                            });                           
+                        }
+                        else{
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                window.location.href = "/Company/Company";
+                            });                         
+                        }
+
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+        })
+    });
+</script>

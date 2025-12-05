@@ -1,0 +1,187 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Business.IService
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model Employees
+@{
+    var sessionRoleId = Context.Session.GetInt32("RoleId");
+    Layout = "_Layout";
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (sessionRoleId >= 0)
+    {
+        var id = sessionRoleId.Value;
+        int employeeModuleId = (int)EmployeesInformationsPages.SalaryModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(employeeModuleId, id);
+    }
+
+}
+
+@if (sessionRoleId == 1 || sessionRoleId == 2)
+{
+    <div class="nk-block-head nk-block-head-sm">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title"></h3>
+            </div><!-- .nk-block-head-content -->
+            <div class="d-flex mb-1">
+                @Html.ActionLink("Back To Employees", "EmployeesInfo", "Employees", null, new { @class = "btn btn-secondary ml-auto mt-auto mb-auto btn-sm" })
+            </div>
+        </div><!-- .nk-block-between -->
+    </div>
+}
+
+
+<div class="components-preview">
+    <div class="nk-block nk-block-lg">
+        <div class="card card-bordered">
+            <form class="nk-stepper stepper-init is-alter nk-stepper-s1" action="#" id="stepper-create-project">
+                <div class="row g-0 col-sep col-sep-md col-sep-xl">
+                    <div class="col-md-4 col-xl-3">
+                        <div class="card-inner">
+                            <ul class="nk-stepper-nav nk-stepper-nav-s1 stepper-nav is-vr selectedwizard">
+                                <li id="step1">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Intro</div>
+                                            <div class="sub-text">Edit Details</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step2">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Profile Information</div>
+                                            <div class="sub-text">Profile</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step3">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Address Information</div>
+                                            <div class="sub-text">Address</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step4">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Other Details</div>
+                                            <div class="sub-text">Other</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step5">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Qualification Information</div>
+                                            <div class="sub-text">Qualification</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li id="step6">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Experience Information</div>
+                                            <div class="sub-text">Experience</div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                @if (rolePrivileges == true)
+                                {
+                                    <li id="step8">
+                                        <div class="step-item">
+                                            <div class="step-text">
+                                                <div class="lead-text">Salary Details</div>
+                                                <div class="sub-text">Salary</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+
+                                <li id="step7">
+                                    <div class="step-item">
+                                        <div class="step-text">
+                                            <div class="lead-text">Bank Details</div>
+                                            <div class="sub-text">Bank</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-xl-9">
+                        <div class="card-inner p-0">
+                            <div class="nk-stepper-content">
+                                <div class="nk-stepper-steps stepper-steps">
+                                    <div class="nk-stepper-step" id="bind-modal-content">
+                                    </div>
+                                    <div class="nk-stepper-step">
+                                    </div>
+                                    <div class="nk-stepper-step">
+                                    </div>
+                                    <div class="nk-stepper-step">
+                                    </div>
+                                    <div class="nk-stepper-step">
+                                    </div>                                    
+                                    <div class="nk-stepper-step">
+                                    </div>
+                                    @if (rolePrivileges == true)
+                                    {
+                                        <div class="nk-stepper-step">
+                                        </div>
+                                    }
+                                    <div class="nk-stepper-step text-center">
+                                    </div>
+                                </div>
+                                <ul class="nk-stepper-pagination pt-4 gx-4 gy-2 stepper-pagination" style="display:none">
+                                    <li class="step-prev"><button class="btn btn-dim btn-primary">Prev</button></li>
+                                    <li class="step-next"><button class="btn btn-primary">Next</button></li>
+                                    <li class="step-submit"><button class="btn btn-primary">Submit</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div><!-- .nk-block -->
+</div>
+
+<input type="hidden" id="EmpId" value="@Model.EmpId" />
+
+<div class="modal" id="success_Msg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Employee Updated Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseEmployee">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/UpdateEmployee?empId=" + empId);
+
+    });
+
+</script>

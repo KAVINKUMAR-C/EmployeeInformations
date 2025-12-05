@@ -1,0 +1,543 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel;
+@model EmployeeChangeLogViewModel;
+@{
+    ViewBag.Title = "EmployeesChangeLog";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Employees Log</h3>
+        </div><!-- .nk-block-head-content -->
+
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="row">
+
+    <div class="col-lg-3  col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Employees</label>
+            <div>
+                @Html.DropDownListFor(m => m.EmpId, new SelectList(Model.ReportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control" })
+            </div>
+            @Html.ValidationMessageFor(m => m.EmpId, "", new { @class = "error text-danger", id = "errValid-EmployeeName" })
+        </div>
+    </div>
+
+    <div class="col-lg-3  col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Modules</label>
+            <div>
+                @Html.DropDownListFor(m => m.EmployeeModules, new SelectList(Model.EmployeeDetails, "ModuleName", "EmployeeModules"), new { @class = "form-control" })
+            </div>
+            @* @Html.ValidationMessageFor(m => m.EmployeeModules, "", new { @class = "error text-danger", id = "errValid-EmployeeModules" }) *@
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-6">
+        <div class="form-group">
+            <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+            <div id="startDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                <input type="text" class="form-control" id="startDate" placeholder="Enter start Date">
+                <span class="input-group-addon">
+                    <i class="icon ti-calendar"></i>
+                </span>
+            </div>
+            <span class="error text-danger" id="errValid-StartDate"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-6">
+        <div class="form-group">
+            <label class="form-label" id="leaveToLabel">End Date<span class="required" style="color: #FF0000">*</span></label>
+            <div id="enddatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                <input type="text" class="form-control" id="endDate" placeholder="Enter End Date">
+                <span class="input-group-addon">
+                    <i class="icon ti-calendar"></i>
+                </span>
+            </div>
+            <span class="error text-danger" id="errValid-EndDate"></span>
+            <span id="errVerify-endDate" style="display:none;" class="error text-danger"> Please select <b>End Date</b> should not be less than <b>Start Date</b> </span>
+        </div>
+    </div>
+
+    <div class="col emp-log-search-btn pb-1">
+        <button type="button" class="btn btn-primary icon-ch" id="btnFilterLeave" value=""><i class="ti-search"></i></button>
+    </div>
+
+    <div class="col d-flex emp-log-dwn-btn justify-content-end">
+        <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="generatepfs"><img src="./images/pdf.png" /></button>
+        <button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployeeLeave"><i class="ti-download"></i></button>
+    </div>
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="employeeChangeLogDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmployeeLogData">            
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="fieldName"><span class="sub-text">Field Name</span></th>
+                    <th class="nk-tb-col" data-id="previousValue"><span class="sub-text">Previous Value</span></th>
+                    <th class="nk-tb-col" data-id="newValue"><span class="sub-text">New Value</span></th>
+                    <th class="nk-tb-col" data-id="event"><span class="sub-text">Event </span></th>
+                    <th class="nk-tb-col" data-id="authorName"><span class="sub-text">Author</span></th>
+                    <th class="nk-tb-col" data-id="createdDate"><span class="sub-text">Time stamp</span></th>
+                </tr>
+            </thead>           
+        </table>       
+    </div>
+</div>
+<script type="text/javascript">
+
+    // $(document).ready(function () {
+
+    //     $.fn.dataTable.moment('DD/MM/YYYY');
+
+    //     $('#getEmployeeLogData').DataTable({
+    //         "bInfo": true,
+    //         "paging": true,
+    //         order: [
+    //             [5, "desc"]
+    //         ],
+    //     });
+    // });
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindEmployeesLogData();
+        function BindEmployeesLogData() {
+
+            var employeeId = $("#EmpId").val();
+            var employeeModules = $("#EmployeeModules option:selected").text();
+            var dateString = $("#startDate").val();
+            var dateParts = dateString.split("/");
+            var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+            var startDate = $("#startDate").val();
+            var endDate = $("#endDate").val();
+            var table = $("#getEmployeeLogData").DataTable();
+            $("#getEmployeeLogData").remove();
+            if (table) {
+                table.destroy();
+            }
+
+            var ajaxUrl;
+            if (startDate == "") {
+                ajaxUrl = "/Employees/EmployeesChangeLogFilter";                
+            } else {
+                ajaxUrl = "/Employees/FilterEmployeeLog";                
+            }
+
+            $("#getEmployeeLogData").DataTable({
+                serverSide: true,
+                processing: true,
+                pageLength: entries,
+                ajax: {
+                    url: ajaxUrl,
+                    type: 'GET',
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getEmployeeLogData_filter"); //get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']"); // get search div input
+                        var searchValue = searchInput.value; // get search value
+                        var empLogEntry = document.getElementById("getEmployeeLogData_length"); //get entries div id
+                        var entrySelect = empLogEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue; 
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.EmpId = employeeId;
+                        d.EmployeeModules = employeeModules;
+                        d.StartDate = startDate;
+                        d.EndDate = endDate;
+                        d.ColumnName = columnIndex;
+                        d.ColumnDirection = columnDirection;
+                    }
+                },
+                columns: [
+                    { data: 'fieldName', render: function (data, type, row) { if (row.fieldName == null) { row.fieldName = "" } return "<span>" + row.fieldName + "</span>"; } },
+
+                    { data: 'previousValue', render: function (data, type, row) { if (row.previousValue != null) { var trimPreviousValue = row.previousValue.trim(); } else { row.previousValue = "" }
+                            return "<div class='leave-reason'> <p type='button' class='tb-sub text-info' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimPreviousValue + "'>" + row.previousValue + "</p></div>";
+                        }
+                    },
+                    { data: 'newValue', render: function (data, type, row) { if (row.newValue == null) { row.newValue = "" } else { var trimNewValue = row.newValue.trim(); }
+                            return "<div class='leave-reason'><p type='button' class='text-success' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimNewValue + "'>" + row.newValue + "</p></div>";
+                        }
+                    },
+                    { data: 'event', render: function (data, type, row) { return "<span class='badge badge-dim bg-primary'>" + row.event + "</span>"; } },
+                    { data: 'author', render: function (data, type, row) { return "<b class='tb-sub text-primary'>" + row.authorName + "</b>"; } },
+                    { data: 'timestamp', render: function (data, type, row) { return "<span>" + dateFormat(row.createdDate) + "</span>"; } },
+                ],
+                createdRow: function (row, data, dataIndex, settings) {
+                    $(row).addClass('nk-tb-item');
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+            });
+            // $('[data-bs-toggle="tooltip"]').tooltip();
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+        }
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+
+        $("#btnFilterLeave").click(function () {
+            var isValid = true;
+            $("#errValid-StartDate").text('');
+            $("#errValid-EndDate").text('');
+            $("#errVerify-endDate").hide();
+            $("#errValid-EmployeeName").text("");
+
+            if ($("#startDate").val() == "") {
+                $("#errValid-StartDate").text("Start Date field is required");
+                isValid = false;
+            }
+
+            if ($("#endDate").val() == "") {
+                $("#errValid-EndDate").text("End Date field is required");
+                isValid = false;
+            }
+
+            if ($("#EmpId :selected").val() == "") {
+                $("#errValid-EmployeeName").text("Employee field is required");
+                isValid = false;
+            }
+
+            var employeeId = $("#EmpId").val();
+            var employeeModules = $("#EmployeeModules option:selected").text();
+            var startTime = $("#startDate").val();
+            var endDate = $("#endDate").val();
+            var employeeChangeLogViewModel = {
+                EmpId: employeeId,
+                EmployeeModules: employeeModules,
+                StartDate: startTime,
+                EndDate: endDate
+            };
+
+            if (isValid) {
+                var isValidDate = dateDifference(startTime, endDate);
+                if (isValidDate) {
+                    $('.loader').removeClass('d-none');
+                    BindEmployeesLogData();
+                }
+                else {
+                    $('.loader').addClass('d-none');
+                    $("#errVerify-endDate").show();
+                    return false;
+                }
+                $('.loader').addClass('d-none');
+            }
+            else {
+                return false;
+            }
+        });
+
+
+    });
+
+    $(document).ready(function () {
+        $('#btnBack').click(function () {
+            var urlToRedirect = '@Url.Action("EmployeesInfo", "Employees")';
+            window.location.href = urlToRedirect;
+        });
+
+        $("#startDatedatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#enddatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        var employee = $("#EmpId").select2();
+        $("#EmpId").select2().on("change", function () {
+
+            $("#errValid-EmployeeName").text("")
+        });        
+
+        //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Nice scroll EmpId
+
+        $("#EmpId,#EmployeeModules").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });        
+
+    });
+
+    // Change Summary
+
+    $("#startDate").change(function () {
+
+        $("#errValid-StartDate").text("");
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+        }
+        else {
+            $("#errValid-StartDate").text("");
+        }
+    });
+
+    $("#endDate").change(function () {
+
+        $("#errValid-EndDate").text("");
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            $("#errVerify-endDate").hide();
+        }
+        else {
+            $("#errValid-EndDate").text("");
+        }
+    });
+
+    $("#EmpId").change(function () {
+        $("#errValid-EmployeeName").text("");
+        if ($("#EmpId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employee field is required");
+        }
+        else {
+            $("#errValid-EmployeeName").text("");
+        }
+    });
+    
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Filter Leave Details
+
+    // Download Document
+
+    $('#DownloadEmployeeLeave').click(function () {
+        var formData = new FormData();
+        var isValid = "true";
+        $("#errValid-StartDate").text('');
+        $("#errValid-EndDate").text('');
+        $("#errVerify-endDate").hide();
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            isValid = false;
+        }
+
+        if ($("#EmpId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employee field is required");
+            isValid = false;
+        }
+
+        var employeeId = $("#EmpId").val();
+        var employeeModules = $("#EmployeeModules option:selected").text();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+
+        formData.append("EmpId", employeeId);
+        formData.append("StartDate", startTime);
+        formData.append("EndDate", endDate);
+        formData.append("EmployeeModules", employeeModules);
+
+        if (isValid) {
+            var isValidDate = dateDifference(startTime, endDate);
+            if (isValidDate) {
+                var url = "/Employees/DownloadExcel";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Employees/Download?fileGuid=' + data;
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'No Record Found!',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+                $('.loader').addClass('d-none');
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-endDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+
+    // Date Validation
+
+    function dateDifference(startTime, endDate) {
+        var result = false;
+        var splitFrom = startTime.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = endDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+
+    function dateFormat(createdDate) {
+        var dateObject = new Date(createdDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();        
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        var seconds = dateObject.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+ 
+        // Convert hours from 24-hour to 12-hour format
+        if (hours > 12) {
+             hours = hours - 12;
+        } else if (hours === 0) {
+             hours = 12;
+        }
+ 
+        // Add leading zeros to minutes and seconds
+        minutes = ("0" + minutes).slice(-2);
+        seconds = ("0" + seconds).slice(-2);
+
+        var formattedDate = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ampm;
+        return formattedDate;
+    }
+    // Create Pdf File
+
+    $("#generatepfs").click(function () {
+
+        var isValid = true;
+        $("#errValid-StartDate").text('');
+        $("#errValid-EndDate").text('');
+        $("#errVerify-endDate").hide();
+        $("#errValid-EmployeeName").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            isValid = false;
+        }
+
+        if ($("#EmpId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employee field is required");
+            isValid = false;
+        }
+
+        var employeeId = $("#EmpId").val();
+        var employeeModules = $("#EmployeeModules option:selected").text();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        var employeeChangeLogViewModel = {
+            EmpId: employeeId,
+            EmployeeModules: employeeModules,
+            StartDate: startTime,
+            EndDate: endDate
+        };
+
+        if (isValid) {
+            var isValidDate = true;
+            var isValidDate = dateDifference(startTime, endDate);
+            if (isValidDate) {
+                var url = "/Employees/CreatePdf";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: employeeChangeLogViewModel,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Employees/DownloadPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire("No Record Found !", "", "error").then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-endDate").show();
+                return false;
+            }
+
+        }
+        else {
+
+            return false;
+        }
+
+    });
+
+
+
+    
+
+</script>

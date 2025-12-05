@@ -1,0 +1,28 @@
+﻿@using EmployeeInformations.Model.TeamsViewModel;
+@using Microsoft.AspNetCore.Http;
+@model Teams
+@{
+    var roleId = Context.Session.GetInt32("TeamsMeetingId");
+
+}
+
+<div id="bind-TeamsMeetingmodal-content">
+</div>
+
+<input type="hidden" id="txt-TeamsMeetingId" value="@Model.TeamsMeetingId" />
+<input type="hidden" id="txt-Code" value="@Model.Code" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        debugger
+        
+        var teamsMeetingId = $("#txt-TeamsMeetingId").val();
+        var code = $("#txt-Code").val();
+
+        var url = "/Teams/UpdateTeams?TeamsMeetingId=" + teamsMeetingId + "&Code=" + code;
+        PageUtil.goToContent(url);
+       // PageUtil.goToTeamsMeeting("/Teams/UpdateTeams?TeamsMeetingId=" + teamsMeetingId);
+    });
+
+</script>

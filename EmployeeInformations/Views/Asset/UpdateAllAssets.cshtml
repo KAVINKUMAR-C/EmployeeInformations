@@ -1,0 +1,854 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Common.Enums;
+@using EmployeeInformations.Model.AssetViewModel;
+@model AllAssets
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Edit Asset</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row">
+                @Html.HiddenFor(m => m.AllAssetsId)
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Company</label>
+                        @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control",@disabled=true})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Category<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m =>m.CategoryId, new SelectList(Model.AssetCategory,"CategoryId","CategoryName"), "--Select Category--",new{@class="form-control",id="CategoryId",@disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CategoryId,"",new{@class="error text-danger" , id="errValid-CategoryId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Device Type<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m =>m.AssetTypeId, new SelectList(Model.AssetTypes,"Id","TypeName"), "--Select Device Type--",new{@class="form-control",id="AssetTypeId",@disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.AssetTypeId,"",new{@class="error text-danger" , id="errValid-AssetTypeId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Brand<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m =>m.BrandId, new SelectList(Model.AssetBrandType,"BrandTypeId","BrandType"), "--Select Brand--",new{@class="form-control",id="BrandId"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.BrandId,"",new{@class="error text-danger" , id="errValid-BrandId"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Code</label>
+                        @Html.TextBoxFor(m => m.AssetCode, new { @class = "form-control",@disabled=true})
+                        @Html.ValidationMessageFor(m => m.AssetCode,"",new{@class="error text-danger",id="errValid-AssetCode"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Device Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.AssetName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.AssetName,"",new{@class="error text-danger",id="errValid-AssetName"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Purchase Order/Invoice Number</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.PurchaseNumber,Html.GetEnumSelectList<PurchaseOrderInvoiceNumber>(), "--Select Purchase Number--",new { @class = "form-control"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.PurchaseNumber,"",new{@class="error text-danger",id="errValid-PoInNo"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4" id="hidden_PurchaseOrder" style="display:none">
+
+                    <div class="form-group">
+                        <label class="form-label">Purchase Order<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="input-group">
+                            @if (Model.PurchaseNumber == 1)
+                            {
+
+                                <input type="text" id="PurchaseOrder" value="@Model.PurchaseOrder" class="form-control" />
+                            }
+                            else
+                            {
+                                <input type="text" id="PurchaseOrder" value="" class="form-control" />
+                            }
+
+                        </div>
+                        <span class="error text-danger" id="errValid-PurchaseOrder"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4" id="hidden_InvoiceNumber" style="display:none">
+
+                    <div class="form-group">
+                        <label class="form-label">Invoice Number<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="input-group">
+                            @if (Model.PurchaseNumber == 2)
+                            {
+
+                                <input type="text" id="InvoiceNumber" value="@Model.InvoiceNumber" class="form-control" />
+                            }
+                            else
+                            {
+                                <input type="text" id="InvoiceNumber" value="" class="form-control" />
+                            }
+
+                        </div>
+                        <span class="error text-danger" id="errValid-InvoiceNumber"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Vendor Name</label>
+                        @Html.TextBoxFor(m => m.VendorName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.VendorName,"",new{@class="error text-danger",id="errValid-VentorName"})
+                    </div>
+                </div>
+
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Product Number</label>
+                        @Html.TextBoxFor(m => m.ProductNumber, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ProductNumber,"",new{@class="error text-danger",id="errValid-ProductNumber"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Model Number</label>
+                        @Html.TextBoxFor(m => m.ModelNumber, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ModelNumber,"",new{@class="error text-danger",id="errValid-ModelNumber"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.LocationId,new SelectList(Model.BranchLocations,"BranchLocationId","BranchLocationName"),"--Select Location--",new{@class="form-control ",id="LocationId"})
+                        </div>
+                        @Html.ValidationMessageFor(m =>m.LocationId,"",new{@class="error text-danger",id="errValid-Location"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Purchase Date</label>
+                        <div id="PurchaseDateDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="PurchaseDate" placeholder="Enter Purchase Date" value="@Model.PurchaseDate?.ToString(Constant.DateFormat)">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-PurchaseDate"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Warranty Start Date</label>
+                        <div id="WarrantyDateDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="WarrantyStartDate" placeholder="Enter Warranty Start Date" value="@Model.WarrantyStartDate?.ToString(Constant.DateFormat)">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-WarrantyDate"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6" id="updateleaveToDatedatepickerblock">
+                    <div class="form-group">
+                        <label class="form-label" id="leaveToLabel">Warranty End Date</label>
+                        <div id="WarrantyToDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="WarrantyEndDate" placeholder="Enter Warranty End Date" value="@Model.WarrantyEndDate?.ToString(Constant.DateFormat)">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-WarrantyToDate"></span>
+                        <span id="errVerify-WarrantyEndDate" style="display:none;" class="error text-danger"> Please select <b>Warranty End Date</b> Should Not be Less than <b>Warranty Start Date!</b> </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Return Date</label>
+                        <div id="ReturnDateDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="ReturnDate" placeholder="Enter Return Date" value="@Model.ReturnDate?.ToString(Constant.DateFormat)">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-ReturnDate"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <div>
+                            @Html.DropDownListFor(m =>m.AssetStatusId, new SelectList(Model.AssetStatus,"StatusId","StatusName"), "--Select Status--",new{@class="form-control"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.AssetStatusId,"",new{@class="error text-danger" , id="errValid-AssetStatus"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4  col-md-6 autocomplete">
+                    <div class="form-group">
+                        <label class="form-label">Employees</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.EmployeeId,new SelectList(Model.reportingPeople,"EmployeeId","EmployeeIdWithName"),"--Select Employee--",new{@class="form-control",id="EmployeeId"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.EmployeeId,"",new{@class="error text-danger", id="errValid-ReporingPerson"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Issue Date</label>
+                        <div id="IssueDateDatedatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                            <input type="text" class="form-control" id="IssueDate" placeholder="Enter Issue Date" value="@Model.IssueDate?.ToString(Constant.DateFormat)">
+                            <span class="input-group-addon">
+                                <i class="icon ti-calendar"></i>
+                            </span>
+                        </div>
+                        <span class="error text-danger" id="errValid-IssueDate"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Remark</label>
+                        @Html.TextBoxFor(m => m.Remark, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Remark,"",new{@class="error text-danger",id="errValid-Remark"})
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label">Asset Info</label>
+                    @* @Html.TextBoxFor(m => m.TaskDescription, new { @class = "form-control" })*@
+                    @Html.TextArea("Description", null, new { cols = "5", rows = "5" ,@class="form-control"})
+                    @Html.ValidationMessageFor(m => m.Description,"",new{@class="error text-danger" , id="errValid-Description"})
+                </div>
+            </div>
+
+            <div class="col-lg-12 d-flex mt-3 p-0">
+                <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                <input type="button" class="btn btn-primary" id="btnUpdateAsset" value="Save" />
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    $("#btnBack").click(function () {
+        var urlToRedirect = '@Url.Action("AllAssets","Asset")';
+        window.location.href = urlToRedirect;
+    });
+
+    // Datepicker summary
+
+    $("#IssueDateDatedatepicker").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+    $("#ReturnDateDatedatepicker").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+    $("#WarrantyDateDatedatepicker").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+    $("#WarrantyToDatedatepicker").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+
+    $("#PurchaseDateDatedatepicker").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+    });
+
+    $(document).ready(function () {
+
+        var employee = $("#EmployeeId").select2();
+        $("#EmployeeId").select2().on("change", function () {
+
+            $("#errValid-Employee").text("")
+        });
+
+        // Nice scroll
+
+        $("#EmployeeId,#CategoryId,#AssetTypeId,#BrandId,#PurchaseNumber,#LocationId,#AssetStatusId").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+    });
+
+    // Change summary
+
+    //$("#PurchaseDate").change(function () {
+    //    $("#errValid-PurchaseDate").text("");
+    //    if ($("#PurchaseDate").val() == "") {
+    //        $("#errValid-PurchaseDate").text("PurchaseDate field is required");
+    //    }
+    //    else {
+    //        $("#errValid-PurchaseDate").text("");
+    //    }
+    //});
+
+    // $("#WarrantyStartDate").change(function () {
+    //     $("#errValid-WarrantyDate").text("");
+    //     if ($("#WarrantyStartDate").val() == "") {
+    //         $("#errValid-WarrantyDate").text("Warranty Start Date field is required");
+    //     }
+    //     else {
+    //         $("#errValid-WarrantyDate").text("");
+    //     }
+    // });
+
+    // $("#WarrantyEndDate").change(function () {
+    //     $("#errValid-WarrantyToDate").text("");
+    //     if ($("#WarrantyEndDate").val() == "") {
+    //         $("#errValid-WarrantyToDate").text("Warranty End Date field is required");
+    //         $("#errVerify-WarrantyToDate").hide();
+    //     }
+    //     else {
+    //         $("#errValid-WarrantyToDate").text("");
+    //     }
+    // });
+
+    //$("#ReturnDate").change(function () {
+    //    $("#errValid-ReturnDate").text("");
+    //    if ($("#ReturnDate").val() == "") {
+    //        $("#errValid-ReturnDate").text("ReturnDate field is required");
+    //    }
+    //    else {
+    //        $("#errValid-ReturnDate").text("");
+    //    }
+    //});
+
+    //$("#IssueDate").change(function () {
+    //    $("#errValid-IssueDate").text("");
+    //    if ($("#IssueDate").val() == "") {
+    //        $("#errValid-IssueDate").text("IssueDate field is required");
+    //    }
+    //    else {
+    //        $("#errValid-IssueDate").text("");
+    //    }
+    //});
+
+    $("#AssetTypeId").change(function () {
+        $("#errValid-AssetTypeId").text("");
+        if ($("#AssetTypeId").val() == "") {
+            $("#errValid-AssetTypeId").text("Device Type field is required");
+        }
+    });
+
+    $("#CategoryId").change(function () {
+        $("#errValid-CategoryId").text("");
+        if ($("#CategoryId").val() == "") {
+            $("#errValid-CategoryId").text("Category field is required");
+        }
+    });
+
+    //$("#AssetStatusId").change(function () {
+    //    $("#errValid-AssetStatus").text("");
+    //    if ($("#AssetStatusId").val() == "") {
+    //        $("#errValid-AssetStatus").text("AssetStatus field is required");
+    //    }
+    //});
+
+    //$("#EmployeeId").change(function () {
+    //    $("#errValid-Employee").text("");
+    //    if ($("#EmployeeId").val() == "") {
+    //        $("#errValid-Employee").text("Employee field is required");
+    //    }
+    //});
+
+    $("#BrandId").change(function () {
+        $("#errValid-BrandId").text("");
+        if ($("#BrandId").val() == "") {
+            $("#errValid-BrandId").text("Brand field is required");
+        }
+    });
+
+    // keyup summary
+
+    $("#AssetName").keyup(function () {
+        $("#errValid-AssetName").text("");
+        if ($("#AssetName").val() == "") {
+            $("#errValid-AssetName").text("Device Name field is required");
+        }
+    });
+
+    $("#AssetCode").keyup(function () {
+        $("#errValid-AssetCode").text("");
+        if ($("#AssetCode").val() == "") {
+            $("#errValid-AssetCode").text("Asset Code field is required");
+        }
+    });
+
+    //$("#PurchaseNumber").keyup(function () {
+    //    $("#errValid-PoInNo").text("");
+    //    if ($("#PurchaseNumber").val() == "") {
+    //        $("#errValid-PoInNo").text("Purchase Order Number field is required");
+    //    }
+    //});
+
+    //$("#ProductNumber").keyup(function () {
+    //    $("#errValid-ProductNumber").text("");
+    //    if ($("#ProductNumber").val() == "") {
+    //        $("#errValid-ProductNumber").text("Product Number field is required");
+    //    }
+    //});
+
+    //$("#ModelNumber").keyup(function () {
+    //    $("#errValid-ModelNumber").text("");
+    //    if ($("#ProductNumber").val() == "") {
+    //        $("#errValid-ModelNumber").text("Model Number field is required");
+    //    }
+    //});
+
+    //$("#LocationId").keyup(function () {
+    //    $("#errValid-Location").text("");
+    //    if ($("#Location").val() == "") {
+    //        $("#errValid-Location").text("Location field is required");
+    //    }
+    //});
+
+    //$("#Remark").keyup(function () {
+    //    $("#errValid-Remark").text("");
+    //    if ($("#Remark").val() == "") {
+    //        $("#errValid-Remark").text("Remark field is required");
+    //    }
+    //});
+
+    //$("#Description").keyup(function () {
+    //    $("#errValid-Description").text("");
+    //    if ($("#Description").val() == "") {
+    //        $("#errValid-Description").text("Description field is required");
+    //    }
+    //});
+
+    $("#PurchaseOrder").keyup(function () {
+        $("#errValid-PurchaseOrder").text("");
+        if ($("#PurchaseOrder").val() == "") {
+            $("#errValid-PurchaseOrder").text("Purchase Order field is required");
+        }
+    });
+
+    $("#InvoiceNumber").keyup(function () {
+        $("#errValid-PurchaseOrder").text("");
+        if ($("#InvoiceNumber").val() == "") {
+            $("#errValid-InvoiceNumber").text("Invoice Number field is required");
+        }
+    });
+
+
+    if ($("#PurchaseNumber").val() == 1) {
+        $('#hidden_PurchaseOrder').css('display', 'block');
+    }
+    else {
+        $('#hidden_PurchaseOrder').css('display', 'none');
+    }
+
+    if ($("#PurchaseNumber").val() == 2) {
+        $('#hidden_InvoiceNumber').css('display', 'block');
+    }
+    else {
+        $('#hidden_InvoiceNumber').css('display', 'none');
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // update asset
+
+    $("#btnUpdateAsset").click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-AssetTypeId").text("");
+        $("#errValid-CategoryId").text("");
+        $("#errValid-AssetName").text("");
+        $("#errValid-AssetCode").text("");
+        $("#errValid-Entity").text("");
+        $("#errValid-Location").text("");
+        $("#errValid-PurchaseDate").text("");
+        $("#errValid-WarrantyDate").text("");
+        $("#errValid-ReturnDate").text('');
+        $("#errValid-AssetStatus").text('');
+        $("#errValid-Employee").text('');
+        $("#errValid-IssueDate").text('');
+        $("#errValid-Remark").text('');
+        $("#errValid-Description").text('');
+        $("#errValid-BrandId").text('');
+        $("#errValid-ProductNumber").text('');
+        $("#errValid-ModelNumber").text();
+        $("#errValid-WarrantyStartDate").text();
+        $("#errVerify-WarrantyEndDate").hide();
+        $("#errValid-PoInNo").text();
+        $("#errValid-PurchaseOrder").text('');
+        $("#errValid-InvoiceNumber").text('');
+        $("#errValid-VendorName").text('');
+
+        if ($("#AssetTypeId").val() == "") {
+            $("#errValid-AssetTypeId").text("Device Type field is required");
+            isValid = false;
+        }
+        if ($("#CategoryId").val() == "") {
+            $("#errValid-CategoryId").text("Category field is required");
+            isValid = false;
+        }
+        if ($("#AssetName").val() == "") {
+            $("#errValid-AssetName").text("Device Name field is required");
+            isValid = false;
+        }
+
+        //if ($("#AssetCode").val() == "") {
+        //    $("#errValid-AssetCode").text("AssetCode field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#BrandId").val() == "") {
+            $("#errValid-BrandId").text("Brand field is required");
+            isValid = false;
+        }
+        if ($("#PurchaseNumber").val() == 1) {
+            if ($("#PurchaseOrder").val() == "") {
+                $("#errValid-PurchaseOrder").text("Purchase Order field is required");
+                isValid = false;
+            }
+        }
+
+        if ($("#PurchaseNumber").val() == 2) {
+            if ($("#InvoiceNumber").val() == "") {
+                $("#errValid-InvoiceNumber").text("Invoice Number field is required");
+                isValid = false;
+            }
+        }
+
+        // if ($("#VendorName").val() == "") {
+        //     $("#errValid-VentorName").text("Vendor Name field is required");
+        //     isValid = false;
+        // }
+
+        //if ($("#PurchaseNumber").val() == "") {
+        //    $("#errValid-PoInNo").text("Purchase Order Number field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#ProductNumber").val() == "") {
+        //    $("#errValid-ProductNumber").text("Product Number field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#ModelNumber").val() == "") {
+        //    $("#errValid-ModelNumber").text("Model Number field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#Entity").val() == "") {
+        //    $("#errValid-Entity").text("Entity field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#LocationId").val() == "") {
+        //    $("#errValid-Location").text("Location field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#PurchaseDate").val() == "") {
+        //    $("#errValid-PurchaseDate").text("PurchaseDate field is required");
+        //    isValid = false;
+        //}
+
+        // if ($("#WarrantyStartDate").val() == "") {
+        //     $("#errValid-WarrantyDate").text("Warranty Start Date field is required");
+        //     isValid = false;
+        // }
+
+        // if ($("#WarrantyEndDate").val() == "") {
+        //     $("#errValid-WarrantyToDate").text("Warranty End Date field is required");
+        //     isValid = false;
+        // }
+
+        //if ($("#ReturnDate").val() == "") {
+        //    $("#errValid-ReturnDate").text("ReturnDate field is required");
+        //    isValid = false;
+        //}
+        //if ($("#AssetStatusId").val() == "") {
+        //    $("#errValid-AssetStatus").text("AssetStatus field is required");
+        //    isValid = false;
+        //}
+        //if ($("#EmployeeId").val() == "") {
+        //    $("#errValid-Employee").text("Employee field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#IssueDate").val() == "") {
+        //    $("#errValid-IssueDate").text("IssueDate field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#Remark").val() == "") {
+        //    $("#errValid-Remark").text("Remark field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#Description").val() == "") {
+        //    $("#errValid-Description").text("Description field is required");
+        //    isValid = false;
+        //}
+       
+
+        var allAssetsId = $("#AllAssetsId").val();
+        var assetTypeId = $("#AssetTypeId").val();
+        var categoryId = $("#CategoryId").val();
+        var assetsName = $("#AssetName").val();
+        var assetCode = $("#AssetCode").val();
+        var location = $("#LocationId").val();
+        var brandId = $("#BrandId").val();
+        var purchaseDate = $("#PurchaseDate").val();
+        var warrantyStartDate = $("#WarrantyStartDate").val();
+        var returnDate = $("#ReturnDate").val();
+        var assetStatusId = $("#AssetStatusId").val();
+        var employeeId = $("#EmployeeId").val();
+        var issueDate = $("#IssueDate").val();
+        var remark = $("#Remark").val();
+        var description = $("#Description").val();
+        var productNumber = $("#ProductNumber").val();
+        var modelNumber = $("#ModelNumber").val();
+        var warrantyEndDate = $("#WarrantyEndDate").val();
+        var purchaseNumber = $("#PurchaseNumber").val();
+        var purchaseOrder = $("#PurchaseOrder").val();
+        var invoiceNumber = $("#InvoiceNumber").val();
+        var ventorName = $("#VendorName").val();
+
+        var start = $('#WarrantyStartDate').val();
+        var end = $('#WarrantyEndDate').val();
+        var dateSplit1 = start.split('/');
+        var date1 = new Date(dateSplit1[2] + "," + dateSplit1[1] + "," + dateSplit1[0]);
+        var dateSplit2 = end.split('/');
+        var date2 = new Date(dateSplit2[2] + "," + dateSplit2[1] + "," + dateSplit2[0]);
+        var diffTime = Math.abs(date2 - date1);
+        var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        var leaveDate = (diffDays + 1)
+
+        formData.append("AllAssetsId", allAssetsId);
+        formData.append("AssetTypeId", assetTypeId);
+        formData.append("CategoryId", categoryId);
+        formData.append("AssetName", assetsName);
+        formData.append("AssetCode", assetCode);
+        formData.append("LocationId", location);
+        formData.append("BrandId", brandId);
+        formData.append("PurchaseDate", purchaseDate);
+        formData.append("WarrantyStartDate", warrantyStartDate);
+        formData.append("ReturnDate", returnDate);
+        formData.append("AssetStatusId", assetStatusId);
+        formData.append("EmployeeId", employeeId);
+        formData.append("IssueDate", issueDate);
+        formData.append("Remark", remark);
+        formData.append("Description", description);
+        formData.append("ProductNumber", productNumber);
+        formData.append("ModelNumber", modelNumber);
+        formData.append("WarrantyEndDate", warrantyEndDate);
+        formData.append("PurchaseNumber", purchaseNumber);
+        formData.append("PurchaseOrder", purchaseOrder);
+        formData.append("InvoiceNumber", invoiceNumber);
+        formData.append("VendorName", ventorName);
+
+        formData.append("StrPurchaseDate", purchaseDate);
+        formData.append("StrWarrantyDate", warrantyStartDate);
+        formData.append("StrReturnDate", returnDate);
+        formData.append("StrIssueDate", issueDate);
+        formData.append("StrWarrantyToDate", warrantyEndDate);
+
+        var isTimeValid = true;
+
+
+        if (isValid) {
+            //  var isValidDate = dateDifference(warrantyStartDate, warrantyEndDate);
+            // if (isValidDate) {
+            var url = "/Asset/UpdateAllAssets";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+                    if (result > 0) {
+                        Swal.fire({
+                            title: 'Updated successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                                window.location.href = "/Asset/AllAssets";
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            window.location.href = "/Asset/AllAssets";
+                        });
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+            // }else{
+            //      $('.loader').addClass('d-none');
+            //      $("#errVerify-WarrantyEndDate").show();
+            //      return false;
+            // }
+        }
+        else {
+            return false;
+        }
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Change summary
+
+    $("#CategoryId").change(function () {
+
+        var CategoryId = $('#CategoryId').val()
+        $.ajax({
+            type: "Get",
+            url: "/Asset/GetBycategoryId?CategoryId=" + CategoryId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $('#AssetTypeId').val('');
+                }
+                else {
+                    $("#errValid-AssetTypeId").text(" ");
+                    $('#AssetTypeId').html('');
+                    $('#AssetTypeId').append($('<option> ' + "--Select TypeName--" + ' </option>').val("0").html("--Select TypeName--"));
+
+                    $.each(Result, function (id, option) {
+                        $('#AssetTypeId').append($('<option> ' + option.typeName + ' </option>').val(option.id).html(option.typeName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+    $("#CategoryId").change(function () {
+
+        var CategoryId = $('#CategoryId').val()
+        $.ajax({
+            type: "Get",
+            url: "/Asset/GetRefCategoryId?CategoryId=" + CategoryId,
+            success: (Result) => {
+
+                $('.loader').addClass('d-none');
+                $('#AssetCode').val(Result);
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+    $("#PurchaseNumber").change(function () {
+
+        var selectedText = $(this).find("option:selected").text();
+        var selectedValue = $(this).val();
+        if (selectedText == 'PurchaseOrder') {
+            $("#hidden_PurchaseOrder").show();
+        }
+        else {
+            $("#hidden_PurchaseOrder").hide();
+            $("#PurchaseOrder").val("");
+        }
+    });
+
+    $("#PurchaseNumber").change(function () {
+
+        var selectedText = $(this).find("option:selected").text();
+        var selectedValue = $(this).val();
+        if (selectedText == 'InvoiceNumber') {
+            $("#hidden_InvoiceNumber").show();
+        }
+        else {
+            $("#hidden_InvoiceNumber").hide();
+            $("#InvoiceNumber").val("");
+        }
+    });
+
+    // Date validation
+
+    function dateDifference(warrantyStartDate, warrantyEndDate) {
+
+        var result = false;
+        var splitFrom = warrantyStartDate.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = warrantyEndDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+
+
+</script>

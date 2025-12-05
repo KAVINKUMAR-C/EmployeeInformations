@@ -1,0 +1,1066 @@
+﻿@using EmployeeInformations.Model.CompanyViewModel;
+@using EmployeeInformations.Common.Enums;
+@model Company
+@{
+    ViewBag.Title = "CreateCompany";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Create Company</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-header data-head">
+        <h6>Company Details</h6>
+    </div>
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            <div class="row">
+                @Html.HiddenFor(m =>m.IsActive)
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label"> Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.CompanyName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.CompanyName,"",new{@class="error text-danger",id="errValid-CompanyName"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Email<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.CompanyEmail, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.CompanyEmail,"",new{@class="error text-danger",id="errValid-CompanyEmail"})
+                        <span id="errVerifyEmailFormat-Email" style="display:none;" class="error text-danger">Invalid email address </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.CompanyPhoneNumber, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.CompanyPhoneNumber,"",new{@class="error text-danger",id="errValid-CompanyPhoneNumber"})
+                    </div>
+                </div>
+                @Html.HiddenFor(m => m.CountryCode)
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Industry<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.Industry, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Industry,"",new{@class="error text-danger",id="errValid-Industry"})
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-header data-head">
+        <h6>Contact Person</h6>
+    </div>
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                @Html.HiddenFor(m =>m.IsActive)               
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">First Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.ContactPersonFirstName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ContactPersonFirstName,"",new{@class="error text-danger",id="errValid-ContactPersonFirstName"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Last Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.ContactPersonLastName, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ContactPersonLastName,"",new{@class="error text-danger",id="errValid-ContactPersonLastName"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Gender<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.ContactPersonGender,Html.GetEnumSelectList<Gender>(),"--Select Gender--",new{@class="form-control",id="gender"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ContactPersonGender,"",new{@class="error text-danger" , @id="errValid-ContactPersonGender"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Email<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.ContactPersonEmail, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ContactPersonEmail,"",new{@class="error text-danger",id="errValid-ContactPersonEmail"})
+                        <span id="errVerifyEmailFormat-ContactPersonEmail" style="display:none;" class="error text-danger">Invalid email address </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.ContactPersonPhoneNumber, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.ContactPersonPhoneNumber,"",new{@class="error text-danger",id="errValid-ContactPersonPhoneNumber"})
+                    </div>
+                </div>
+
+                @Html.HiddenFor(m => m.CompanyCountryCode)
+
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-header data-head">
+        <h6>Customer Physical Address</h6>
+    </div>
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                @Html.HiddenFor(m =>m.IsActive)             
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Address Line 1<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.PhysicalAddress1, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.PhysicalAddress1,"",new{@class="error text-danger",id="errValid-PhysicalAddress1"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Address Line 2<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.PhysicalAddress2, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.PhysicalAddress2,"",new{@class="error text-danger",id="errValid-PhysicalAddress2"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Country<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.PhysicalCountryId,new SelectList(Model.countrys,"CountryId","Name","CCA2"),"--Select Country--",new{@class="form-control ",id="PhysicalCountryId"})
+                        </div>
+                        @Html.ValidationMessageFor(m=>m.PhysicalCountryId,"",new{@class="error text-danger",id="errValid-Country"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">State<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.PhysicalAddressState,new SelectList(Model.states,"StateId","StateName"),"--Select State--",new{@class="form-control ",id="state",@disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m =>m.PhysicalAddressState,"",new{@class="error text-danger",id="errValid-PhysicalAddressState"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">City<span class="required" style="color: #FF0000">*</span></label>
+                        <div>
+                            @Html.DropDownListFor(m => m.PhysicalAddressCity,new SelectList(Model.cities,"CityId","CityName"),"--Select City--",new{@class="form-control",id="city",@disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m=>m.PhysicalAddressCity,"",new{@class="error text-danger",id="errValid-PhysicalAddressCity"})
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Zip Code<span class="required" style="color: #FF0000">*</span></label>
+                        @if (Model.PhysicalAddressZipCode == 0)
+                        {
+                            <input type="text" id="PhysicalAddressZipCode" class="form-control" placeholder="Enter the Zip code" value="" />
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.PhysicalAddressZipCode, new { @class = "form-control"})
+                        }
+                        @Html.ValidationMessageFor(m => m.PhysicalAddressZipCode,"",new{@class="error text-danger",id="errValid-PhysicalAddressZipCode"})
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Company logo<span class="required" style="color: #FF0000">*</span></label>
+                        <div class="input-group custom-file-button">
+                            @Html.TextBoxFor(m => m.CompanyFilePath, "", new { type= "file",@class = "form-control",name="file"})
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CompanyFilePath,"",new{@class="error text-danger",id="errValid-CompanyFilePath"})
+                        <span id="errValid-CompanyLogo" style="display:none;" class="error text-danger"> Please upload the image in any of the following formats (.png, .jpeg, .jpg) </span>
+                    </div>
+                </div>
+
+                <div class="row px-3">
+                    <div class="col-12">
+                        <div class="alert alert-light alert-icon"><em class="icon ni ni-alert-circle"></em>Physical Address SameAs Mailing Address</div>
+                    </div>
+                    <div class="col-12 my-3">
+                        @if (Model.IsActive)
+                        {
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" checked class="custom-control-input" id="SameAs" name="chkIsEnabledModule" value="1">
+                                <label class="custom-control-label" for="SameAs"><b>SameAsAbove</b></label>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="custom-control custom-control-sm custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="SameAs" name="chkIsEnabledModule" value="0">
+                                <label class="custom-control-label" for="SameAs"><b>Same As Above</b></label>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-header data-head">
+        <h6>Customer Mailing Address</h6>
+    </div>
+    <div class="card-inner">
+        <form autocomplete="off">
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="row">
+                @Html.HiddenFor(m =>m.IsActive)               
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Address Line 1</label>
+                        @Html.TextBoxFor(m => m.MailingAddress1, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.MailingAddress1,"",new{@class="error text-danger",id="errValid-MailingAddress1"})
+                    </div>
+                </div>
+
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Address Line 2</label>
+                        @Html.TextBoxFor(m => m.MailingAddress2, new { @class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.MailingAddress2,"",new{@class="error text-danger",id="errValid-MailingAddress2"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.MailingCountryId,new SelectList(Model.countrys,"CountryId","Name","CCA2"),"--Select Country--",new{@class="form-control "})
+                        </div>
+                        @Html.ValidationMessageFor(m=>m.MailingCountryId,"",new{@class="error text-danger",id="errValid-MailingCountry"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.MailingAddressState,new SelectList(Model.states,"StateId","StateName"),"--Select State--",new{@class="form-control" , @disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m =>m.MailingAddressState,"",new{@class="error text-danger",id="errValid-MailingAddressState"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <div>
+                            @Html.DropDownListFor(m => m.MailingAddressCity,new SelectList(Model.cities,"CityId","CityName"),"--Select City--",new{@class="form-control", @disabled=true})
+                        </div>
+                        @Html.ValidationMessageFor(m=>m.MailingAddressCity,"",new{@class="error text-danger",id="errValid-MailingAddressCity"})
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Zip Code</label>
+                        @if (Model.MailingAddressZipCode == 0)
+                        {
+                            <input type="text" id="MailingAddressZipCode" class="form-control" placeholder="Enter the Zip code" value="" />
+                        }
+                        else
+                        {
+                            @Html.TextBoxFor(m => m.MailingAddressZipCode, new { @class = "form-control"})
+                        }
+
+                        @Html.ValidationMessageFor(m => m.MailingAddressZipCode,"",new{@class="error text-danger",id="errValid-MailingAddressZipCode"})
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="col-lg-12 d-flex mt-3 p-0">
+    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+    <input type="button" class="btn btn-primary" id="btnCreateCompany" value="Save" />
+</div>
+
+<script type="text/javascript">
+
+    $('input[type=checkbox][name=chkIsEnabledModule]').change(function () {
+
+        if ($(this).is(':checked')) {
+
+            $(this).val("1");
+        }
+        else {
+            $(this).val("0");
+        }
+    });
+
+    var selectedCountryCode;
+    var countryCode;
+    if ($("#CountryCode").val() == '') {
+        countryCode = 'in'
+    }
+    else {
+        countryCode = $("#CountryCode").val();
+    }
+
+    $(function () {
+        var phone_number = document.querySelector("#CompanyPhoneNumber");
+        window.intlTelInput(phone_number, {
+            separateDialCode: true,
+            initialCountry: countryCode,
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                selectedCountryCode = selectedCountryData.iso2;
+                return "e.g. " + selectedCountryPlaceholder;
+            }
+        });
+
+    });
+
+    var selectedCompanyCountryCode;
+    var companyCountryCode;
+    if ($("#CompanyCountryCode").val() == '') {
+        companyCountryCode = 'in'
+    }
+    else {
+        companyCountryCode = $("#CompanyCountryCode").val();
+    }
+
+    $(function () {
+        var phone_number = document.querySelector("#ContactPersonPhoneNumber");
+        window.intlTelInput(phone_number, {
+            separateDialCode: true,
+            initialCountry: companyCountryCode,
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                selectedCompanyCountryCode = selectedCountryData.iso2;
+                return "e.g. " + selectedCountryPlaceholder;
+            }
+        });
+
+    });
+
+   $(document).ready(function (){
+
+       // Nice scroll
+
+        $("#gender,#PhysicalCountryId,#state,#city,#MailingCountryId,#MailingAddressState,#MailingAddressCity").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+  
+        $('#PhysicalCountryId').change( function () {
+            $("#errValid-Country").text(" ");
+            if ($("#PhysicalCountryId :selected").val() == "0" || $("#PhysicalCountryId :selected").val() == '') {
+                $("errValid-Country").text("Country field is required");
+            }
+
+        });
+       
+   });
+
+
+    $("#btnBack").click(function () {
+        var urlToRedirect = '@Url.Action("Company","Company")';
+        window.location.href = urlToRedirect;
+    });
+
+    // Allow numbers only summary
+
+    $("#CompanyPhoneNumber").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $("#ContactPersonPhoneNumber").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $("#PhysicalAddressZipCode").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    $("#MailingAddressZipCode").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    // Click Summary
+
+    $("#gender").change(function () {
+        $("#errValid-ContactPersonGender").text("");
+
+        if ($("#gender").val() == "") {
+            $("#errValid-ContactPersonGender").text("Gender field is required");
+        }
+
+    });
+
+    $("#PhysicalCountryId").click(function () {
+        $("#errValid-Country").text(" ");
+        if ($("#PhysicalCountryId").val() == "") {
+            $("#errValid-Country").text("Country field is required");
+        }
+    });
+
+    $("#MailingCountryId").click(function () {
+        $("#errValid-MailingCountry").text("");
+        if ($("#MailingCountryId").val() == "") {
+            $("#errValid-MailingCountry").text("Country field is required");
+        }
+    });
+
+
+    // KeyUp Summary
+
+    $("#CompanyName").keyup(function () {
+        $("#errValid-CompanyName").text(" ");
+        if ($("#CompanyName").val() == "") {
+            $("#errValid-CompanyName").text("Name field is required");
+        }
+    });
+
+    $("#CompanyEmail").keyup(function () {
+        $("#errValid-CompanyEmail").text(" ");
+        $("#errVerifyEmailFormat-Email").hide();
+        if ($("#CompanyEmail").val() == "") {
+            $("#errValid-CompanyEmail").text("Email field is required");
+        }
+    });
+
+    $("#CompanyPhoneNumber").keyup(function () {
+        $("#errValid-CompanyPhoneNumber").text(" ");
+        if ($("#CompanyPhoneNumber").val() == "") {
+            $("#errValid-CompanyPhoneNumber").text("Phone Number field is required");
+        }
+    });
+
+    $("#Industry").keyup(function () {
+        $("#errValid-Industry").text(" ");
+        if ($("#Industry").val() == "") {
+            $("#errValid-Industry").text("Industry field is required");
+        }
+    });
+
+    $("#ContactPersonFirstName").keyup(function () {
+        $("#errValid-ContactPersonFirstName").text(" ");
+        if ($("#ContactPersonFirstName").val() == "") {
+            $("#errValid-ContactPersonFirstName").text("First Name field is required");
+        }
+    });
+
+    $("#ContactPersonLastName").keyup(function () {
+        $("#errValid-ContactPersonLastName").text(" ");
+        if ($("#ContactPersonLastName").val() == "") {
+            $("#errValid-ContactPersonLastName").text("Last Name field is required");
+        }
+    });
+
+    $("#ContactPersonEmail").keyup(function () {
+        $("#errValid-ContactPersonEmail").text(" ");
+        $("#errVerifyEmailFormat-ContactPersonEmail").hide();
+        if ($("#ContactPersonEmail").val() == "") {
+            $("#errValid-ContactPersonEmail").text("Email field is required");
+        }
+    });
+
+    $("#ContactPersonPhoneNumber").keyup(function () {
+        $("#errValid-ContactPersonPhoneNumber").text(" ");
+        if ($("#ContactPersonPhoneNumber").val() == "") {
+            $("#errValid-ContactPersonPhoneNumber").text("Phone Number field is required");
+        }
+    });
+
+    $("#PhysicalAddress1").keyup(function () {
+        $("#errValid-PhysicalAddress1").text(" ");
+        if ($("#PhysicalAddress1").val() == "") {
+            $("#errValid-PhysicalAddress1").text("Address Line 1 field is required");
+        }
+    });
+
+    $("#PhysicalAddress2").keyup(function () {
+        $("#errValid-PhysicalAddress2").text(" ");
+        if ($("#PhysicalAddress2").val() == "") {
+            $("#errValid-PhysicalAddress2").text("Address Line 2 field is required");
+        }
+    });
+
+    $("#state").change(function () {
+        $("#errValid-PhysicalAddressState").text(" ");
+        if ($("#state :selected").val() == "0" || $("#state :selected").val() == '') {
+            $("#errValid-PhysicalAddressState").text("State field is required");
+        }
+    });
+
+    $("#city").change(function () {
+        $("#errValid-PhysicalAddressCity").text(" ");
+        if ($("#city :selected").val() == "0" || $("#city :selected").val() == '') {
+            $("#errValid-PhysicalAddressCity").text("City field is required");
+        }
+    });
+
+    $("#PhysicalAddressZipCode").keyup(function () {
+        $("#errValid-PhysicalAddressZipCode").text(" ");
+        if ($("#PhysicalAddressZipCode").val() == "") {
+            $("#errValid-PhysicalAddressZipCode").text("Zip Code field is required");
+        }
+    });
+
+    $("#MailingAddress1").keyup(function () {
+        $("#errValid-MailingAddress1").text(" ");
+        if ($("#MailingAddress1").val() == "") {
+            $("#errValid-MailingAddress1").text("Mailing Address1 field is required");
+        }
+    });
+
+    $("#MailingAddress2").keyup(function () {
+        $("#errValid-MailingAddress2").text(" ");
+        if ($("#MailingAddress2").val() == "") {
+            $("#errValid-MailingAddress2").text("Mailing Address2 field is required");
+        }
+    });
+
+    $("#states").change(function () {
+        $("#errValid-MailingAddressState").text(" ");
+        if ($("#states :selected").val() == "0" || $("#states :selected").val() == '') {
+            $("#errValid-MailingAddressState").text("Mailing Address State field is required");
+        }
+    });
+
+    $("#citys").change(function () {
+        $("#errValid-MailingAddressCity").text(" ");
+        if ($("#citys :selected").val() == "0" || $("#citys :selected").val() == '') {
+            $("#errValid-MailingAddressCity").text("Mailing Address City field is required");
+        }
+    });
+
+    $("#MailingAddressZipCode").keyup(function () {
+        $("#errValid-MailingAddressZipCode").text(" ");
+        if ($("#MailingAddressZipCode").val() == "") {
+            $("#errValid-MailingAddressZipCode").text("Mailing Address ZipCode field is required");
+        }
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Create Company
+
+    $("#btnCreateCompany").click(function () {
+        
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-CompanyName").text("");
+        $("#errValid-CompanyEmail").text("");
+        $("#errVerifyEmailFormat-Email").hide();
+        $("#errValid-CompanyPhoneNumber").text("");
+        $("#errValid-Industry").text("");
+        $("#errValid-ContactPersonFirstName").text("");
+        $("#errValid-ContactPersonLastName").text("");
+        $("#errValid-ContactPersonGender").text("");
+        $("#errValid-ContactPersonEmail").text("");
+        $("#errVerifyEmailFormat-ContactPersonEmail").hide();
+        $("#ContactPersonPhoneNumber").text("");
+        $("#errValid-PhysicalAddress1").text();
+        $("#errValid-PhysicalAddress2").text("");
+        $("#errValid-PhysicalAddressState").text("");
+        $("#errValid-PhysicalAddressCity").text("");
+        $("#errValid-PhysicalAddressZipCode").text("");
+        $("#errValid-CompanyFilePath").text("");
+        $("#errValid-Country").text("");
+        $("#errValid-MailingCountry").text("");
+
+        if ($("#CompanyName").val() == "") {
+            $("#errValid-CompanyName").text("Name field is required");
+            isValid = false;
+        }
+        if ($("#CompanyEmail").val() == "") {
+            $("#errValid-CompanyEmail").text("Email field is required");
+            isValid = false;
+        }
+
+        if ($("#CompanyPhoneNumber").val() == "") {
+            $("#errValid-CompanyPhoneNumber").text("Phone Number field is required");
+            isValid = false;
+        }
+
+        if ($("#Industry").val() == "") {
+            $("#errValid-Industry").text("Industry field is required");
+            isValid = false;
+        }
+
+        if ($("#ContactPersonFirstName").val() == "") {
+            $("#errValid-ContactPersonFirstName").text("First Name field is required");
+            isValid = false;
+        }
+
+        if ($("#ContactPersonLastName").val() == "") {
+            $("#errValid-ContactPersonLastName").text("Last Name field is required");
+            isValid = false;
+        }
+
+        if ($("#gender :selected").val() == "0" || $("#gender :selected").val() == "") {
+            $("#errValid-ContactPersonGender").text("Gender field is required");
+            isValid = false;
+        }
+
+        if ($("#ContactPersonEmail").val() == "") {
+            $("#errValid-ContactPersonEmail").text("Email field is required");
+            isValid = false;
+        }
+
+        if ($("#ContactPersonPhoneNumber").val() == "") {
+            $("#errValid-ContactPersonPhoneNumber").text("Phone Number field is required");
+            isValid = false;
+        }
+
+        if ($("#PhysicalAddress1").val() == "") {
+            $("#errValid-PhysicalAddress1").text("Address Line 1  field is required");
+            isValid = false;
+        }
+
+        if ($("#PhysicalAddress2").val() == "") {
+            $("#errValid-PhysicalAddress2").text("Address Line 2 field is required");
+            isValid = false;
+        }
+
+        if ($("#state :selected").val() == "0" || $("#state :selected").val() == '') {
+            $("#errValid-PhysicalAddressState").text("State field is required");
+            isValid = false;
+        }
+
+        if ($("#city :selected").val() == "0" || $("#city :selected").val() == '') {
+            $("#errValid-PhysicalAddressCity").text("City field is required");
+            isValid = false;
+        }
+
+        if ($("#PhysicalAddressZipCode").val() == "") {
+            $("#errValid-PhysicalAddressZipCode").text("Zip Code  field is required");
+            isValid = false;
+        }
+
+        //if ($("#MailingAddress1").val() == "") {
+        //    $("#errValid-MailingAddress1").text("Mailing Address1  field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#MailingAddress2").val() == "") {
+        //    $("#errValid-MailingAddress2").text("Mailing Address2  field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#states :selected").val() == "0" || $("#states :selected").val() == '') {
+        //    $("#errValid-MailingAddressState").text("Mailing Address State field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#citys :selected").val() == "0" || $("#citys :selected").val() == '') {
+        //    $("#errValid-MailingAddressCity").text("Mailing Address City field is required");
+        //    isValid = false;
+        //}
+
+        //if ($("#MailingAddressZipCode").val() == "") {
+        //    $("#errValid-MailingAddressZipCode").text("Mailing Address ZipCode  field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#PhysicalCountryId :selected").val() == "0" || $("#PhysicalCountryId :selected").val() == '') {
+            $("#errValid-Country").text("Country field is required");
+            isValid = false;
+        }
+
+        var companyFilePath = $("#CompanyFilePath").val();
+
+        if (companyFilePath == "") {
+            $("#errValid-CompanyFilePath").text("Company logo field is required");
+            isValid = false;
+        }
+
+        if (companyFilePath != "") {
+            var ext = companyFilePath.split('.').pop();
+            var value = ext.toLowerCase();
+            if (value == "jpeg" || value == "png" || value == "jpg" || value == "jfif" || value == "tiff") {
+
+            } else {
+                $("#errValid-CompanyLogo").show();
+                isValid = false;
+            }
+        }
+
+        formData.append("file", $('#CompanyFilePath').prop("files")[0]);
+       
+        var companyName = $("#CompanyName").val();
+        var email = $("#CompanyEmail").val();
+        var countryCode = selectedCountryCode;
+        var companyPhoneNumber = $("#CompanyPhoneNumber").val();
+        var industry = $("#Industry").val();
+        var contactPersonFirstName = $("#ContactPersonFirstName").val();
+        var contactPersonLastName = $("#ContactPersonLastName").val();
+        var contactPersonGender = $("#ContactPersonGender").val();
+        var contactPersonEmail = $("#ContactPersonEmail").val();
+        var companyCountryCode = selectedCompanyCountryCode;
+        var contactPersonPhoneNumber = $("#ContactPersonPhoneNumber").val();
+        var physicalAddress1 = $("#PhysicalAddress1").val();
+        var physicalAddress2 = $("#PhysicalAddress2").val();
+        var physicalAddressState = $("#state").val();
+        var physicalAddressCity = $("#city").val();
+        var physicalAddressZipCode = $("#PhysicalAddressZipCode").val();
+        var mailingAddress1 = $("#MailingAddress1").val();
+        var mailingAddress2 = $("#MailingAddress2").val();
+        var mailingAddressState = $("#MailingAddressState").val();
+        var mailingAddressCity = $("#MailingAddressCity").val();
+        var mailingAddressZipCode = $("#MailingAddressZipCode").val();
+        var country = $("#PhysicalCountryId").val();
+        var mailingCountry = $("#MailingCountryId").val();
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+
+
+        formData.append("CompanyName", companyName);
+        formData.append("CompanyEmail", email);
+        formData.append("CountryCode", countryCode);
+        formData.append("CompanyPhoneNumber", companyPhoneNumber);
+        formData.append("Industry", industry);
+        formData.append("ContactPersonFirstName", contactPersonFirstName);
+        formData.append("ContactPersonLastName", contactPersonLastName);
+        formData.append("ContactPersonGender", contactPersonGender);
+        formData.append("ContactPersonEmail", contactPersonEmail);
+        formData.append("CompanyCountryCode", companyCountryCode);
+        formData.append("ContactPersonPhoneNumber", contactPersonPhoneNumber);
+        formData.append("PhysicalAddress1", physicalAddress1);
+        formData.append("PhysicalAddress2", physicalAddress2);
+        formData.append("PhysicalAddressState", physicalAddressState);
+        formData.append("PhysicalAddressCity", physicalAddressCity);
+        formData.append("PhysicalAddressZipCode", physicalAddressZipCode);
+        formData.append("MailingAddress1", mailingAddress1);
+        formData.append("MailingAddress2", mailingAddress2);
+        formData.append("MailingAddressState", mailingAddressState);
+        formData.append("MailingAddressCity", mailingAddressCity);
+        formData.append("MailingAddressZipCode", mailingAddressZipCode);
+        formData.append("PhysicalCountryId", country);
+        formData.append("MailingCountryId", mailingCountry);
+        formData.append("IsActive", checkbox);
+
+        if (isValid) {
+            var isEmailVerify = emailCheck(email, contactPersonEmail);
+            if (isEmailVerify) {
+                var url = "/Company/AddCompany";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        if (result > 0) {
+                            Swal.fire({
+                                title: 'Added Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/Company/Company";
+                            });                           
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/Company/Company";
+                            });                           
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                return false;
+            }
+        }
+        else {
+            $('.loader').addClass('d-none');
+            return false;
+        }
+    });
+    //----------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Email Validation 
+
+    function emailCheck(email, contactPersonEmail) {
+        var isEmailValid = true;
+        var mailformat = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        $("#errVerifyEmailFormat-Email").hide();
+        if (!mailformat.test(email)) {
+            $("#errVerifyEmailFormat-Email").show();
+            isEmailValid = false;
+        }
+
+        $("#errVerifyEmailFormat-ContactPersonEmail").hide();
+        if (!mailformat.test(contactPersonEmail)) {
+            $("#errVerifyEmailFormat-ContactPersonEmail").show();
+            isEmailValid = false;
+        }
+        return isEmailValid
+    }
+
+    // Show state and city based on countryId
+
+    $("#PhysicalCountryId").change(function () {
+ 
+        var countryId = $('#PhysicalCountryId').val()
+  
+        $("#state").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/Employees/GetByCountryId?countryId=" + countryId,
+            success: (Result) => {
+           
+                if (Result.length == 0) {
+                    $("#city").prop('disabled', false);
+                    $('#state').val('');
+                    $('#city').val('');
+                    $("#state").prop('disabled', true);
+                    $("#city").prop('disabled', true);
+                }
+                else {
+                    $('#state').html('')
+                    $("#errValid-SecondaryStateId").text(" ");
+                    $('#state').append($('<option> ' + "--Select State--" + ' </option>').val("0").html("--Select State--"));
+
+                    var datas = Result.map(function (option) {
+                    // $.each(Result, function (id, option) {
+                        $('#state').append($('<option> ' + option.stateName + ' </option>').val(option.stateId).html(option.stateName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+
+
+    $("#state").change(function () {
+
+        var stateId = $('#state').val()
+        $("#city").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/Company/GetByStateId?stateId=" + stateId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $("#city").prop('disabled', false);
+                    $('#city').val('');
+                    $("#city").prop('disabled', true);
+                }
+                else {
+                    $("#errValid-PhysicalAddressCity").text(" ");
+                    $('#city').html('');
+                    $('#city').append($('<option> ' + "--Select City--" + ' </option>').val("0").html("--Select City--"));
+
+                    var city = Result.map(function (option) {
+                    // $.each(Result, function (id, option) {
+                        $('#city').append($('<option> ' + option.cityName + ' </option>').val(option.cityId).html(option.cityName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+    
+
+    $("#MailingCountryId").change(function () {
+        var id = $("#MailingCountryId").val();
+        
+        var countryId = $("#MailingCountryId").val();
+        var country = $('#PhysicalCountryId').val();
+        var stateId = $('#state').val();
+        $("#MailingAddressState").prop('disabled', false);
+        countryId == "" ? countryId =country : countryId;
+        $('#MailingCountryId').val(countryId).attr('selected');
+        $.ajax({
+            type: "Get",
+            url: "/Employees/GetByCountryId?countryId=" + countryId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $("#MailingAddressCity").prop('disabled', false);
+                    $('#MailingAddressState').val('');
+                    $('#MailingAddressCity').val('');
+                    $("#MailingAddressState").prop('disabled', true);
+                    $("#MailingAddressCity").prop('disabled', true);
+                }
+                else {
+                    $('#MailingAddressState').html('')
+                    $("#errValid-SecondaryStateId").text(" ");
+                    $('#MailingAddressState').append($('<option> ' + "--Select State--" + ' </option>').val("0").html("--Select State--"));
+
+                    var country = Result.map(function (option) {
+                    // $.each(Result, function (id, option) {
+                        $('#MailingAddressState').append($('<option> ' + option.stateName + ' </option>').val(option.stateId).html(option.stateName));
+                    });
+                    if (id == "") {
+                        
+                        $('#MailingAddressState').val(stateId).attr('selected');
+                        $("#MailingAddressState").prop('disabled', true);
+                    }
+                    
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+        
+    });
+
+
+    $("#MailingAddressState").change(function () {
+        var id = $("#MailingAddressState").val();
+        var stateId = $("#MailingAddressState").val();
+        var states = $('#state').val();
+        var cityId = $('#city').val();
+        $("#MailingAddressCity").prop('disabled', false);
+        stateId == "" || stateId == null ? stateId = states : stateId;
+        $.ajax({
+            type: "Get",
+            url: "/Company/GetByStateId?stateId=" + stateId,
+            success: (Result) => {
+                if (Result.length == 0) {
+                    $("#MailingAddressCity").prop('disabled', false);
+                    $('#MailingAddressCity').val('');
+                    $("#MailingAddressCity").prop('disabled', true);
+                }
+                else {
+                    $("#errValid-MailingAddressCity").text(" ");
+                    $('#MailingAddressCity').html('');
+                    $('#MailingAddressCity').append($('<option> ' + "--Select City--" + ' </option>').val("0").html("--Select City--"));
+
+                    var res = Result.map(function (option) {
+                    // $.each(Result, function (id, option) {
+                        $('#MailingAddressCity').append($('<option> ' + option.cityName + ' </option>').val(option.cityId).html(option.cityName));
+                    });
+                    if (id == "" || id == null ) {
+                        $('#MailingAddressCity').val(cityId).attr('selected');
+                        $("#MailingAddressCity").prop('disabled', true);
+                    }
+                   
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // if physical address and mailing address are same
+
+    $("#SameAs").click(function () {
+        
+        if ($(this).is(':checked') == true) {
+            $(this).val("1");
+        }
+        else {
+            $(this).val("0");
+        }
+        //var formData = new FormData();
+       
+
+        $("#errValid-MailingAddress1").text("");
+        $("#errValid-MailingAddress2").text("");
+        $("#errValid-MailingAddressState").text("");
+        $("#errValid-MailingAddressCity").text("");
+        $("#errValid-MailingAddressZipCode").text("");
+
+        var id = $(this).data("id")
+        var mailingAddress1 = $("#PhysicalAddress1").val();
+        var mailingAddress2 = $("#PhysicalAddress2").val();
+        var mailingAddressState = $("#state").val();
+        var mailingAddressCity = $("#city").val();
+        var mailingAddressZipCode = $("#PhysicalAddressZipCode").val();
+        var mailingCountry = $("#PhysicalCountryId").val();
+        var initialCountry = "";
+        var initialState = "";
+
+        var checkbox = $('input[type=checkbox][name=chkIsEnabledModule]').val() == "1" ? true : false;
+        if (checkbox == true) {   
+            $('#MailingAddress1').val(mailingAddress1);
+            $('#MailingAddress2').val(mailingAddress2);
+
+            $("#MailingCountryId").val(initialCountry).change();
+            $('#MailingAddressState').val(initialState).change();
+            $('#MailingAddressZipCode').val(mailingAddressZipCode);
+           
+        }
+        else {
+
+            $('#MailingAddress1').val('');
+            $('#MailingAddress2').val('');
+            $('#MailingAddressState').val("0").change();
+            $('#MailingAddressCity').val("0").change();
+            $('#MailingAddressZipCode').val('');
+            $('#MailingCountryId').val("0").change();
+        }
+
+    });
+
+</script>

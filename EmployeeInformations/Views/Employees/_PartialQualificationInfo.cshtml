@@ -1,0 +1,725 @@
+﻿@using EmployeeInformations.Model.EmployeesViewModel;
+@using Microsoft.AspNetCore.Http;
+@model QulificationViewModel
+@{
+    var sessionEmployeeId = Context.Session.GetInt32("RoleId");
+}
+<div class="d-flex mb-1 title data-head">
+    <h6>Qualification Information</h6>
+</div>
+
+<div class="tab-pane p-3">
+    <div class="card my-4 boxshadow-none table-card edit-page" data-simplebar>
+        <table class="table" id="getdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Qualification</th>
+                    <th>Institution Name</th>
+                    <th>Percentage</th>
+                    <th>Year Of Passing</th>
+                    <th style="display:none;">File Name</th>
+                    <th class="nk-tb-col">
+                        <div class="nk-tb-col py-0 border-0">
+                            @*<ul class="nk-tb-actions gx-1 my-n1">
+                            <li class="me-n1">
+                            <div class="dropdown">
+                            <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown" aria-expanded="true">
+                            <em class="icon ni ni-more-h"></em>
+                            </a>
+                            </div>
+                            </li>
+                            </ul>*@
+                            Action
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="displayQualification">
+                @if (Model?.Qualifications?.Count() > 0)
+                {
+                    foreach (var item in Model.Qualifications)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col">
+                                @item.QualificationType
+                            </td>
+                            <td class="nk-tb-col">
+                                @item.InstitutionName
+                            </td>
+                            <td class="nk-tb-col">
+                                @item.Percentage %
+                            </td>
+
+                            <td class="nk-tb-col">
+                                @item.YearOfPassing
+                            </td>
+                            @*<td style="display:none;">
+                    @item.QualificationName
+                    </td>*@
+                            <td class="nk-tb-col">
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="EditBtn" data-id="@item.QualificationId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.QualificationId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.QualificationId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td class="dataTables_empty" style="text-align:center;" colspan="5">No data available</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="card boxshadow-none p-3">
+        <div class="row">
+            <input type="hidden" class="form-control" id="qualificationId">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.EmpId">
+            <input type="hidden" class="form-control" id="EmpId" value="@Model.CompanyId">
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="form-label">Qualification Type<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="qualificationType" placeholder="">
+                    <span class="error text-danger" id="errValid-QualificationType"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="form-label">Institution Name<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="institutionName" placeholder="">
+                    <span class="error text-danger" id="errValid-InstitutionName"></span>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label class="form-label">Percentage<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="percentage" placeholder="">
+                    <span class="error text-danger" id="errValid-Percentage"></span>
+                    <span class="error text-danger" id="errVerify-Percentage"></span>
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="form-group">
+                    <label class="form-label">Year Of Passing<span class="required" style="color: #FF0000">*</span></label>
+                    <input type="text" class="form-control" id="yearOfPassing" placeholder="" maxlength="4">
+                    <span class="error text-danger" id="errValid-YearOfPassings"></span>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label class="form-label">Document<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="input-group custom-file-button">
+                        @* <label class="input-group-text" for="inputGroupFile">Upload</label>*@
+                        @Html.TextBoxFor(m => m.DocumentFilePath, new { type = "file", name = "file", multiple = "multiple", @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.DocumentFilePath, "", new { @class = "error text-danger", id = "errValid-DocumentFilePath" })
+                    <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                </div>
+                <div id="hide_documentName" style="display:none;" class="text-primary mt-1">
+                    <ul class="displayQualificationDoc d-flex flex-wrap"></ul>
+                    <lable id="displayDocumentName"></lable>
+                </div>
+
+                @* <span id="errValid-Document" class="error text-danger" style="display:none;"> Invalid document </span>*@
+            </div>
+
+            <div class="col-12 d-flex mb-3 mt-auto">
+                <button type="button" class="btn btn-primary ml-auto" id="btnAdd" value="add">Add</button>
+                <button type="button" class="btn btn-primary ml-auto" id="btnUpdate" value="update" style="display:none">Update</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 d-flex mt-3">
+        <input type="button" class="btn btn-secondary" id="btnQulificationBack" value="Back" />
+        <input type="button" class="btn btn-primary ml-auto" id="btnCreateQualification" value="Next" />
+    </div>
+</div>
+
+<div class="modal" id="success_CreateQualification_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Qualification Created Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseCreateQualification">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_UpdateQualification_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Qualification Updated Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateQualification">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteQualification_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteQualification">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('.selectedwizard li').removeClass('current');
+        $("#step5").addClass('current');
+
+        //Change Summary
+        $("#DocumentFilePath").change(function () {
+            $("#errValid-DocumentFilePath").text("");
+            $("#displayDocumentName").text('');
+            //$("#errValid-Document").hide();
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+            }
+        });
+    });
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+    $(".displayQualificationDoc").on('click', 'li', function () {
+        var imgName = $(this).text();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/Qualifications/' + imgName + '');
+    });
+
+    //KeyUp Summary
+    $("#qualificationType").keyup(function () {
+        $("#errValid-QualificationType").text("");
+        if ($("#qualificationType").val() == "") {
+            $("#errValid-QualificationType").text("Qualification Type field is required");
+        }
+    });
+
+    $("#percentage").keyup(function () {
+        $("#errValid-Percentage").text("");
+        $("#errVerify-Percentage").text("");
+
+        if ($("#percentage").val() == "") {
+            $("#errValid-Percentage").text("Percentage field is required");
+        }
+    });
+
+    $("#yearOfPassing").keyup(function () {
+        $("#errValid-YearOfPassings").text("");
+        if ($("#yearOfPassing").val() == "") {
+            $("#errValid-YearOfPassings").text("Year Of Passing field is required");
+        }
+    });
+
+    $("#institutionName").keyup(function () {
+        $("#errValid-InstitutionName").text("");
+        if ($("#institutionName").val() == "") {
+            $("#errValid-InstitutionName").text("Institution Name field is required");
+        }
+    });
+
+    //Click Summary
+    $("#btnQulificationBack").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/CreateOtherDetails?empId=" + empId);
+        $("#hide_documentName").hide();
+    });
+
+    $("#btnCreateQualification").click(function () {
+        var empId = $("#EmpId").val();
+        PageUtil.goTo("/Employees/Createexperience?empId=" + empId);
+    });
+
+    //Percentage Field Only Allow For Numbers
+
+    $('#percentage').keypress(function (event) {
+        if (((event.which != 46 || (event.which == 46 && $(this).val() == '')) ||
+            $(this).val().indexOf('.') != -1) && (event.which < 48 || event.which > 57)) {
+            event.preventDefault();
+        }
+    }).on('paste', function (event) {
+        event.preventDefault();
+    });
+
+    //yearOfPassing Field Only Allow For Numbers
+    $("#yearOfPassing").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Create Qualification
+    $('#btnAdd').click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-QualificationType").text("");
+        $("#errValid-Percentage").text("");
+        $("#errValid-YearOfPassings").text("");
+        $("#errValid-DocumentFilePath").text("");
+        //$("#errValid-Document").hide();
+        $("#hide_documentName").hide();
+        $("#displayDocumentName").hide();
+        $("#displayDocumentName").text('');
+        $("#errValid-ErrorFileSize").text('');
+        $("#errValid-InstitutionName").text("");
+
+
+
+        if ($("#qualificationType").val() == "") {
+            $("#errValid-QualificationType").text("Qualification Type field is required");
+            isValid = false;
+        }
+        if ($("#percentage").val() == "") {
+            $("#errValid-Percentage").text("Percentage field is required");
+            isValid = false;
+        }
+        else {
+            $("#errValid-Percentage").text("");
+            $("#errVerify-Percentage").text("");
+        }
+
+        if ($("#yearOfPassing").val() == "") {
+            $("#errValid-YearOfPassings").text("Year Of Passing field is required");
+            isValid = false;
+        }
+
+
+        if ($("#institutionName").val() == "") {
+            $("#errValid-InstitutionName").text("Institution Name field is required");
+            isValid = false;
+        }
+
+        var attachmentFilePath = $("#DocumentFilePath").val();
+        if (attachmentFilePath == "") {
+            $("#errValid-DocumentFilePath").text("Attachment field is required");
+            isValid = false;
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+        var checkPercentage = $("#percentage").val();
+        if (checkPercentage > 100) {
+            $("#errVerify-Percentage").text("Percentage should not exceed 100");
+            isValid = false;
+        }
+        else {
+            $("#errVerify-Percentage").text("");
+        }
+
+        var empId = $("#EmpId").val();
+        var qualificationId = $("#qualificationId").val();
+        var qualificationType = $("#qualificationType").val();
+        var percentage = $("#percentage").val();
+        var yearOfPassing = $("#yearOfPassing").val();
+
+        var institutionName = $("#institutionName").val();
+
+        formData.append("empId", empId);
+        formData.append("qualificationId", qualificationId);
+        formData.append("qualificationType", qualificationType);
+        formData.append("percentage", percentage);
+        formData.append("yearOfPassing", yearOfPassing);
+        formData.append("institutionName", institutionName);
+
+
+        if (isValid) {
+            var url = "/Employees/AddQualification";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (Result) => { //list of data count
+                    $('#displayQualification').html("");
+
+                    $("#success_CreateQualification_Popup").css('display', 'none !important');
+                    if (Result.length > 0) {
+                        Swal.fire({
+                            title: 'Added Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            $.each(Result, function (key, value) {
+                                $('#displayQualification').append("<tr><td>" + value.qualificationType + "</td><td>" + value.institutionName + "</td><td>" + value.percentage + "%" + "</td><td>" + value.yearOfPassing + "</td><td style='display:none;' >" + value.qualificationName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='EditBtn' data-id=" + value.qualificationId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + value.qualificationId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' id='btnDownload' data-id=" + value.qualificationId + "><em class='icon ni ni-download'></em><span>Download</span></a></li></ul></div></div></li></ul></div></td></tr>");
+                            });
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            var empId = $("#EmpId").val();
+                            PageUtil.goTo("/Employees/CreateQualification?empId=" + empId);
+                        });
+                    }
+
+                    $('#DocumentFilePath').val('');
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+
+        $("#qualificationType").val('');
+        $("#qualificationId").val('');
+        $("#percentage").val('');
+        $("#yearOfPassing").val('');
+        $("#institutionName").val('');
+        $("#hide_documentName").hide();
+    });
+
+    //Edit Qualification
+    $('#getdata').on('click', '#EditBtn', function () {
+        $("#errValid-QualificationType").text("");
+        $("#errValid-InstitutionName").text("");
+        $("#errValid-Percentage").text("");
+        $("#errValid-YearOfPassings").text("");
+        $("#errValid-DocumentFilePath").text("");
+        $("#hide_documentName").hide();
+        $("#displayDocumentName").hide();
+        $("#errValid-ErrorFileSize").text('');
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim().replace("%", '');
+        var FourthCol = tr.find('td:eq(3)').text().trim();
+        var FifthCol = tr.find('td:eq(4)').text().trim();
+        $('#qualificationId').val(id);
+        $('#qualificationType').val(FirstCol);
+        $('#institutionName').val(SecondCol);
+        $('#percentage').val(ThirdCol);
+        $('#yearOfPassing').val(FourthCol);
+
+        var qualificationId = id;
+        var url = "/Employees/GetQualificationDocument"
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { qualificationId: qualificationId },
+            beforeSend: function () {
+                $('.loader').removeClass('d-none');
+            },
+            success: (Result) => {
+                $('.loader').addClass('d-none');
+                $('.displayQualificationDoc').html("");
+                $.each(Result, function (key, value) {
+                    var img = "";
+                    var ext = value.split('.').pop();
+                    if (ext == "pdf") {
+                        img = "/images/Pdf-Icon.png";
+                    }
+                    else if (ext == "doc" || ext == "docx") {
+                        img = "/images/Doc-Icon.png";
+                    }
+                    else {
+                        img = "/images/Image-Icon.png";
+                    }
+                    $('.displayQualificationDoc').append("<li><img class='mt-1' src='" + img + "' style='height: 40px;'><div style='display:none;'>" + value + "</div></li>");
+                });
+            }
+        });
+        $("#hide_documentName").show();
+        $("#displayDocumentName").show();
+        $("#btnUpdate").show();
+        $("#btnAdd").hide();
+    });
+
+    //Update Qualification
+    $('#btnUpdate').click(function () {
+
+        var isValid = true;
+        var formData = new FormData();
+        $("#errValid-QualificationType").text("");
+        $("#errValid-Percentage").text("");
+        $("#errValid-YearOfPassings").text("");
+        $("#errValid-InstitutionName").text("");
+        $("#errValid-Document").hide();
+        $("#errValid-ErrorFileSize").text('');
+        $('#hide_documentName').hide();
+        if ($("#qualificationType").val() == "") {
+            $("#errValid-QualificationType").text("Qualification Type field is required");
+            isValid = false;
+        }
+        if ($("#percentage").val() == "") {
+            $("#errValid-Percentage").text("Percentage field is required");
+            isValid = false;
+        }
+        if ($("#yearOfPassing").val() == "") {
+            $("#errValid-YearOfPassings").text("Year Of Passing field is required");
+            isValid = false;
+        }
+        if ($("#institutionName").val() == "") {
+            $("#errValid-InstitutionName").text("Institution Name field is required");
+            isValid = false;
+        }
+
+        var attachmentFilePath = $("#DocumentFilePath").val();
+
+        if (qualificationId == 0) {
+            var attachmentFilePath = $("#DocumentFilePath").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-DocumentFilePath").text("Attachment field is required");
+                isValid = false;
+            }
+        }
+        else {
+            $('#hide_documentName').show();
+        }
+        var checkPercentage = $("#percentage").val();
+        if (checkPercentage > 100) {
+            $("#errVerify-Percentage").text("Percentage should not exceed 100");
+            isValid = false;
+        }
+        else {
+            $("#errVerify-Percentage").text("");
+        }
+
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;
+
+        for (var x = 0; x < attachmentLength; x++) {
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var empId = $("#EmpId").val();
+        var qualificationId = $("#qualificationId").val();
+        var qualificationType = $("#qualificationType").val();
+        var percentage = $("#percentage").val();
+        var yearOfPassing = $("#yearOfPassing").val();
+        var institutionName = $("#institutionName").val();
+
+
+        formData.append("empId", empId);
+        formData.append("qualificationId", qualificationId);
+        formData.append("qualificationType", qualificationType);
+        formData.append("percentage", percentage);
+        formData.append("yearOfPassing", yearOfPassing);
+        formData.append("institutionName", institutionName);
+
+        if (isValid) {
+            var url = "/Employees/UpdateQualification";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (Result) => {
+
+                    $("#success_UpdateQualification_Popup").css('display', 'none !important');
+                    if (Result.length > 0) {
+                        Swal.fire({
+                            title: 'Updated Successfully',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            $('#displayQualification').html("");
+                            $.each(Result, function (key, value) {
+                                $('#displayQualification').append("<tr><td>" + value.qualificationType + "</td><td>" + value.institutionName + "</td><td>" + value.percentage + "%" + "</td><td>" + value.yearOfPassing + "</td><td style='display:none;'>" + value.qualificationName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='EditBtn' data-id=" + value.qualificationId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + value.qualificationId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' id='btnDownload' data-id=" + value.qualificationId + "><em class='icon ni ni-download'></em><span>Download</span></a></li></ul></div></div></li></ul></div></td></tr>");
+                            });
+                            $("#btnUpdate").hide();
+                            $("#btnAdd").show();
+                            $("#errValid-DocumentFilePath").hide();
+                            $('#displayDocumentName').hide();
+
+                            $("#displayDocumentName").text('');
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            var empId = $("#EmpId").val();
+                            PageUtil.goTo("/Employees/CreateQualification?empId=" + empId);
+                        });
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+        $("#qualificationType").val('');
+        $("#qualificationId").val('');
+        $("#percentage").val('');
+        $("#yearOfPassing").val('');
+        $("#institutionName").val('');
+        $('#DocumentFilePath').val('');
+        $("#hide_documentName").val('');
+        $("#hide_documentName").hide();
+    });
+
+    //Delete Qualification
+    $('#getdata').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            //text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                var id = $(this).data("id")
+                var qualification = {
+                    QualificationId: id,
+                    EmpId: $("#EmpId").val()
+                };
+
+                $('.loader').removeClass('d-none');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Employees/DeleteQualification",
+                    data: qualification,
+                    success: (Result) => {
+                        $('#displayQualification').html('')
+                        $("#success_DeleteQualification_Popup").css('display', 'none !important');
+                        Swal.fire({
+                            title: 'Deleted Successfully!',
+                            text: "",
+                            icon: 'success',
+                            allowOutsideClick: false
+                        }).then((resultvalue) => {
+                            if (resultvalue.isConfirmed) {
+                                if (Result.length == 0) {
+                                    $('#displayQualification').append("<tr><td class='dataTables_empty' style = 'text-align:center;' colspan = '5' > No data available </td></tr>");
+                                }
+                                else {
+                                    $.each(Result, function (key, value) {
+                                        $('#displayQualification').append("<tr><td>" + value.qualificationType + "</td><td>" + value.institutionName + "</td><td>" + value.percentage + "%" + "</td><td>" + value.yearOfPassing + "</td><td style='display:none;'>" + value.qualificationName + "</td><td><div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='EditBtn' data-id=" + value.qualificationId + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li><li><a href='javascript:void(0)' id='btnDelete' data-id=" + value.qualificationId + "><em class='icon ni ni-delete'></em><span>Delete</span></a></li><li><a href='javascript:void(0)' id='btnDownload' data-id=" + value.qualificationId + "><em class='icon ni ni-download'></em><span>Download</span></a></li></ul></div></div></li></ul></div></td></tr>");
+                                    });
+
+                                }
+                                $('.loader').addClass('d-none');
+                            };
+                        });
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+
+                $("#qualificationType").val('');
+                $("#qualificationId").val('');
+                $("#percentage").val('');
+                $("#yearOfPassing").val('');
+                $("#institutionName").val('');
+                $('#DocumentFilePath').val('');
+                $("#hide_documentName").val('');
+                $("#displayDocumentName").text('')
+
+            }
+        })
+    });
+
+    //Download Document
+    $('#getdata').on('click', '#btnDownload', function () {
+
+        var qualificationId = $(this).data("id");
+        window.location.href = "/Employees/DownloadQualificationFile?qualificationId=" + qualificationId;
+        $('.loader').addClass('d-none');
+
+    });
+
+    $("#btnCloseCreateQualification").click(function () {
+        $("#success_CreateQualification_Popup").hide();
+    });
+
+    $("#btnCloseUpdateQualification").click(function () {
+        $("#success_UpdateQualification_Popup").hide();
+    });
+
+    $("#btnCloseDeleteQualification").click(function () {
+        $("#success_DeleteQualification_Popup").hide();
+    });
+
+</script>

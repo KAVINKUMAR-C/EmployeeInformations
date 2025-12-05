@@ -1,0 +1,1089 @@
+﻿@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Common
+@using EmployeeInformations.Model.AttendanceViewModel;
+@model AttendaceListViewModels
+@{
+    ViewBag.Title = "ViewAttendanceData";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">View In/Out Details</h3>
+        </div><!-- .nk-block-head-content -->
+
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="row">
+    @Html.HiddenFor(e => e.RoleId)
+    <div class="col-lg-3  col-md-6 autocomplete">
+        <div class="form-group">
+            <label class="form-label">Employees<span class="required" style="color: #FF0000">*</span></label>
+            <div>
+                @if (Model.RoleId == (Role.Employee))
+                {
+                    @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.reportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId", disabled = "disabled" })
+                }
+                else
+                {
+                    @Html.DropDownListFor(m => m.EmployeeId, new SelectList(Model.reportingPeople, "EmployeeId", "EmployeeIdWithName"), "--Select Employees--", new { @class = "form-control", id = "EmployeeId" })
+                }
+            </div>
+            @Html.ValidationMessageFor(m => m.EmployeeId, "", new { @class = "error text-danger", id = "errValid-EmployeeName" })
+        </div>
+    </div>
+
+    <div class="col-lg-2 col-md-6">
+        <div class="form-group">
+            <label class="form-label">Start Date<span class="required" style="color: #FF0000">*</span></label>
+            <div id="startdatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                @Html.TextBoxFor(m => m.LogDate, new { @class = "form-control", id = "startDate" })
+                <span class="input-group-addon">
+                    <i class="icon ti-calendar"></i>
+                </span>
+            </div>
+            <span class="error text-danger" id="errValid-StartDate"></span>
+        </div>
+    </div>
+
+
+    <div class="col-lg-2 col-md-6">
+        <div class="form-group">
+            <label class="form-label" id="leaveToLabel">End Date<span class="required" style="color: #FF0000">*</span></label>
+            <div id="enddatepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                @Html.TextBoxFor(m => m.EndDate, new { @class = "form-control", id = "endDate" })
+                <span class="input-group-addon">
+                    <i class="icon ti-calendar"></i>
+                </span>
+            </div>
+            <span class="error text-danger" id="errValid-EndDate"></span>
+            <span id="errVerify-endDate" style="display:none;" class="error text-danger"> Please select <b>End Time</b> should not be less than <b>Start Time</b> </span>
+        </div>
+    </div>
+
+    @* start time and end time *@
+    <div class="col-lg-4 col-md-6">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="form-label">Start Time</label>
+                    <div class="input-group" id="drp_FromTime">
+                        <input type="text" class="form-control" id="StartTime" placeholder="" value="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label class="form-label">End Time</label>
+                    <div class="input-group" id="drp_ToTime">
+                        <input type="text" class="form-control" id="EndTime" placeholder="" value="">
+                    </div>                  
+                    <span id="errVerify-EndTime" class="error text-danger" style="display:none;"> Please select <b>End Time</b> should not be less than <b>Start Time</b> </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @if (Model.EmployeeId == 0)
+    {
+        <div class="col-lg-2 col-md-6 autocomplete">
+            <div class="form-group">
+                <label class="form-label">Active / In Active<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.EmployeeStatus, Html.GetEnumSelectList<EmployeeStatus>(), "--Select Active / In Active--", new { @class = "form-control", id = "status" })
+                </div>
+                <span class="error text-danger" id="errValid-Status"></span>
+            </div>
+        </div>
+    }
+    <div class="col in-out-search-btn">
+        <div class="form-group">
+            <button type="button" class="btn btn-primary icon-ch" id="btnFilterLeave" value="" /><i class="ti-search"></i></button>
+        </div>
+    </div>
+    <div class="col d-flex justify-content-end download-send-btn">
+        <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="generatepdfs"><img src="./images/pdf.png" /></button>
+        <button type="button" class="mr-3 btn btn-secondary icon-ch" id="btnDownloadExcel" value="" /><i class="ti-download"></i></button>
+        <button type="button" class="btn btn-secondary icon-ch" title="Send Mail" id="SendEmployeeInandOut"><em class="ni ni-send"></em></button>
+    </div>
+</div>
+
+<div class="modal" id="successEmailSending_Msg_Popup" style="display:none;" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Email Sent Successfully! </h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseChangePassword">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="filterMandatory_Msg_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtValidationMeg">
+                <h4 class="nk-modal-title"> Select Mandatory Fields! </h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseFilterValidation">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="card card-bordered card-preview">
+    @if (Model.RoleId == (Role.Employee))
+    {
+        <div class="col-lg-12" id="timeing" style="text-align: center;">
+            <div class="form-group">
+                <label class="form-label text-info text-decoration-underline" style="text-align: center"> <span> <b>Timing</b>  </span> </label>
+                <div>
+
+                    <div id="timingDiv">
+                        @if (Model.InsideOffice != null)
+                        {
+                            @if (Model.TotalSecounds < 25200)
+                            {
+                                <label class="form-label"><span id="insideOfficeTime1" class="text-danger">@Model.InsideOffice Hrs (Actual)</span> / <span id="totalHoursTime" class="text-primary">@Model.TotalHours Hrs (Total)</span></label>
+                            }
+                            else if (Model.TotalSecounds < 28800)
+                            {
+                                <label class="form-label"><span id="insideOfficeTime2" class="text-orange">@Model.InsideOffice Hrs (Actual)</span> / <span id="totalHoursTime" class="text-primary">@Model.TotalHours Hrs (Total)</span></label>
+                            }
+                            else if (Model.TotalSecounds > 28800)
+                            {
+                                <label class="form-label"><span id="insideOfficeTime3" class="text-success">@Model.InsideOffice Hrs (Actual)</span> / <span id="totalHoursTime" class="text-primary">@Model.TotalHours Hrs (Total)</span></label>
+                            }
+                        }
+                        else
+                        {
+                            <label class="form-label"> <span id="insideOfficeTime" class="text-gray">00:00 Hrs (Actual)</span> / <span id="totalHoursTime" class="text-primary">00:00 Hrs (Total)</span> </label>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card-inner table-card" id="attendanceInOutDiv">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getAttendanceData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col"><span class="sub-text">Employee Id</span></th>
+                    @if (Model.RoleId < (Role.Employee))
+                    {
+                        <th class="nk-tb-col tb-col"><span class="sub-text">Employee Name</span></th>
+                    }
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Date</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Log Date Time</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Log Time</span></th>
+                    <th class="nk-tb-col tb-col"><span class="sub-text">Direction</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ViewAttendanceLog.Count() > 0 && Model.ViewAttendanceLog != null)
+                {
+                    @foreach (var item in Model.ViewAttendanceLog)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col tb-col">
+                                <b class="tb-sub text-primary">@item.EmployeeId</b>
+                            </td>
+                            @if (Model.RoleId < (Role.Employee))
+                            {
+                                <td class="nk-tb-col tb-col">
+                                    @if (item.Status == true)
+                                    {
+                                        <a href="javascript:void(0)" class="viewEmployee" data-empid="@item.EmployeeCode"><span class="text-danger">@item.EmployeeName</span></a>
+                                    }
+                                    else
+                                    {
+                                        <a href="javascript:void(0)" class="viewEmployee" data-empid="@item.EmployeeCode"><span class="text-info">@item.EmployeeName</span></a>
+                                    }
+
+
+                                </td>
+                            }
+
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.LogDate</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.LogDateTime</span>
+                            </td>
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.LogTime</span>
+                            </td>
+
+                            <td class="nk-tb-col tb-col">
+                                <span>@item.Direction</span>
+                            </td>
+
+                        </tr>
+                        <!-- .nk-tb-item  -->
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        var id = $("#RoleId").val();
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        if (id < 5) {
+            $('#getAttendanceData').DataTable({
+                "bInfo": true,
+                "paging": true,
+
+                order: [
+                    [2, "asc"]
+                ],
+            });
+        }
+        else {
+            $('#getAttendanceData').DataTable({
+                "bInfo": true,
+                "paging": true,
+                order: [
+                    [1, "asc"]
+                ],
+            });
+        }
+
+    });
+
+    $(document).ready(function () {
+
+        $("#startdatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $("#enddatepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: "today",
+        });
+
+        $('#StartTime').timepicker({
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,   
+        });
+
+     $('#EndTime').timepicker({
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true,
+    
+     });
+
+    var employee = $("#EmpId").select2();
+    $("#EmpId").select2().on("change", function () {
+
+        $("#errValid-ReporingPerson").text("")
+    });
+        });
+
+    // Nice scroll
+
+    $("#EmployeeId,#status").select2().on("select2:open", function () {
+        $('.select2-results__options').niceScroll({
+            cursorcolor: "#4e5e7a",
+            cursorwidth: "5px",
+            autohidemode: false,
+            cursorborder: "1px solid #4e5e7a",
+            horizrailenabled: false,
+        });
+    });
+
+
+    //Change Summary
+
+    $("#startDate").change(function () {
+
+        $("#errValid-StartDate").text("");
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+        }
+        else {
+            $("#errValid-StartDate").text("");
+        }
+    });
+
+    $("#endDate").change(function () {
+
+        $("#errValid-EndDate").text("");
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+        }
+        else {
+            $("#errValid-EndDate").text("");
+        }
+    });
+
+    $("#EmployeeId").change(function () {
+        $("#errValid-EmployeeName").text("");
+        if ($("#EmployeeId :selected").val() == "") {
+            $("#errValid-EmployeeName").text("Employee field is required");
+        }
+        else {
+            $("#errValid-EmployeeName").text("");
+        }
+    });
+
+    $("#status").change(function () {
+        $("#errValid-Status").text("");
+        if ($("#status :selected").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+        }
+        else {
+            $("#errValid-Status").text("");
+        }
+    });
+    //--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Filter Employee log data
+
+    $("#btnFilterLeave").click(function () {
+        var isValid = true;
+        $("#errValid-StartDate").text("");
+        $("#errValid-EndDate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errValid-EndTime").text("");
+        $("#errVerify-endDate").hide();
+        $("#errVerify-EndTime").hide();
+        $("#errValid-Status").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            isValid = false;
+        }
+
+        if ($("#status option:selected").val() == 0) {
+            $("#errValid-Status").text("Status field is required");
+            isValid = false;
+        }
+
+        var employeeId = $("#EmployeeId").val();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        var startTimes = $("#StartTime").val();
+        var endTime = $("#EndTime").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+
+        //time format
+        if (startTimes && endTime != null) {
+            var time = $("#StartTime").val();
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours < 12) hours = hours + 12;
+            if (AMPM == "AM" && hours == 12) hours = hours - 12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if (hours < 10) sHours = "0" + sHours;
+            if (minutes < 10) sMinutes = "0" + sMinutes;
+            var timeform = sHours + ":" + sMinutes + ":" + "00";
+
+            var time1 = $("#EndTime").val();
+            var hours1 = Number(time1.match(/^(\d+)/)[1]);
+            var minutes1 = Number(time1.match(/:(\d+)/)[1]);
+            var AMPM = time1.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours1 < 12) hours1 = hours1 + 12;
+            if (AMPM == "AM" && hours1 == 12) hours1 = hours1 - 12;
+            var sHours1 = hours1.toString();
+            var sMinutes1 = minutes1.toString();
+            if (hours1 < 10) sHours1 = "0" + sHours1;
+            if (minutes1 < 10) sMinutes1 = "0" + sMinutes1;
+            var timeto = sHours1 + ":" + sMinutes1 + ":" + "00";
+
+            if (timeto < timeform) {
+                $("#errVerify-EndTime").show();
+            }
+        }
+        var attendaceListViewModel = {
+            EmployeeId: employeeId,
+            StartDate: startTime,
+            EndDate: endDate,
+            EntryTime: timeform,
+            ExitTime: timeto,
+            EmployeeStatus: validStatus,
+        };
+
+        if (startTime != "" && endDate != "") {
+            var timeDifference = dateDifferenceCount(startTime, endDate);
+            if (timeDifference == 0) {
+                $("#timeing").show();
+                $("#insideOfficeTime").show();
+                $("#totalHoursTime").show();
+            }
+            else {
+                $("#timeing").hide();
+                $("#insideOfficeTime").hide();
+                $("#totalHoursTime").hide();
+            }
+        }
+
+        if (isValid) {
+            var isValidDate = dateDifference(startTime, endDate, startTimes, endTime);
+            if (isValidDate) {
+                var url = "/Attendance/FilterEmployeeLogData";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: attendaceListViewModel,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+                        $('#attendanceInOutDiv').empty();
+                        if (result.viewAttendanceLog.length != 0) {
+                            if (result.roleId < 5) {
+                                var tableHeadHtml = " <table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th class='nk-tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Date</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Date Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Direction</span></th> </tr> </thead> <tbody>";
+
+                                var log = result.viewAttendanceLog.map(function (value) {
+                              @*   $.each(result.viewAttendanceLog, function (key, value) { *@
+                                    tableHeadHtml += "<tr class='nk-tb-item'><td class='nk-tb-col tb-col'><b class='tb-sub text-primary'>" + value.employeeId + "</b></td><td class='nk-tb-col tb-col'>";
+                                    if (value.status == true) {
+                                        tableHeadHtml += "<a href='javascript:void(0)' class='viewEmployee' data-empid=" + value.employeeId + "><span class='text-danger'>" + value.employeeName + "</span></a>";
+                                    }
+                                    else {
+                                        tableHeadHtml += "<a href='javascript:void(0)' class='viewEmployee' data-empid=" + value.employeeId + "><span class='text-info'>" + value.employeeName + "</span></a>";
+                                    }
+                                    tableHeadHtml += "</td><td class='nk-tb-col tb-col'><span>" + value.logDate + "</span > </td><td class='nk-tb-col tb-col'><span>" + value.logDateTime + "</span > </td><td class='nk-tb-col tb-col'><span>" + value.logTime + "</span > </td><td class='nk-tb-col tb-col'><span>" + value.direction + "</span > </td></tr > ";
+                                });
+                                tableHeadHtml += "</tbody> </table> </div></div>";
+                                $('#attendanceInOutDiv').html(tableHeadHtml);
+                                $.fn.dataTable.moment('DD/MM/YYYY');
+
+                                $('#getAttendanceData').DataTable({
+
+                                    "bInfo": true,
+                                    "paging": true,
+                                    order: [
+                                        [2, "asc"]
+                                    ],
+                                });
+                            }
+                            else {
+                                if (result.insideOffice != null) {
+                                    $("#timingDiv").empty('');
+                                    if (result.totalSecounds < 25200) {
+                                        $("#insideOfficeTime").hide();
+                                        $("#insideOfficeTime1").show();
+                                        $("#insideOfficeTime2").hide();
+                                        $("#insideOfficeTime3").hide();
+                                        $("#insideOfficeTime1").text(result.insideOffice + " (Actual)");
+                                        var text = "<label class='form-label'><span id='insideOfficeTime1' class='text-danger'>" + result.insideOffice + " (Actual)</span> / <span id='totalHoursTime' class='text-primary'>" + result.totalHours + " (Total)</span></label>";
+                                        $("#timingDiv").append(text);
+                                    }
+                                    else if (result.totalSecounds < 28800) {
+                                        $("#insideOfficeTime").hide();
+                                        $("#insideOfficeTime1").hide();
+                                        $("#insideOfficeTime2").show();
+                                        $("#insideOfficeTime3").hide();
+                                        $("#insideOfficeTime2").text(result.insideOffice + " (Actual)");
+                                        var text = "<label class='form-label'><span id='insideOfficeTime2' class='text-orange'>" + result.insideOffice + " (Actual)</span> / <span id='totalHoursTime' class='text-primary'>" + result.totalHours + " (Total)</span></label>";
+                                        $("#timingDiv").append(text);
+
+                                    }
+                                    else {
+                                        $("#insideOfficeTime").hide();
+                                        $("#insideOfficeTime1").hide();
+                                        $("#insideOfficeTime2").hide();
+                                        $("#insideOfficeTime3").show();
+                                        $("#insideOfficeTime3").text(result.insideOffice + " (Actual)");
+                                        var text = "<label class='form-label'><span id='insideOfficeTime3' class='text-success'>" + result.insideOffice + " (Actual)</span> / <span id='totalHoursTime' class='text-primary'>" + result.totalHours + " (Total)</span></label>";
+                                        $("#timingDiv").append(text);
+                                    }
+
+                                    $("#totalHoursTime").text(result.totalHours + " (Total)");
+                                }
+                                else {
+                                    $("#timingDiv").empty();
+                                    $("#insideOfficeTime").show();
+                                    $("#insideOfficeTime1").hide();
+                                    $("#insideOfficeTime2").hide();
+                                    $("#insideOfficeTime3").hide();
+                                    $("#insideOfficeTime").text("00:00 Hrs (Actual)");
+                                    $("#totalHoursTime").text("00:00 Hrs (Total)");
+                                    var text = "<label class='form-label'><span id='insideOfficeTime' class='text-grey'>00:00 Hrs (Actual)</span> / <span id='totalHoursTime' class='text-primary'>00:00 Hrs (Total)</span></label>";
+                                    $("#timingDiv").append(text);
+                                }
+
+                                var tableHtml = "<table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th class='nk-tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Date</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Date Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Direction</span></th> </tr> </thead> <tbody> ";
+
+                                var attendancelog = result.viewAttendanceLog.map(function (value) {
+                               @*  $.each(result.viewAttendanceLog, function (key, value) { *@
+                                    tableHtml += "<tr class='nk-tb-item'> <td class='nk-tb-col tb-col'> <b class='tb-sub text-primary'>" + value.employeeId + "</b> </td> <td class='nk-tb-col tb-col'> <span> " + value.logDate + " </span> </td> <td class='nk-tb-col tb-col'> <span> " + value.logDateTime + " </span> </td> <td class='nk-tb-col tb-col'> <span> " + value.logTime + " </span> </td> <td class='nk-tb-col tb-col'> <span>" + value.direction + "</span> </td> </tr>";
+                                });
+                                tableHtml += "</tbody> </table> </div></div>";
+                                $('#attendanceInOutDiv').html(tableHtml);
+                                $.fn.dataTable.moment('DD/MM/YYYY');
+
+                                $('#getAttendanceData').DataTable({
+
+                                    "bInfo": true,
+                                    "paging": true,
+                                    order: [
+                                        [1, "asc"]
+                                    ],
+                                });
+                            }
+                        }
+                        else {
+                            var tableHeadHtml = " <table class='display employee-holiday-table mb-3 no-sorting' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th class='nk-tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Date</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Date Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Log Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Direction</span></th> </tr> </thead> <tbody>";
+                            tableHeadHtml += "</tbody> </table> </div></div>";
+
+                            $('#attendanceInOutDiv').html(tableHeadHtml);
+
+                            $.fn.dataTable.moment('DD/MM/YYYY');
+
+                            $('#getAttendanceData').DataTable({
+
+                                "bInfo": true,
+                                "paging": true,
+                                order: [
+                                    [2, "desc"]
+                                ],
+                            });
+
+                            $("#timingDiv").empty();
+                            $("#insideOfficeTime").show();
+                            $("#insideOfficeTime1").hide();
+                            $("#insideOfficeTime2").hide();
+                            $("#insideOfficeTime3").hide();
+                            $("#insideOfficeTime").text("00:00 Hrs (Actual)");
+                            $("#totalHoursTime").text("00:00 Hrs (Total)");
+                            var text = "<label class='form-label'><span id='insideOfficeTime' class='text-gray'>00:00 Hrs (Actual)</span> / <span id='totalHoursTime' class='text-primary'>00:00 Hrs (Total)</span></label>";
+                            $("#timingDiv").append(text);
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerify-endDate").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+
+    $("#status").change(function () {
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+        $("#EmployeeId").prop('disabled', false);
+        $.ajax({
+            type: "Get",
+            url: "/Attendance/GetByStatusId?StatusId=" + validStatus,
+            success: (Result) => {
+
+                if (Result.length == 0) {
+                    $("#EmployeeId").prop('disabled', false);
+                    $('#EmployeeId').val('');
+                    $('#EmployeeId').append($('<option> ' + "--All Employee--" + ' </option>').val("0").html("--All Employee--"));
+                    $("#EmployeeId").prop('disabled', true);
+                }
+                else {
+                    $('#EmployeeId').html('')
+                    $("#errValid-State").text(" ");
+
+                    var result = Result.map(function (option) {
+                   @*  $.each(Result, function (id, option) { *@
+                        $('#EmployeeId').append($('<option> ' + option.employeeIdWithName + ' </option>').val(option.employeeId).html(option.employeeIdWithName));
+                    });
+                }
+            },
+            error: (Result) => {
+                $('.loader').addClass('d-none');
+            }
+        });
+    });
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Date validation
+
+    function dateDifference(startTime, endDate, startTimes, endTime) {
+        var result = false;
+        var splitFrom = startTime.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = endDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            result = true;
+        }
+        return result;
+    }
+
+    function dateDifferenceCount(startTime, endDate) {
+        var result = 0;
+        var splitFrom = startTime.split('/');
+        var monthF = parseInt(splitFrom[1]);
+        var dayF = parseInt(splitFrom[0]);
+        var yearF = parseInt(splitFrom[2]);
+        var fromDate = new Date(yearF + "-" + monthF + "-" + dayF)
+        var splitTo = endDate.split('/');
+        var monthT = parseInt(splitTo[1]);
+        var dayT = parseInt(splitTo[0]);
+        var yearT = parseInt(splitTo[2]);
+        var toDate = new Date(yearT + "-" + monthT + "-" + dayT)
+        if (toDate >= fromDate) {
+            var timeDifference = Math.abs(toDate - fromDate);
+            result = Math.ceil(timeDifference / (1000 * 3600 * 24));
+        }
+        return result;
+    }
+
+    $('#attendanceInOutDiv').on('click', '.viewEmployee', function () {
+        var empId = $(this).data('empid');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+
+    // Download
+
+    $('#btnDownloadExcel').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-StartDate").text("");
+        $("#errValid-EndDate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errValid-EndTime").text("");
+        $("#errVerify-endDate").hide();
+        $("#errVerify-EndTime").hide();
+        $("#errValid-Status").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+
+        if ($("#status option:selected").val() == 0) {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+
+        var employeeId = $("#EmployeeId").val();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        var startTimes = $("#StartTime").val();
+        var endTime = $("#EndTime").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+
+        //time format
+        if (startTimes && endTime != null) {
+            var time = $("#StartTime").val();
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours < 12) hours = hours + 12;
+            if (AMPM == "AM" && hours == 12) hours = hours - 12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if (hours < 10) sHours = "0" + sHours;
+            if (minutes < 10) sMinutes = "0" + sMinutes;
+            var timeform = sHours + ":" + sMinutes + ":" + "00";
+
+            var time1 = $("#EndTime").val();
+            var hours1 = Number(time1.match(/^(\d+)/)[1]);
+            var minutes1 = Number(time1.match(/:(\d+)/)[1]);
+            var AMPM = time1.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours1 < 12) hours1 = hours1 + 12;
+            if (AMPM == "AM" && hours1 == 12) hours1 = hours1 - 12;
+            var sHours1 = hours1.toString();
+            var sMinutes1 = minutes1.toString();
+            if (hours1 < 10) sHours1 = "0" + sHours1;
+            if (minutes1 < 10) sMinutes1 = "0" + sMinutes1;
+            var timeto = sHours1 + ":" + sMinutes1 + ":" + "00";
+
+            if (timeto < timeform) {
+                $("#errVerify-EndTime").show();
+            }
+        }
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("StartDate", startTime);
+        formData.append("EndDate", endDate);
+        if (startTimes != "" && endTime != "") {
+            formData.append("EntryTime", timeform);
+            formData.append("ExitTime", timeto);
+        }
+        formData.append("EmployeeStatus", validStatus);
+
+        if (isValid) {
+            var url = "/Attendance/DownloadInandOutExcel";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (data) => {
+                    var response = data;
+                    if (data != "") {
+                        window.location.href = '/Attendance/Download?fileGuid=' + data;
+                    }
+                    else {
+                        swal.fire({
+                            title: "No Record Found!",
+                            icon: "error",
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $('#attendanceInOutDiv').empty();
+                                var tableHeadHtml = "<table class='display employee-holiday-table mb-3 ' style='width:100%' data-auto-responsive='false' id='getAttendanceData'> <thead> <tr class='nk-tb-item table-header'> <th class='nk-tb-col'><span class='sub-text'>Employee Id</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Employee Name</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Date</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Entry Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Exit Time</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Total Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Break Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Actual Hours</span></th> <th class='nk-tb-col tb-col'><span class='sub-text'>Timesheet Hours</span></th> </tr> </thead> <tbody>";
+                                tableHeadHtml += "</tbody> </table> </div></div>";
+
+                                $("#attendanceInOutDiv").html(tableHeadHtml);
+
+                                $.fn.dataTable.moment('DD/MM/YYYY');
+
+                                $('#getAttendanceData').DataTable({
+
+                                    "bInfo": true,
+                                    "paging": true,
+                                    order: [
+                                        [0, "asc"]
+                                    ],
+                                });
+                                $("#successEmailSending_Msg_Popup").modal('hide');
+                            };
+                        });
+
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+            $('.loader').addClass('d-none');
+        }
+        else {
+            return false;
+        }
+
+    });
+
+    //Pdf download
+    $("#generatepdfs").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        var formData = new FormData();
+        $("#errValid-StartDate").text("");
+        $("#errValid-EndDate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errValid-EndTime").text("");
+        $("#errVerify-endDate").hide();
+        $("#errVerify-EndTime").hide();
+        $("#errValid-Status").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+
+        if ($("#status option:selected").val() == 0) {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+
+        var employeeId = $("#EmployeeId").val();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        var startTimes = $("#StartTime").val();
+        var endTime = $("#EndTime").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+
+        //time format
+        if (startTimes && endTime != null) {
+            var time = $("#StartTime").val();
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours < 12) hours = hours + 12;
+            if (AMPM == "AM" && hours == 12) hours = hours - 12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if (hours < 10) sHours = "0" + sHours;
+            if (minutes < 10) sMinutes = "0" + sMinutes;
+            var timeform = sHours + ":" + sMinutes + ":" + "00";
+
+            var time1 = $("#EndTime").val();
+            var hours1 = Number(time1.match(/^(\d+)/)[1]);
+            var minutes1 = Number(time1.match(/:(\d+)/)[1]);
+            var AMPM = time1.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours1 < 12) hours1 = hours1 + 12;
+            if (AMPM == "AM" && hours1 == 12) hours1 = hours1 - 12;
+            var sHours1 = hours1.toString();
+            var sMinutes1 = minutes1.toString();
+            if (hours1 < 10) sHours1 = "0" + sHours1;
+            if (minutes1 < 10) sMinutes1 = "0" + sMinutes1;
+            var timeto = sHours1 + ":" + sMinutes1 + ":" + "00";
+
+            if (timeto < timeform) {
+                $("#errVerify-EndTime").show();
+            }
+        }
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("StartDate", startTime);
+        formData.append("EndDate", endDate);
+        if (startTimes != "" && endTime != "") {
+            formData.append("EntryTime", timeform);
+            formData.append("ExitTime", timeto);
+        }
+        formData.append("EmployeeStatus", validStatus);
+
+        if (isValid) {
+            var isValidDate = true;
+
+            if (isValidDate) {
+                var url = "/Attendance/CreateInandOutPdf";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                            window.location.href = '/Attendance/DownloadPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire({
+                                title: "No Record Found!",
+                                icon: "error",
+                                allowOutsideClick: false
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $("#successEmailSending_Msg_Popup").modal('hide');
+                                };
+                            });
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                return false;
+            }
+
+        }
+        else {
+            return false;
+        }
+
+    });
+
+
+    // Email sent to the employees
+
+    $('#SendEmployeeInandOut').click(function () {
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-StartDate").text("");
+        $("#errValid-EndDate").text("");
+        $("#errValid-StartTime").text("");
+        $("#errValid-EndTime").text("");
+        $("#errVerify-endDate").hide();
+        $("#errVerify-EndTime").hide();
+        $("#errValid-Status").text("");
+
+        if ($("#startDate").val() == "") {
+            $("#errValid-StartDate").text("Start Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        if ($("#endDate").val() == "") {
+            $("#errValid-EndDate").text("End Date field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+
+        if ($("#status option:selected").val() == 0) {
+            $("#errValid-Status").text("Status field is required");
+            $("#filterMandatory_Msg_Popup").show();
+            isValid = false;
+        }
+
+        $("#btnCloseFilterValidation").click(function () {
+            $("#filterMandatory_Msg_Popup").hide();
+        });
+
+        var employeeId = $("#EmployeeId").val();
+        var startTime = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        var startTimes = $("#StartTime").val();
+        var endTime = $("#EndTime").val();
+        var status = $("#status").val();
+        var validStatus = status == 1 ? 0 : 1;
+
+        //time format
+        if (startTimes && endTime != null) {
+            var time = $("#StartTime").val();
+            var hours = Number(time.match(/^(\d+)/)[1]);
+            var minutes = Number(time.match(/:(\d+)/)[1]);
+            var AMPM = time.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours < 12) hours = hours + 12;
+            if (AMPM == "AM" && hours == 12) hours = hours - 12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if (hours < 10) sHours = "0" + sHours;
+            if (minutes < 10) sMinutes = "0" + sMinutes;
+            var timeform = sHours + ":" + sMinutes + ":" + "00";
+
+            var time1 = $("#EndTime").val();
+            var hours1 = Number(time1.match(/^(\d+)/)[1]);
+            var minutes1 = Number(time1.match(/:(\d+)/)[1]);
+            var AMPM = time1.match(/\s(.*)$/)[1];
+            if (AMPM == "PM" && hours1 < 12) hours1 = hours1 + 12;
+            if (AMPM == "AM" && hours1 == 12) hours1 = hours1 - 12;
+            var sHours1 = hours1.toString();
+            var sMinutes1 = minutes1.toString();
+            if (hours1 < 10) sHours1 = "0" + sHours1;
+            if (minutes1 < 10) sMinutes1 = "0" + sMinutes1;
+            var timeto = sHours1 + ":" + sMinutes1 + ":" + "00";
+
+            if (timeto < timeform) {
+                $("#errVerify-EndTime").show();
+            }
+        }
+
+        formData.append("EmployeeId", employeeId);
+        formData.append("StartDate", startTime);
+        formData.append("EndDate", endDate);
+        if (startTimes != "" && endTime != "") {
+            formData.append("EntryTime", timeform);
+            formData.append("ExitTime", timeto);
+        }
+        formData.append("EmployeeStatus", validStatus);
+
+        if (isValid) {
+            var url = "/Attendance/SendEmployeeInandOut";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (result) => {
+                    if (result == true) {
+                        $("#successEmailSending_Msg_Popup").modal('show');
+                        $("#btnCloseChangePassword").click(function () {
+                            $("#successEmailSending_Msg_Popup").modal('hide');
+                        });
+                    }
+                    else {
+                        swal.fire({
+                            title: "No Record Found!",
+                            icon: "error",
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $("#successEmailSending_Msg_Popup").modal('hide');
+                            };
+                        });
+                    }
+
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+            $('.loader').addClass('d-none');
+        }
+        else {
+            return false;
+        }
+
+    });
+
+</script>

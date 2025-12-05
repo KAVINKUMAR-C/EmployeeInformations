@@ -1,0 +1,103 @@
+﻿using EmployeeInformations.CoreModels.DataViewModel;
+using EmployeeInformations.CoreModels.Model;
+using EmployeeInformations.Model.DashboardViewModel;
+using EmployeeInformations.Model.MasterViewModel;
+using EmployeeInformations.Model.PagerViewModel;
+
+namespace EmployeeInformations.Data.IRepository
+{
+    public interface IMasterRepository
+    {       
+        Task<int> Create(DesignationEntity designationEntity);       
+        Task<int> CreateDepartment(DepartmentEntity departmentEntity);
+        Task<int> CreateRole(RoleEntity roleEntity);
+        Task DeleteIsActive(RoleEntity roleEntity);
+        Task<List<SendEmailsEntity>> GetAllSendEmails(int companyId);
+        Task<int> CreateModule(ModulesEntity modulesEntity);
+        Task UpdateModule(ModulesEntity modulesEntity);
+        Task<int> GetModuleName(string moduleName);
+        Task<DesignationEntity> GetDesignationByEmployeeId(int designationId,int companyId);
+        Task<DepartmentEntity> GetDepartmentByEmployeeId(int departmentId,int companyId);
+     
+        Task<int> CreateSubModule(SubModulesEntity subModulesEntity);
+        Task<int> GetSubModulesName(string name,int companyId);
+        Task<List<ModulesEntity>> GetAllModuleName(int companyId);
+        Task<bool> DeleteSubModuleId(int subModuleId);
+        Task<List<ProjectTypeMaster>> GetAllProjectTypes(int companyId);
+        Task UpdateSubModule(SubModulesEntity subModulesEntity);       
+        Task<int> CreateProjectTypes(ProjectTypesEntity projectTypesEntity);
+        Task<bool> DeleteModule(int id);
+        Task<bool> DeletedDesignation(int designationId, int sessionCompanyId);
+        Task UpdateDesignation(DesignationEntity designationEntity);
+        Task UpdateDepartment(DepartmentEntity departmentEntity);       
+        Task<int> CreateDocumentType(DocumentTypesEntity documentTypesEntity);
+        Task UpdateDocumentTypes(DocumentTypesEntity documentTypesEntity);
+        Task<int> CreateskillSet(SkillSetEntity skillSetEntity);
+        Task UpdateSkillSet(SkillSetEntity skillSetEntity);      
+        Task<int> CreateEmailSettings(EmailSettingsEntity emailSettingsEntity);       
+
+        Task<int> AddSendEmails(SendEmailsEntity sendEmailsEntity);
+        Task<List<LeaveTypeMaster>> GetAllLeaveTypes(int companyId);
+        Task<int> CreateLeaveType(LeaveTypesEntity leaveTypesEntity,int companyId);
+        Task<int> GetLeaveType(string leaveType,int companyId);
+        Task UpadateLeave(LeaveTypesEntity leaveTypesEntity,int companyId);
+        Task<bool> DeleteLeaveType(int leaveTypeId,int companyId);      
+        Task<int> CreateAnnouncement(AnnouncementEntity announcementEntity,int companyId);
+        Task<List<LeaveTypeMaster>> GetAllCompanyLeaveType();
+        Task<int> CreateDashboardMenus(DashboardMenusEntity dashboardMenusEntity);
+        Task UpdateDashboardMenus(DashboardMenusEntity dashboardMenusEntity);
+        Task<bool> DeleteDashboardMenus(int menuId);
+        Task<int> CreateRelievingReasonName(RelievingReasonEntity relievingReasonEntity);
+        Task UpdateRelievingReasonststus(RelievingReasonEntity relievingReasonEntity);
+        Task<bool> DeleteRelievingReason(int relievingReasonId);
+        Task UpdateRelievingReason(RelievingReasonEntity relievingReasonEntity);
+        Task UpdateAnnouncement(AnnouncementEntity announcementEntity);
+        Task<List<AnnouncementEntity>> GetAllAnnouncementactive(int companyId);
+        Task<RoleEntity> GetRoleById(int roleId,int companyId);
+        Task<List<Announcements>> GetAnnouncement();
+        Task<List<SubModules>> GetAllSubModules(int companyId);   
+        Task<List<Designation>> GetDesignation(int companyId);
+        Task<List<Announcement>> GetAllAnnouncement(int companyId);
+        Task<List<TicketTypes>> GetAllTicketTypes(int companyId);
+        Task<int> CreateTicketType(TicketTypesEntity ticketTypesEntity);
+        Task<bool> InsertAnnouncementAttachment(List<AnnouncementAttachmentsEntity> announcementAttachments, int announcementId);
+        Task<List<AnnouncementAttachmentsEntity>> GetAnnouncementDocumentAndFilePath(int announcementId);
+        Task<List<TicketTypes>> GetTicketTypes(int companyId);
+        Task<int> AnnouncementFilterCount(int companyId, SysDataTablePager pager);
+        Task<List<AnnouncementFilterViewModel>> AnnouncementFilter(int companyId, SysDataTablePager pager, string columnName, string columnDirection);
+        Task<List<Designation>> GetAllDesignation(int companyId);
+        Task<bool> DeleteDepartment(int departmentId, int CompanyId);
+        Task<List<Department>> GetAllDepartment(int companyId);
+        Task<int> GetDepartmentName(string departmentName, int companyId);
+        Task<int> GetDesignationName(string designationName, int companyId);
+        Task<List<RoleTableMaster>> GetAllRoles(int companyId);
+        Task<bool> DeleteRole(int roleId, int companyId);
+        Task<int> GetRoleName(string roleName, int companyId);
+        Task<List<Modules>> GetAllModules(int companyId);
+        Task<int> GetProjectTypes(string projectTypeName, int CompanyId);
+        Task<bool> DeleteProjectTypeId(int projectTypeId, int companyId);
+        Task<List<DocumentType>> GetAllDocumentTypes(int companyId);
+        Task DeletedDocumentTypeId(int documentTypeId, int companyId);
+        Task<int> GetDocumentTypes(string documentName, int companyId);
+        Task<List<SkillSetEntity>> GetAllSkillSet(int companyId);
+        Task<int> GetSkillSet(string skillName, int companyId);
+        Task<EmailSettingsViewModel> GetAllEmailSettings(int companyId);
+        Task<bool> DeleteSendEmail(int emailListId, int companyId);
+        Task<int> GetEmailCount(string fromEmail, int companyId);
+        Task<int> GetSendEmailCount(string emailId, int companyId);
+        Task<List<Department>> GetDepartment(int companyId);
+        Task<int> GetAnnouncementName(string announcementName, int companyId);
+        Task<bool> DeleteAnnouncement(int announcementId, int companyId);
+        Task<bool> DeletedSkillSetId(int skillId, int companyId);
+        Task<List<DashboardMenus>> GetAllDashboardMenus(int sessionCompanyId);
+        Task<int> GetMenuName(string menuName, int companyId);
+        Task<List<RelievingReason>> GetAllRelievingReasons(int companyId);
+        Task<int> GetRelievingReasonName(string relievingReasonName, int companyId);
+        Task<List<RelievingReasonEntity>> GetAllRelievingReason(int comapnyId);
+        Task<bool> DeleteTicketType(int ticketTypeId, int companyId);
+        Task<TicketTypesEntity> GetByTicketTypeId(int ticketTypeId, int companyId);
+        Task<int> GetTicketName(string ticketName, int companyId);
+        Task<AnnouncementEntity> GetAnnouncementById(int announcementId, int companyId);
+        Task<SendEmailsEntity> GetSendEmailsByEmailListId(int emailListId, int companyId);
+    }
+}

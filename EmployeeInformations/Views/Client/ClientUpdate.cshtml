@@ -1,0 +1,404 @@
+﻿@using EmployeeInformations.Model.ClientSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model ClientViewModel
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Customer</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+            <form>
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @Html.HiddenFor(m => m.ClientId)
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.ClientName, new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.ClientName,"",new{@class="error text-danger",id="errValid-ClientName"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Company<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.ClientCompany, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ClientCompany,"",new{@class="error text-danger" , id="errValid-ClientCompany"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Customer Details<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.ClientDetails, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ClientDetails,"",new{@class="error text-danger" , id="errValid-ClientDetails"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label"> Email<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control",@type="email" })
+                            @Html.ValidationMessageFor(m => m.Email,"",new{@class="error text-danger" , id="errValid-Email"})
+                            <span id="errVerifyEmailFormat-Email" style="display:none;" class="error text-danger">  Invalid email address </span>
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group country-dropdown">
+                            <label class="form-label">Phone Number</label>
+                            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.PhoneNumber,"",new{@class="error text-danger", id="errValid-Phonenumber"})
+                            <span id="errVerify-PhoneNumberCount" style="display:none;" class="error text-danger"> Please enter 10 digits </span>
+                        </div>
+                    </div>
+                    @Html.HiddenFor(m => m.CountryCode, new { @class = "form-control" })
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Country<span class="required" style="color: #FF0000">*</span></label>
+                            <div>
+                                @Html.DropDownListFor(m => m.CountryId,new SelectList(Model.countrys,"CountryId","Name","CCA2"),"--Select Country--",new{@class="form-control ",id="CountryId"})
+                            </div>
+                            @Html.ValidationMessageFor(m=>m.CountryId,"",new{@class="error text-danger",id="errValid-Country"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group country-dropdown">
+                            <label class="form-label">Address<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Address,"",new{@class="error text-danger", id="errValid-Address"})
+                        </div>
+                    </div>
+
+                    <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6">
+                        <div class="form-group country-dropdown">
+                            <label class="form-label">Zip Code<span class="required" style="color: #FF0000">*</span></label>
+
+                            @Html.TextBoxFor(m => m.ZipCode, new { @class = "form-control" })
+
+                            @Html.ValidationMessageFor(m => m.ZipCode,"",new{@class="error text-danger", id="errValid-ZipCode"})
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnClientBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnUpdateClient" value="Save" />
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_UpdateClient_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Created Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseUpdateClient">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var selectedCountryCode;
+
+    $(function () {
+        var phone_number = document.querySelector("#PhoneNumber");
+        var countryCodee = $("#CountryCode").val();
+        window.intlTelInput(phone_number, {
+            separateDialCode: true,
+            initialCountry: countryCodee,
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                selectedCountryCode = selectedCountryData.iso2;
+                return "e.g. " + selectedCountryPlaceholder;
+            }
+        });
+
+    });
+
+    $('#btnClientBack').click(function () {
+        var urlToRedirect = '@Url.Action("Client","Client")';
+        window.location.href = urlToRedirect;
+    });
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Nice Scroll Country
+    $("#CountryId").select2().on("select2:open", function () {
+        $('.select2-results__options').niceScroll({
+            cursorcolor: "#4e5e7a",
+            cursorwidth: "5px",
+            autohidemode: false,
+            cursorborder: "1px solid #4e5e7a",
+            horizrailenabled: false,
+        });
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Keyup summary
+
+    $("#ClientName").keyup(function () {
+        var isValid = true;
+        $("#errValid-ClientName").text("");
+        if ($("#ClientName").val() == "") {
+            $("#errValid-ClientName").text("Name field is required");
+            isValid = false;
+        }
+    });
+
+    $("#ClientCompany").keyup(function () {
+        var isValid = true;
+        $("#errValid-ClientCompany").text("");
+        if ($("#ClientCompany").val() == "") {
+            $("#errValid-ClientCompany").text("Company field is required");
+            isValid = false;
+        }
+    });
+
+    $("#ClientDetails").keyup(function () {
+        var isValid = true;
+        $("#errValid-ClientDetails").text("");
+        if ($("#ClientDetails").val() == "") {
+            $("#errValid-ClientDetails").text("Customer Details field is required");
+            isValid = false;
+        }
+    });
+
+    $("#Email").keyup(function () {
+        $("#errValid-Email").text("");
+        $("#errVerifyEmailFormat-Email").hide();
+
+        if ($("#Email").val() == "") {
+            $("#errValid-Email").text("Email field is required");
+
+        }
+    });
+
+    //$("#PhoneNumber").keyup(function () {
+    //    var isValid = true;
+    //    $("#errValid-Phonenumber").text("");
+    //    $("#errVerify-PhoneNumberCount").hide();
+    //    if ($("#PhoneNumber").val() == "") {
+    //        $("#errValid-Phonenumber").text("Phone Number field is required");
+    //        isValid = false;
+    //    }
+    //else {
+    //    if ($("#PhoneNumber").val().length != 10) {
+    //        $("#errVerify-PhoneNumberCount").show();
+    //        isValid = false;
+    //    }
+    //}
+    //});
+
+    $("#Address").keyup(function () {
+        $("#errValid-Address").text("");
+        if ($("#Address").val() == "") {
+            $("#errValid-Address").text("Address field is required");
+        }
+    });
+
+    $("#ZipCode").keyup(function () {
+        $("#errValid-ZipCode").text(" ");
+        if ($("#ZipCode").val() == "") {
+            $("#errValid-ZipCode").text("Zip Code field is required");
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Only Allow Numbers
+
+    $("#PhoneNumber").on("input", function (evt) {
+        var self = $(this);
+        self.val(self.val().replace(/\D/g, ""));
+        if ((evt.which < 48 || evt.which > 57)) {
+            evt.preventDefault();
+        }
+    });
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Click Summary
+    $("#CountryId").change(function () {
+        $("#errValid-Country").text(" ");
+        if ($("#CountryId").val() == "") {
+            $("#errValid-Country").text("Country field is required");
+        }
+    });
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Update Client
+
+    $("#btnUpdateClient").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-ClientName").text("");
+        $("#errValid-ClientCompany").text("");
+        $("#errValid-ClientDetails").text("");
+        $("#errValid-Email").text("");
+        $("#errValid-Phonenumber").text("");
+        $("#errVerifyEmailFormat-Email").hide();
+        $("#errVerify-PhoneNumberCount").hide();
+        $("#errValid-Country").text("");
+        $("#errValid-Address").text("");
+        $("#errValid-ZipCode").text("");
+
+        if ($("#ClientName").val() == "") {
+            $("#errValid-ClientName").text("Name field is required");
+            isValid = false;
+        }
+
+        if ($("#ClientCompany").val() == "") {
+            $("#errValid-ClientCompany").text("Company field is required");
+            isValid = false;
+        }
+
+        if ($("#ClientDetails").val() == "") {
+            $("#errValid-ClientDetails").text("Customer Details field is required");
+            isValid = false;
+        }
+
+        if ($("#Email").val() == "") {
+            $("#errValid-Email").text("Email field is required");
+            isValid = false;
+        }
+
+        //if ($("#PhoneNumber").val() == "") {
+        //    $("#errValid-Phonenumber").text("Phone Number field is required");
+        //    isValid = false;
+        //}
+        //else {
+        //    if ($("#PhoneNumber").val().length != 10) {
+        //        $("#errVerify-PhoneNumberCount").show();
+        //        isValid = false;
+        //    }
+        //}
+
+        if ($("#CountryId :selected").val() == "0" || $("#CountryId :selected").val() == '') {
+            $("#errValid-Country").text("Country field is required");
+            isValid = false;
+        }
+
+        if ($("#Address").val() == "") {
+            $("#errValid-Address").text("Address field is required");
+            isValid = false;
+        }
+
+        if ($("#ZipCode").val() == "") {
+            $("#errValid-ZipCode").text("Zip Code field is required");
+            isValid = false;
+        }
+
+        var clientId = $("#ClientId").val();
+        var clientName = $("#ClientName").val();
+        var clientCompany = $("#ClientCompany").val();
+        var clientDetails = $("#ClientDetails").val();
+        var email = $("#Email").val();
+        var country = $("#CountryId").val();
+        var address = $("#Address").val();
+        var zipcode = $("#ZipCode").val();
+        var phoneNumber = $("#PhoneNumber").val();
+        var CountryCode = selectedCountryCode;
+
+        formData.append("ClientId", clientId);
+        formData.append("ClientName", clientName);
+        formData.append("ClientCompany", clientCompany);
+        formData.append("ClientDetails", clientDetails);
+        formData.append("Email", email);
+        formData.append("CountryId", country);
+        formData.append("Address", address);
+        formData.append("ZipCode", zipcode);
+        formData.append("PhoneNumber", phoneNumber);
+        formData.append("CountryCode", CountryCode);
+
+        if (isValid) {
+            var isEmailVerify = emailCheck(email);
+            if (isEmailVerify) {
+
+                var url = "/Client/UpdateClient";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+
+                        $("#success_UpdateClient_Popup").css('display', 'none !important');
+                        if (result > 0) {
+                            Swal.fire({
+                                title: 'Updated Successfully',
+                                text: "",
+                                icon: 'success',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                window.location.href = "/Client/Client";
+                            });                           
+                        }
+                        else {
+                            Swal.fire({
+                                title: 'Something error',
+                                text: "",
+                                icon: 'error',
+                                allowOutsideClick: false
+                            }).then((resultValue) => {
+                                    window.location.href = "/Client/Client";
+                            });                           
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerifyEmailFormat-Email").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+
+    //-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Email Validation
+
+    function emailCheck(email) {
+        var isEmailValid = true;
+        var mailformat = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        $("#errVerifyEmailFormat-Email").hide();
+        if (!mailformat.test(email)) {
+            $("#errVerifyEmailFormat-Email").show();
+            isEmailValid = false;
+        }
+        return isEmailValid
+    }
+
+</script>

@@ -1,0 +1,655 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.EmployeesViewModel
+@using EmployeeInformations.Common.Enums;
+@using Microsoft.AspNetCore.Http;
+@model ProfileInfo
+
+@{
+    var roleId = Context.Session.GetInt32("RoleId");
+}
+
+<form>
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="d-flex mb-1 title data-head">
+        <h6>Profile Information</h6>
+    </div>
+    <div class="row p-3 pb-0">
+        @Html.HiddenFor(m => m.ProfileId)
+        @Html.HiddenFor(m => m.EmpId)
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Gender<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.Gender, Html.GetEnumSelectList<Gender>(), "--Select Gender--", new { @class = "form-control" })
+                </div>
+                @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "error text-danger", @id = "errValid-Gender" })
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Marital Status<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.MaritalStatus, Html.GetEnumSelectList<MaritalStatus>(), "--Select Marital Status--", new { @class = "form-control" })
+                </div>
+                @Html.ValidationMessageFor(m => m.MaritalStatus, "", new { @class = "error text-danger", @id = "errValid-MaritalStatus" })
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Date of Birth<span class="required" style="color: #FF0000">*</span></label>
+                <div id="datepicker" class="input-group date" data-date-format="dd/mm/yyyy">
+                    @if (Model.ProfileId == 0)
+                    {
+                        <input type="text" class="form-control" id="DateOfBirth" value="" placeholder="Select Date of Birth" />
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.DateOfBirth, "{0:dd/MM/yyyy}", new { @class = "form-control", @Value = Model.DateOfBirth.ToString(Constant.DateFormat) })
+                    }
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                @Html.ValidationMessageFor(m => m.DateOfBirth, "", new { @class = "error text-danger", @id = "errValid-DateOfBirth" })
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Blood Group<span class="required" style="color: #FF0000">*</span></label>
+                <div>
+                    @Html.DropDownListFor(m => m.BloodGroup, new SelectList(Model.BloodGroups, "BloodGroupId", "BloodGroupName"), "--Select Blood Group--", new { @class = "form-control", id = "BloodGroup" })
+                </div>
+                @Html.ValidationMessageFor(m => m.BloodGroup, "", new { @class = "error text-danger", id = "errValid-BloodGroup" })
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group">
+                <label class="form-label">Date Of Joining<span class="required" style="color: #FF0000">*</span></label>
+                <div id="datepicker2" class="input-group date" data-date-format="dd/mm/yyyy">
+                    @if (Model.ProfileId == 0)
+                    {
+
+                        <input type="text" class="form-control" id="DateOfJoining" value="" placeholder="Select Date Of Joining" />
+                    }
+                    else
+                    {
+                        @Html.TextBoxFor(m => m.DateOfJoining, "{0:dd/MM/yyyy}", new { @class = "form-control", @Value = Model.DateOfJoining.ToString(Constant.DateFormat) })
+                    }
+                    <span class="input-group-addon">
+                        <i class="icon ti-calendar"></i>
+                    </span>
+                </div>
+                @Html.ValidationMessageFor(m => m.DateOfJoining, "", new { @class = "error text-danger", @id = "errValid-DateOfJoining" })
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="form-group country-dropdown">
+                <label class="form-label">Phone Number<span class="required" style="color: #FF0000">*</span></label>
+                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "error text-danger", id = "errValid-Phonenumber" })
+                <span id="errVerify-PhoneNumberCount" style="display:none;" class="error text-danger"> Please enter 10 digits </span>
+            </div>
+        </div>
+        @Html.HiddenFor(m => m.CountryCode)
+        <div class="col-12">
+            <div class="form-group">
+                <label class="form-label">Profile Image<span class="required" style="color: #FF0000">*</span></label>
+                <div class="input-group custom-file-button">
+                    @*    <label class="input-group-text" for="inputGroupFile2">Upload</label>*@
+                    @Html.TextBoxFor(m => m.ProfileFilePath, "", new { type = "file", @class = "form-control", name = "file" })
+
+                </div>
+                @if (Model.ProfileActionName == "update")
+                {
+                    <div class="user-avatar mt-1 bg-light">
+                        <img src="@Model.ProfileViewImage" style="height: 50px;">
+                    </div>
+                    <div class="text-primary mt-1">
+                        @Model.ProfileName
+                    </div>
+                }
+
+                @Html.ValidationMessageFor(m => m.ProfileFilePath, "", new { @class = "error text-danger", id = "errValid-ProfileFilePath" })
+                <span id="errValid-Image" style="display:none;" class="error text-danger"> Please upload the image in any of the following formats (.png, .jpeg, .jpg) </span>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<form>
+    <div>
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="card-title title mb-0 data-head">
+            <h6>Emergency Contact Person</h6>
+        </div>
+        <div class="row p-3 pb-0">
+            @Html.HiddenFor(m => m.ProfileId)
+            @Html.HiddenFor(m => m.EmpId)
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Name<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.ContactPersonName, new { type = "text", onkeydown = "return /[a-z]/i.test(event.key)", @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ContactPersonName, "", new { @class = "error text-danger", id = "errValid-ContactPersonName" })
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-label">Relationship<span class="required" style="color: #FF0000">*</span></label>
+                    <div>
+                        @Html.DropDownListFor(m => m.RelationshipId, new SelectList(Model.RelationshipType, "RelationshipId", "RelationshipName"), "--Select Relationship--", new { @class = "form-control", id = "RelationshipId" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.RelationshipId, "", new { @class = "error text-danger", id = "errValid-RelationshipId" })
+                </div>
+            </div>
+
+            <div class="col-lg-4" id="hidden_Others" style="display:none">
+
+                <div class="form-group">
+                    <label class="form-label">Others Name<span class="required" style="color: #FF0000">*</span></label>
+                    <div class="input-group">
+                        @if (Model.RelationshipId == 6)
+                        {
+
+                            <input type="text" id="OthersName" value="@Model.OthersName" class="form-control" />
+                        }
+                        else
+                        {
+                            <input type="text" id="OthersName" value="" class="form-control" />
+                        }
+
+                    </div>
+                    <span class="error text-danger" id="errValid-Others"></span>
+                </div>
+            </div>
+            @Html.HiddenFor(m => m.CountryCodeNumber)
+            <div class="col-lg-4">
+                <div class="form-group country-dropdown">
+                    <label class="form-label">Contact Number<span class="required" style="color: #FF0000">*</span></label>
+                    @Html.TextBoxFor(m => m.ContactNumber, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ContactNumber, "", new { @class = "error text-danger", id = "errValid-ContactNumber" })
+                    <span id="errVerify-ContactNumberCount" style="display:none;" class="error text-danger"> Please enter 10 digits </span>
+                </div>
+            </div>
+            @Html.HiddenFor(m => m.CountryCode)
+
+
+        </div>
+    </div>
+</form>
+<div class="row px-3">
+    <div class="col-lg-12 d-flex mb-3">
+        <input type="button" class="btn btn-secondary" id="btnProfileBack" value="Back" />
+        <input type="button" class="btn btn-primary ml-auto" id="btnCreateProfile" value="Next" />
+    </div>
+</div>
+
+<div class="modal" id="success_CreateProfile_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Profile Created Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseCreateProfile">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+
+    $(document).ready(function () {
+        $("#datepicker").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+        });
+
+        $("#datepicker2").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            endDate: new Date()
+        });
+
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------
+        // Nice scroll for BloodGroup
+
+        $("#BloodGroup,#RelationshipId,#BloodGroup,#Gender,#MaritalStatus").select2().on("select2:open", function () {
+            $('.select2-results__options').niceScroll({
+                cursorcolor: "#4e5e7a",
+                cursorwidth: "5px",
+                autohidemode: false,
+                cursorborder: "1px solid #4e5e7a",
+                horizrailenabled: false,
+            });
+        });
+
+        //Change Summary
+        $("#RelationshipId").change(function () {
+            var selectedText = $(this).find("option:selected").text();
+            var selectedValue = $(this).val();
+            if (selectedText == 'Others') {
+                $("#hidden_Others").show();
+            }
+            else {
+                $("#hidden_Others").hide();
+                $("#OthersName").val("");
+            }
+        });
+
+        $("#DateOfBirth").change(function () {
+            $("#errValid-DateOfBirth").text("");
+
+            if ($("#DateOfBirth").val() == "") {
+                $("#errValid-DateOfBirth").text("Date Of Birth field is required");
+            }
+            else {
+                $("#errValid-DateOfBirth").text("");
+            }
+        });
+
+        $("#DateOfJoining").change(function () {
+            $("#errValid-DateOfJoining").text("");
+
+            if ($("#DateOfJoining").val() == "") {
+                $("#errValid-DateOfJoining").text("Date Of Joining field is required");
+            }
+            else {
+                $("#errValid-DateOfJoining").text("");
+            }
+        });
+
+        $("#BloodGroup").change(function () {
+
+            $("#errValid-ProfileFilePath").text("");
+            $("#errValid-BloodGroup").text("");
+
+            if ($("#BloodGroup").val() == "") {
+                $("#errValid-BloodGroup").text("Blood Group field is required");
+            }
+        });
+
+        $("#RelationshipId").change(function () {
+            $("#errValid-RelationshipId").text("");
+
+            if ($("#RelationshipId").val() == "") {
+                $("#errValid-RelationshipId").text("Relationship field is required");
+            }
+        });
+
+        $("#Gender").change(function () {
+            $("#errValid-Gender").text("");
+
+            if ($("#Gender").val() == "") {
+                $("#errValid-Gender").text("Gender field is required");
+            }
+
+        });
+
+        $("#MaritalStatus").change(function () {
+            $("#errValid-MaritalStatus").text("");
+
+            if ($("#MaritalStatus").val() == "") {
+                $("#errValid-MaritalStatus").text("Marital Status field is required");
+            }
+        });
+
+        //KeyUp Summary
+
+        $("#PhoneNumber").keyup(function () {
+            $("#errValid-Phonenumber").text("");
+            $("#errVerify-PhoneNumberCount").hide();
+            if ($("#PhoneNumber").val() == "") {
+                $("#errValid-Phonenumber").text("Phone Number field is required");
+            }
+        });
+
+        $("#ContactNumber").keyup(function () {
+
+            $("#errValid-ContactNumber").text("");
+            $("#errVerify-ContactNumberCount").hide();
+
+            if ($("#ContactNumber").val() == "") {
+                $("#errValid-ContactNumber").text("Contact Number field is required");
+            }
+        });
+
+        $("#ContactPersonName").keyup(function () {
+
+            $("#errValid-ContactPersonName").text("");
+            if ($("#ContactPersonName").val() == "") {
+                $("#errValid-ContactPersonName").text("Name field is required");
+            }
+        });
+
+        $("#OthersName").keyup(function () {
+            $("#errValid-Others").text("");
+            if ($("#OthersName").val() == "") {
+                $("#errValid-Others").text("Others Name field is required");
+            }
+        });
+
+        $("#PhoneNumber").on("input", function (evt) {
+            var self = $(this);
+            self.val(self.val().replace(/\D/g, ""));
+            if ((evt.which < 48 || evt.which > 57)) {
+                evt.preventDefault();
+            }
+        });
+
+        $("#ContactNumber").on("input", function (evt) {
+            var self = $(this);
+            self.val(self.val().replace(/\D/g, ""));
+            if ((evt.which < 48 || evt.which > 57)) {
+                evt.preventDefault();
+            }
+        });
+
+        //Click Summary
+
+        $("#btnProfileBack").click(function () {
+
+            var empId = $("#EmpId").val();
+            PageUtil.goTo("/Employees/UpdateEmployee?EmpId=" + empId);
+
+        });
+
+        if ($("#RelationshipId").val() == 6) {
+            $('#hidden_Others').css('display', 'block');
+        }
+        else {
+            $('#hidden_Others').css('display', 'none');
+        }
+        $('.selectedwizard li').removeClass('current');
+        $("#step2").addClass('current');
+
+    });
+
+
+    //Phone Number Country Code Binding
+
+    var selectedCountryCode;
+    var countryCode;
+    if ($("#CountryCode").val() == '') {
+        countryCode = 'in'
+    }
+    else {
+        countryCode = $("#CountryCode").val();
+    }
+
+    $(function () {
+        var phone_number = document.querySelector("#PhoneNumber");
+        window.intlTelInput(phone_number, {
+            separateDialCode: true,
+            initialCountry: countryCode,
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                selectedCountryCode = selectedCountryData.iso2;
+                return "e.g. " + selectedCountryPlaceholder;
+            }
+        });
+
+    });
+
+    var selectedCountryCodeNumber;
+    var countryCodeNumber;
+    if ($("#CountryCodeNumber").val() == '') {
+        countryCodeNumber = 'in'
+    }
+    else {
+        countryCodeNumber = $("#CountryCodeNumber").val();
+    }
+
+    $(function () {
+        var phone_number = document.querySelector("#ContactNumber");
+        window.intlTelInput(phone_number, {
+            separateDialCode: true,
+            initialCountry: countryCodeNumber,
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+            customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                selectedCountryCodeNumber = selectedCountryData.iso2;
+                return "e.g. " + selectedCountryPlaceholder;
+            }
+        });
+
+    });
+
+    //----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    //Create And Update Profile info
+
+    $('#btnCreateProfile').click(function () {
+        $(this).prop('disabled', true);
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Gender").text("");
+        $("#errValid-MaritalStatus").text("");
+        $("#errValid-DateOfBirth").text("");
+        $("#errValid-DateOfJoining").text("");
+        $("#errValid-Phonenumber").text("");
+        $("#errValid-ProfileFilePath").text("");
+        $("#errValid-BloodGroup").text("");
+        $("#errValid-Image").hide();
+
+        $("#errValid-ContactPersonName").text("");
+        $("#errValid-ContactNumber").text("");
+        $("#errValid-RelationshipId").text("");
+        $("#errVerify-PhoneNumberCount").hide();
+        $("#errVerify-ContactNumberCount").hide();
+
+
+        if ($("#RelationshipId").val() == 6) {
+            if ($("#OthersName").val() == "") {
+                $("#errValid-Others").text("Others Name field is required");
+                isValid = false;
+            }
+            if ($("#ContactPersonName").val() == "") {
+                $("#errValid-ContactPersonName").text("Gender field is required");
+                isValid = false;
+            }
+
+            if ($("#ContactNumber").val() == "") {
+                $("#errValid-ContactNumber").text("Contact Number field is required");
+                isValid = false;
+            }
+            if ($("#RelationshipId").val() == "") {
+                $("#errValid-RelationshipId").text("Relationship field is required");
+                isValid = false;
+            }
+
+        }
+        else {
+            if ($("#ContactPersonName").val() == "") {
+                $("#errValid-ContactPersonName").text("Gender field is required");
+                isValid = false;
+            }
+
+            if ($("#ContactNumber").val() == "") {
+                $("#errValid-ContactNumber").text("Contact Number field is required");
+                isValid = false;
+            }
+            if ($("#RelationshipId").val() == "") {
+                $("#errValid-RelationshipId").text("Relationship field is required");
+                isValid = false;
+            }
+
+        }
+
+
+
+        if ($("#ContactNumber").val() == "") {
+            $("#errValid-ContactNumber").text("Contact Number field is required");
+            isValid = false;
+
+        }
+        //if ($("#ContactNumber").val() != "") {
+        //    var contact = $("#ContactNumber").val().length;
+        //       if (contact != 10) {
+        //        $("#errVerify-ContactNumberCount").show();
+        //        isValid = false;
+        //    }
+
+
+
+        if ($("#RelationshipId").val() == "") {
+            $("#errValid-RelationshipId").text("Relationship field is required");
+            isValid = false;
+        }
+
+        if ($("#Others").val() == "") {
+            $("#errValid-Others").text("Others Name field is required");
+            isValid = false;
+        }
+
+
+        if ($("#Gender").val() == "") {
+            $("#errValid-Gender").text("Gender field is required");
+            isValid = false;
+        }
+
+        if ($("#MaritalStatus").val() == "") {
+            $("#errValid-MaritalStatus").text("Marital Status field is required");
+            isValid = false;
+        }
+
+        if ($("#DateOfBirth").val() == "") {
+            $("#errValid-DateOfBirth").text("Date Of Birth field is required");
+            isValid = false;
+        }
+
+        if ($("#DateOfJoining").val() == "") {
+            $("#errValid-DateOfJoining").text("Date Of Joining field is required");
+            isValid = false;
+        }
+        if ($("#BloodGroup").val() == "") {
+            $("#errValid-BloodGroup").text("Blood Group field is required");
+            isValid = false;
+        }
+        if ($("#PhoneNumber").val() == "") {
+            $("#errValid-Phonenumber").text("Phone Number field is required");
+            isValid = false;
+        }
+
+        //if ($("#PhoneNumber").val() != ""){
+        //     var phone = $("#PhoneNumber").val().length;
+        //    if (phone != 10) {
+        //    $("#errVerify-PhoneNumberCount").show();
+        //    isValid = false;
+        //}
+
+        var profileFilePath = $("#ProfileFilePath").val();
+
+        if (profileFilePath == "" && '@Model.ProfileActionName' != "update") {
+            $("#errValid-ProfileFilePath").text("Profile Image field is required");
+            isValid = false;
+        }
+
+        if (profileFilePath != "") {
+            var ext = profileFilePath.split('.').pop();
+            var value = ext.toLowerCase();
+            if (value == "jpeg" || value == "png" || value == "jpg" || value == "jfif" || value == "tiff") {
+
+            } else {
+                $("#errValid-Image").show();
+                isValid = false;
+            }
+        }
+
+        formData.append("file", $('#ProfileFilePath').prop("files")[0]);
+
+        var empId = $("#EmpId").val();
+        var profileId = $("#ProfileId").val();
+        var gender = $("#Gender").val();
+        var maritalStatus = $("#MaritalStatus").val();
+        var dateOfBirth = $("#DateOfBirth").val();
+        var bloodGroup = $("#BloodGroup").val();
+        var dateOfJoining = $("#DateOfJoining").val();
+        var countryCode = selectedCountryCode;
+        var phoneNumber = $("#PhoneNumber").val();
+        var countryCodeNumber = selectedCountryCodeNumber;
+        var contactNumber = $("#ContactNumber").val();
+        var contactPersonName = $("#ContactPersonName").val();
+        var relationshipId = $("#RelationshipId").val();
+        var others = $("#OthersName").val();
+
+        formData.append("ProfileId", profileId);
+        formData.append("EmpId", empId);
+        formData.append("Gender", gender);
+        formData.append("MaritalStatus", maritalStatus);
+        formData.append("DateOfBirth", dateOfBirth);
+        formData.append("BloodGroup", bloodGroup);
+        formData.append("DateOfJoining", dateOfJoining);
+        formData.append("CountryCode", countryCode);
+        formData.append("PhoneNumber", phoneNumber);
+        formData.append("ContactNumber", contactNumber);
+        formData.append("CountryCodeNumber", countryCodeNumber);
+        formData.append("ContactPersonName", contactPersonName);
+        formData.append("RelationshipId", relationshipId);
+        formData.append("OthersName", others);
+
+        formData.append("StrDateOfBirth", dateOfBirth);
+        formData.append("StrDateOfJoining", dateOfJoining);
+
+
+
+        if (isValid) {
+
+            var url = "/Employees/AddProfileInfo";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (result) {
+
+                    if (result > 0) {
+                        //$("#success_CreateProfile_Popup").show();
+                        //$("#btnCloseCreateProfile").click(function () {
+                        PageUtil.goTo("/Employees/CreateAddress?empId=" + result);
+                        //});
+                    } else {
+                        Swal.fire({
+                            title: 'Something error',
+                            text: "",
+                            icon: 'error',
+                            allowOutsideClick: false
+                        }).then((resultValue) => {
+                            PageUtil.goTo("/Employees/CreateAddress?empId=" + result);
+                        });
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+
+        }
+        else {
+            $(this).prop('disabled', false);
+            return false;
+        }
+
+    });
+
+</script>

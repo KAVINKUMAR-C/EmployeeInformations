@@ -1,0 +1,21 @@
+﻿@using EmployeeInformations.Model.AssetViewModel;
+@using Microsoft.AspNetCore.Http;
+@model AllAssets
+@{
+    var roleId = Context.Session.GetInt32("AllAssetsId");
+}
+
+<div id="bind-AllAssetsmodal-content">
+</div>
+
+<input type="hidden" id="txt-AllAssetsId" value="@Model.AllAssetsId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        
+        var allAssetsId = $("#txt-AllAssetsId").val();
+        PageUtil.goToAllAssets("/Asset/UpdateAllAssets?AllAssetsId=" + allAssetsId);
+    });
+
+</script>

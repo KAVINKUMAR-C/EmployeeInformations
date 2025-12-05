@@ -1,0 +1,88 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.OnboardingViewModel;
+@model OBOtherDetailsViewModel
+
+
+<div class="card-title mb-4">
+    <h6 class="title">Other Details</h6>
+</div>
+
+<div class="tab-pane px-3">
+    <div class="card my-4 boxshadow-none edit-page table-card" data-simplebar>
+        <table class="table" id="getdata">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Document Type</th>
+                    <th>Document Number</th>
+                    <th>Valid From</th>
+                    <th>Valid To</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="displayotherdetails">
+                @if (Model.OtherDetails?.Count() > 0)
+                {
+                    foreach (var item in Model.OtherDetails)
+                    {
+                        <tr class="nk-tb-item">
+                            <td class="nk-tb-col">
+                                @item.DocumentTypeName
+                            </td>
+                            <td class="nk-tb-col">
+                                @item.DocumentNumber
+                            </td>
+                            <td class="nk-tb-col">
+                                @item.ValidFrom?.ToString(Constant.DateFormat)
+                            </td>
+                            <td class="nk-tb-col">
+                                @item.ValidTo?.ToString(Constant.DateFormat)
+                            </td>
+                            <td class="nk-tb-col">
+                                <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                    <ul class="nk-tb-actions gx-1 my-n1">
+                                        <li class="me-n1">
+                                            <div class="dropdown">
+                                                <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <ul class="link-list-opt no-bdr">
+                                                        <li><a href="javascript:void(0)" id="btnDownload" data-id="@item.DetailId"><em class="icon ni ni-download"></em><span>Download</span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr class="nk-tb-item">
+                        <td class="text-danger" style="text-align:center;" colspan="4">No record found</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('.viewActive li').removeClass('active');
+        $(".empOtherDetails").addClass('active');
+
+    });
+
+    // Download Document
+
+    $('#displayotherdetails').on('click', '#btnDownload', function () {
+
+        var detailId = $(this).data("id")
+        window.location.href = "/OBEmployees/DownloadOtherDetailsFile?detailId=" + detailId;
+        $('.loader').addClass('d-none');
+    });
+
+</script>

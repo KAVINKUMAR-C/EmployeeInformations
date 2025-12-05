@@ -1,0 +1,32 @@
+﻿
+@using EmployeeInformations.Model.OnboardingViewModel
+@model WelcomeAboard 
+
+@{
+    Layout = "_Layout";
+}
+ <div class="welcome-aboard">
+  <div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title py-3"> <em class="icon ti-user mr-2 bg-primary text-white p-2"></em> Dear @Model.EmployeeName,</h5>
+  <p class="card-text">
+     <b> We are delighted to extend a warm welcome to you as the newest member of our @Model.CompanyName family!
+    We are thrilled that you have choosen to join our organization, and we believe that your talents and skills 
+    will be valuable assets to our team.</b>
+  </p>
+        <p class="card-text"><small class="text-muted">@DateTime.Now</small></p>
+            <div class="col-lg-12 d-flex mt-3 p-0">
+                <input type="button" class="btn btn-primary ml-auto mr-3" id="btnProfile" value="Enrich Your Profile" />
+            </div>
+  </div>
+       
+</div>
+ </div>
+ <script>
+    $("#btnProfile").click(function(){
+
+        window.location.href = "/OBEmployees/EditEmployees";
+    });
+
+ </script>
+

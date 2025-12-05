@@ -1,0 +1,225 @@
+﻿@using EmployeeInformations.Model.CompanyPolicyViewModel;
+@model List<ManualLog>
+@{
+    ViewBag.Title = "Manuallog";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">ManualLog Details</h3>
+        </div><!-- .nk-block-head-content -->    
+        <div class="col d-flex ml-auto mt-auto mb-3 pb-1">
+            <input type="button" class="ml-auto mr-3 btn btn-primary icon-ch" id="CreateManualLog" value="Add" />
+            <input type="button" class="btn btn-secondary icon-ch" id="backManualLogReports" value="Back" />
+        </div>
+    </div><!-- .nk-block-between -->
+</div>
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting-table" style="width:100%" data-auto-responsive="false" id="getManualLogData">
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>S.No</th>
+                    <th>Employee Id</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Entry Status</th>
+                    <th>Total Hours</th>
+                    <th>Break Hours</th>
+                </tr>
+            </thead>
+            <tbody id="displayPolicy">
+                @if (Model.Count() > 0 && Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @item.Sno
+                            </td>
+
+                            <td>
+                                @item.EmpId
+                            </td>
+
+                            <td>
+                                @item.StartTime
+                            </td>
+                            <td>
+                                @item.EndTime
+                            </td>
+                            <td>
+                                @item.EntryStatus
+                            </td>
+                            <td>
+                                @item.TotalHours
+                            </td>
+                            <td>
+                                @item.BreakHours
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>   
+</div>
+
+<div class="modal" id="Create_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">ManualLog Entry</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12">
+                    <div class="form-group">
+                        <label class="form-label">Download Excel</label>
+                        <div>
+                            <input type="button" class="btn btn-primary" id="btnCreate" value="Click" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label class="form-label">Import Data</label>
+                        <div>
+                            <input type="file" id="file" name="UploadedFile" />
+                        </div>
+                        <span class="error text-danger" id="errValid-file"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" name="Submit" id="submit" value="Submit" />
+                    <input type="button" class="btn btn-danger" id="btnCloseDepartment" value="Cancel" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="success_DeleteCompanyPolicy_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDeleteCompanyPolicy">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#getManualLogData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            order: [
+                [2, "asc"]
+            ],
+        });
+    });
+
+    $(document).ready(function () {
+        $("#CreateManualLog").click(function () {
+            $("#Create_Popup").modal('show');
+        });
+
+        $("#file").change(function () {
+            $("#errValid-file").text("");
+            $("#displayDocumentName").text('');
+            //$("#errValid-Document").hide();
+            var attachmentFilePath = $("#file").val();
+            if (attachmentFilePath == "") {
+                $("#errValid-file").text("Attachment field is required");
+            }
+        });
+    });
+    //----------------------------------------------------------------------------------------------------------------------------
+
+    $("#btnCloseDepartment").click(function () {
+        $("#Create_Popup").hide();
+        window.location.href = "/Reports/ManualLog";
+        $('.loader').addClass('d-none');
+    });
+
+    $("#btnCreate").click(function () {
+        window.location.href = "/Reports/Excel"
+        $('.loader').addClass('d-none');
+    });       
+    //-----------------------------------------------------------------------------------------------------------------------------
+
+    // Filter Mannual Log Report
+
+    $('#submit').click(function () {
+        var isValid = true;
+        var formData = new FormData();
+        $("#errValid-file").hide();
+        var attachmentFilePath = $("#file").val();
+        if (attachmentFilePath == "") {
+            $("#errValid-file").text("Attachment field is required");
+            isValid = false;
+        }
+
+        formData.append("file", $('#file').prop("files")[0]);
+        var url = "/Reports/Upload";
+        if (isValid == true) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: (Result) => { //list of data count
+                    swal.fire({
+                        title: "Added Successfully",
+                        text: "",
+                        icon: "success",
+                        allowOutsideClick: false  // This prevents closing on outside click
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/Reports/ManualLog";
+                        };
+                    });
+                    
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            $("#errValid-file").show();
+            return false;
+        }
+
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------
+
+    $('#backManualLogReports').click(function () {
+        window.location.href = "/Reports/ManualLogReports";
+        $('.loader').addClass('d-none');
+    });
+
+</script>

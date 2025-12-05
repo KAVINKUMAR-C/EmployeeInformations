@@ -1,0 +1,240 @@
+﻿@using EmployeeInformations.Common.Enums
+@using EmployeeInformations.Business.IService
+@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@using EmployeeInformations.Model.EmployeesViewModel;
+@model EmployeesListViewModel;
+@{
+    ViewBag.Title = "AllEmployeesReport";
+    Layout = "_Layout";
+
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int timeSheetModuleId = (int)EmployeesInformationsPages.EmployeesListModules;
+
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(timeSheetModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Employees Report</h3>
+
+        </div><!-- .nk-block-head-content -->        
+    </div><!-- .nk-block-between -->
+</div>
+<div class="col d-flex emp-log-dwn-btn justify-content-end">
+    <button type="button" class="mr-3 btn btn-secondary icon-ch pdf-icon" id="generatepfs"><img src="./images/pdf.png" /></button>
+    <button type="button" class="btn btn-secondary icon-ch" id="DownloadEmployee" /><i class="ti-download"></i></button>
+</div>
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card" id="employeeChangeLogDiv">      
+       
+       
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getEmployeesData">          
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="EmployeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col" data-id="UserName"><span class="sub-text">User Name</span></th>
+                    <th class="nk-tb-col" data-id="OfficeEmail"><span class="sub-text">Office Email</span></th>
+                    <th class="nk-tb-col" data-id="PhoneNumber"><span class="sub-text">PhoneNumber</span></th>
+                </tr>
+            </thead>          
+        </table>       
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindEmployeesData();
+        function BindEmployeesData() {
+            var count = 0;
+            var search = $('#Employeesearch').val();
+            var table = $("#getEmployeesData").DataTable();
+            $("#getEmployeesData").remove()
+            if (table) {
+                table.destroy();
+            }
+            
+            $('#getEmployeesData').DataTable({
+                serverSide: true,
+                processing: true,
+              
+                ajax: {
+                    url: "/Reports/GetAllEmployees",
+                    type: 'Get',                   
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getEmployeesData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var employeesEntry = document.getElementById("getEmployeesData_length"); //get entries div id
+                        var entrySelect = employeesEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue;
+                        // Pass pagination parameters
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.columnDirection = columnDirection;
+                        d.ColumnName = columnIndex;
+
+                    }
+                },
+                columns: [
+                    {
+                        data: 'employeeName',
+                        render: function (data, type, row) {
+                            if (count > 5)
+                                count = 1;
+                            var className = getClassNameForGrid(count);
+                            count++;
+                            return "<div class='user-card'> <div class='user-avatar " + className + " '><span style='text-transform:uppercase;'> " + (row.employeeName)[0] + "</span></div><div class='user-info'>" + (row.employeeName) + "</div></div>";
+                        }
+                    },
+                    {
+                        data: 'userName',
+                        render: function (data, type, row) {
+                            return "<span class='badge badge-dim bg-primary'>" + row.userName + "</span>";
+                        }
+                    },
+                    {
+                        data: 'officeEmail',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-primary'>" + row.officeEmail + "</b>";
+                        }
+                    },
+                    {
+                        data: 'phoneNumber',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-primary'>" + row.phoneNumber + "</b>";
+                        }
+                    },
+                ],
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+            });
+
+        }
+        
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            }
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');
+        });
+
+    });
+    
+
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }
+
+
+    $("#generatepfs").click(function () {
+       
+        var url = "/Reports/EmployeesListCreatePdf";
+            $.ajax({
+                    type: "POST",
+                    url: url,                   
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                    window.location.href = '/Reports/DownloadEmployeesPdf?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire("No Record Found !", "", "error").then((result) => {
+                                if (result.isConfirmed) {
+                                };
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+            });
+    });
+
+
+    // Download data
+
+    $('#DownloadEmployee').click(function () {
+       
+        var url = "/Reports/DownloadExcelEmployees";
+            $.ajax({
+                    type: "POST",
+                    url: url,                    
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (data) => {
+                        var response = data;
+                        if (data != "") {
+                         window.location.href = '/Reports/DownloadEmployees?fileGuid=' + data;
+                        }
+                        else {
+                            swal.fire("No Record Found !", "", "error").then((result) => {
+
+
+                                if (result.isConfirmed) {
+                                };
+                            });
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+            });      
+
+    });
+
+</script>

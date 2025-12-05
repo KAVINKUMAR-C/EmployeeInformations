@@ -1,0 +1,788 @@
+﻿@using EmployeeInformations.Model.MasterViewModel;
+@model EmailSettingsViewModel
+@{
+    ViewBag.Title = "EmailSettings";
+    Layout = "_Layout";
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Email Settings</h3>
+        </div><!-- .nk-block-head-content -->
+    </div><!-- .nk-block-between -->
+</div>
+
+<form>
+    <div class="tab-content">
+        <div class="tab-pane active">
+            <br>
+            @Html.HiddenFor(m => m.EmailSettingId)
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Email From<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.FromEmail,"", new { @class = "form-control",id="FromEmail"})
+                        @Html.ValidationMessageFor(x=>x.FromEmail ,"" , new { @class = "error text-danger", @id="errValid-FromEmail"})
+                        <span id="errVerify-EmailExist" style="display:none;" class="error text-danger"> Email Id already exists! </span>
+                        <span id="errVerifyEmailFormat-FromEmail" style="display:none;" class="error text-danger">Invalid email address </span>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Host<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.Host, new { @class = "form-control",id="Host"})
+                        @Html.ValidationMessageFor(x=>x.Host ,"" , new { @class = "error text-danger", @id="errValid-Host"})
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Email Port<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.EmailPort, new { @class = "form-control",id="EmailPort"})
+                        @Html.ValidationMessageFor(x => x.EmailPort,"" , new { @class = "error text-danger" , @id="errValid-EmailPort"})
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>User Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control",id="UserName"})
+                        @Html.ValidationMessageFor(x => x.UserName,"" , new { @class = "error text-danger" , @id="errValid-UserName"})
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Password<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.Password,"", new { @class = "form-control",id="Password", type="password"})
+                        @Html.ValidationMessageFor(x => x.Password,"" , new { @class = "error text-danger" , @id="errValid-Password"})
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Display Name<span class="required" style="color: #FF0000">*</span></label>
+                        @Html.TextBoxFor(m => m.DisplayName,"", new { @class = "form-control",id="DisplayName"})
+                        @Html.ValidationMessageFor(x => x.DisplayName,"" , new { @class = "error text-danger" , @id="errValid-DisplayName"})
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 d-flex mt-3 p-0">
+        @if (Model.EmailSettingId > 0)
+        {
+            <input type="button" class="btn btn-primary ml-auto" id="btnUpdateEmail" value="Update" />
+        }
+        else
+        {
+            <input type="button" class="btn btn-primary ml-auto" id="btnUpdateEmail" value="Add" />
+        }
+
+    </div>
+
+</form>
+
+<div class="tab-pane">
+    <div class="card my-4 edit-page card-res" data-simplebar>
+        <table class="table" id="getdata">
+            @* <table class="datatable-init nk-tb-list nk-tb-ulist" data-auto-responsive="false" id="getdata">*@
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th>Email Id</th>
+                    <th>Description</th>
+                    <th>Display Name</th>
+                    <th>Action</th>
+                    @* <th class="nk-tb-col nk-tb-col-tools">
+                    <div class="nk-tb-col py-0 border-0">
+                    <ul class="nk-tb-actions gx-1 my-n1">
+                    <li class="me-n1">
+                    <div class="dropdown">
+                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                    </div>
+                    </li>
+                    </ul>
+                    Action
+                    </div>
+                    </th>*@
+                </tr>
+            </thead>
+            <tbody id="displayEmail">
+                @if (Model.SendEmailsEntitys != null)
+                {
+                    @if (Model.SendEmailsEntitys.Count() > 0)
+                    {
+                        foreach (var item in Model.SendEmailsEntitys)
+                        {
+                            <tr>
+                                <td>
+                                    @item.EmailId
+                                </td>
+
+                                <td>
+                                    @item.Description
+                                </td>
+
+                                <td>
+                                    @item.DisplayName
+                                </td>
+
+                                <td>
+
+                                    <div class="nk-tb-col nk-tb-col-tools py-0 border-0">
+                                        <ul class="nk-tb-actions gx-1 my-n1">
+                                            <li class="me-n1">
+                                                <div class="dropdown">
+                                                    <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-bs-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                        <ul class="link-list-opt no-bdr">
+                                                            <li><a href="javascript:void(0)" id="EditBtn" data-id="@item.EmailListId"><em class="icon ni ni-edit"></em><span>Edit</span></a></li>
+                                                            <li><a href="javascript:void(0)" id="btnDelete" data-id="@item.EmailListId"><em class="icon ni ni-delete"></em><span>Delete</span></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    @*<div class="d-flex action-btn">
+                        <a class="mr-2 text-primary fe fe-edit" id="EditBtn" title="Update" name="Edit" data-id="@item.EmailListId">
+                        </a>
+                        <a class="text-danger fe fe-trash" id="btnDelete" title="Delete" name="Delete" data-id="@item.EmailListId">
+                        </a>
+                        </div>*@
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <input type="hidden" class="form-control" id="EmailListId">
+    @if (Model.EmailSettingId > 0)
+    {
+        <div class="card boxshadow-none p-3">
+            <div class="row">
+                <input type="hidden" class="form-control" id="EmailSettingId" value="@Model.EmailSettingId">
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Email From<span class="required" style="color: #FF0000">*</span></label>
+                        <input type="text" class="form-control" id="EmailId">
+                        <span class="error text-danger" id="errValid-emailId"></span>
+                        <span id="errVerify-SendEmailExist" style="display:none;" class="error text-danger"> Email Id already exists! </span>
+                        <span id="errVerifyEmailFormat-SendEmail" style="display:none;" class="error text-danger">Invalid email address </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Description<span class="required" style="color: #FF0000">*</span></label>
+
+                        <input type="text" class="form-control" id="description" placeholder="">
+                        <span class="error text-danger" id="errValid-description"></span>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" class="form-control" id="displayName" placeholder="">
+                        <span class="error text-danger" id="errValid-displayName"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <button type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back">Back</button>
+                    <button type="button" class="btn btn-primary" id="btnAdd" value="add">Add</button>
+                    <button type="button" class="btn btn-primary" id="btnUpdate" value="update" style="display:none">Update</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $('#btnBack').click(function () {
+        var urlToRedirect = '@Url.Action("EmailSettings","Master")';
+        window.location.href = urlToRedirect;
+    });
+
+    // KeyUp Summary
+
+    $("#FromEmail").keyup(function () {
+        $("#errValid-FromEmail").text(" ");
+        if ($("#FromEmail").val() == "") {
+            $("#errValid-FromEmail").text("Email From field is required");
+        }
+    });
+
+    $("#Host").keyup(function () {
+        $("#errValid-Host").text(" ");
+        if ($("#Host").val() == "") {
+            $("#errValid-Host").text("Host field is required");
+        }
+    });
+
+    $("#EmailPort").keyup(function () {
+        $("#errValid-EmailPort").text(" ");
+        if ($("#EmailPort").val() == "") {
+            $("#errValid-EmailPort").text("Email Port field is required");
+        }
+    });
+
+
+    $("#UserName").keyup(function () {
+        $("#errValid-UserName").text(" ");
+        if ($("#UserName").val() == "") {
+            $("#errValid-UserName").text("User Name field is required");
+        }
+    });
+
+    $("#Password").keyup(function () {
+        $("#errValid-Password").text(" ");
+        if ($("#Password").val() == "") {
+            $("#errValid-Password").text("Password field is required");
+        }
+    });
+
+    $("#DisplayName").keyup(function () {
+        $("#errValid-DisplayName").text(" ");
+        if ($("#DisplayName").val() == "") {
+            $("#errValid-DisplayName").text("Display Name field is required");
+        }
+    });
+    //----------------------------------------------------------------------------------------------------------------------------
+
+    // update email setting
+
+    $("#btnUpdateEmail").click(function () {
+        var formData = new FormData();
+
+        var isValid = true;
+        $("#errValid-FromEmail").text("");
+        $("#errValid-Host").text("");
+        $("#errValid-EmailPort").text("");
+        $("#errValid-Password").text("");
+        $("#errValid-DisplayName").text("");
+        $("#errValid-UserName").text("");
+        $("#errVerify-EmailExist").hide();
+        $("#errVerifyEmailFormat-FromEmail").hide();
+
+        if ($("#FromEmail").val() == "") {
+            $("#errValid-FromEmail").text("Email From field is required");
+            $("#errVerifyEmailFormat-FromEmail").hide();
+            isValid = false;
+        }
+
+        if ($("#Host").val() == "") {
+            $("#errValid-Host").text("Host field is required");
+            isValid = false;
+        }
+
+        if ($("#EmailPort").val() == "") {
+            $("#errValid-EmailPort").text("Email Port field is required");
+            isValid = false;
+        }
+
+        if ($("#UserName").val() == "") {
+            $("#errValid-UserName").text("User Name field is required");
+            isValid = false;
+        }
+
+        if ($("#Password").val() == "") {
+            $("#errValid-Password").text("Password field is required");
+            isValid = false;
+        }
+
+        if ($("#DisplayName").val() == "") {
+            $("#errValid-DisplayName").text("Display Name field is required");
+            isValid = false;
+        }
+
+        var emailSettingId = $("#EmailSettingId").val();
+        var fromEmail = $("#FromEmail").val();
+        var host = $("#Host").val();
+        var emailPort = $("#EmailPort").val();
+        var userName = $("#UserName").val();
+        var password = $("#Password").val();
+        var displayName = $("#DisplayName").val();
+
+        var emailSettings = {
+            EmailSettingId: emailSettingId,
+            FromEmail: fromEmail,
+            Host: host,
+            EmailPort: emailPort,
+            UserName: userName,
+            Password: password,
+            DisplayName: displayName
+        };
+
+        
+        var isEmailVerify = emailCheck(fromEmail);
+        formData.append("FromEmail", fromEmail);
+        if (isValid) {
+
+            if (isEmailVerify) {
+
+                if (emailSettingId == 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Master/GetEmailCount",
+                        contentType: false,
+                        processData: false,
+                        data: formData,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: function (result) {
+
+                            if (result == 0) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "/Master/CreateEmailSettings",
+                                    data: emailSettings,
+                                    beforeSend: function () {
+                                        $('.loader').removeClass('d-none');
+                                    },
+                                    success: function (result) {
+                                        if (result > 0) {
+                                            swal.fire({
+                                        title: "Added Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                           var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                                window.location.href = urlToRedirect;
+                                    });
+                                           
+                                        }
+                                        else {
+                                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                                window.location.href = urlToRedirect;
+                                    });
+                                            
+                                        }
+                                    },
+                                    complete: function () {
+                                        $('.loader').addClass('d-none');
+                                    }
+                                });
+                            }
+                            else {
+                                $('.loader').addClass('d-none');
+                                $("#errVerify-EmailExist").show();
+                                return false;
+                            }
+                        },
+                        complete: function () {
+                            //$('.loader').addClass('d-none');
+                        }
+                    });
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Master/CreateEmailSettings",
+                        data: emailSettings,
+                        beforeSend: function () {
+                            $('.loader').removeClass('d-none');
+                        },
+                        success: function (result) {
+                            if (result > 0) {
+                                swal.fire({
+                                        title: "Updated Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                    window.location.href = urlToRedirect;
+                                    });
+                                
+                            }
+                            else {
+                                swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                           var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                    window.location.href = urlToRedirect;
+                                    });
+                               
+                            }
+                        },
+                        complete: function () {
+                            $('.loader').addClass('d-none');
+                        }
+                    });
+                }
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerifyEmailFormat-FromEmail").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+    //---------------------------------------------------------------------------------------------------------------------------
+
+    // KeyUp Summary
+
+    $("#EmailId").keyup(function () {
+        $("#errValid-emailId").text(" ");
+        if ($("#EmailId").val() == "") {
+            $("#errValid-emailId").text("Email From field is required");
+        }
+    });
+
+    $("#description").keyup(function () {
+        $("#errValid-description").text(" ");
+        if ($("#description").val() == "") {
+            $("#errValid-description").text("Description field is required");
+        }
+    });
+
+    $("#ProbationMonths").keyup(function () {
+        $('.errMsg-month').text("");
+
+        if ($("#ProbationMonths").val() == "") {
+            $('.errMsg-month').text("ProbationMonths field is required");
+
+        }
+    });
+
+    // Create Email setting
+
+    $("#btnAdd").click(function () {
+        var formData = new FormData();
+        var isValid = true;
+
+        $("#errValid-emailId").text("");
+        $("#errValid-displayName").text("");
+        $("#errValid-description").text("");
+        $("#errVerify-SendEmailExist").hide();
+        $("#errVerifyEmailFormat-SendEmail").hide();
+
+        if ($("#EmailId").val() == "") {
+            $("#errValid-emailId").text("Email From field is required");
+            isValid = false;
+        }
+
+        //if ($("#displayName").val() == "") {
+        //    $("#errValid-displayName").text("DisplayName field is required");
+        //    isValid = false;
+        //}
+
+        if ($("#description").val() == "") {
+            $("#errValid-description").text("Description field is required");
+            isValid = false;
+        }
+
+        var emailSettingId = $("#EmailSettingId").val();
+        var emailListId = $("#EmailListId").val();
+        var emailId = $("#EmailId").val();
+        var displayName = $("#displayName").val();
+        var description = $("#description").val();
+
+        var sendEmails = {
+            EmailSettingId: emailSettingId,
+            EmailListId: emailListId,
+            EmailId: emailId,
+            DisplayName: displayName,
+            Description: description,
+        };
+
+       
+        var isEmailVerify = emailCheck(emailId);
+        formData.append("EmailId", emailId);
+       
+        if (isValid) {
+            if (isEmailVerify) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Master/GetSendEmailCount",
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: function (result) {
+
+                        if (result == 0) {
+                            $.ajax({
+                                type: "POST",
+                                url: "/Master/CreateAddSendEmails",
+                                data: sendEmails,
+                                beforeSend: function () {
+                                    $('.loader').removeClass('d-none');
+                                },
+                                success: function (result) {
+                                    if (result > 0) {
+                                        swal.fire({
+                                        title: "Added Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                           var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                            window.location.href = urlToRedirect;
+                                    });
+                                        
+                                    }
+                                    else {
+                                        swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                            var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                            window.location.href = urlToRedirect;
+                                    });
+                                        
+                                    }
+                                },
+                                complete: function () {
+                                    $('.loader').addClass('d-none');
+                                }
+                            });
+                        }
+                        else {
+                            $('.loader').addClass('d-none');
+                            $("#errVerify-SendEmailExist").show();
+                            return false;
+                        }
+                    },
+                    complete: function () {
+                        // $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerifyEmailFormat-SendEmail").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    });
+
+    // Edit for update
+
+    $('#getdata').on('click', '#EditBtn', function () {
+        $("#errValid-emailId").text("");
+        $("#errValid-displayName").text("");
+
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim();
+        $('#EmailListId').val(id);
+        $('#EmailId').val(FirstCol);
+        $('#description').val(SecondCol);
+        $('#displayName').val(ThirdCol);
+        $("#btnUpdate").show();
+        $("#btnback").show();
+        $("#btnAdd").hide();
+    });
+
+    // update Email setting
+
+    $("#btnUpdate").click(function () {
+        var isValid = true;
+        var formData = new FormData();
+
+        $("#errValid-emailId").text("");
+        $("#errValid-displayName").text("");
+        $("#errValid-description").text("");
+
+        if ($("#EmailId").val() == "") {
+            $("#errValid-emailId").text("EmailFrom field is required");
+            isValid = false;
+        }
+
+        if ($("#displayName").val() == "") {
+            $("#errValid-displayName").text("DisplayName field is required");
+            isValid = false;
+        }
+
+        if ($("#description").val() == "") {
+            $("#errValid-description").text("Description field is required");
+            isValid = false;
+        }
+
+        var emailSettingId = $("#EmailSettingId").val();
+        var emailListId = $("#EmailListId").val();
+        var emailId = $("#EmailId").val();
+        var description = $("#description").val();
+        var displayName = $("#displayName").val();
+
+        formData.append("EmailSettingId", emailSettingId);
+        formData.append("EmailListId", emailListId);
+        formData.append("EmailId", emailId);
+        formData.append("Description", description);
+        formData.append("DisplayName", displayName);
+
+        var isEmailVerify = emailCheck(emailId);
+      
+        if (isValid) {
+            if (isEmailVerify) {
+                var url = "/Master/CreateAddSendEmails";
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+                        $('#displayEmail').html("");
+                        if (Result > 0) {
+                            $("#success_CreateQualification_Popup").css('display', 'none !important');
+                            swal.fire({
+                                        title: "Updated Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                           var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                window.location.href = urlToRedirect;
+                                    });
+                           
+                        }
+                        else {
+                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                            var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                window.location.href = urlToRedirect;
+                                    });
+                            
+                        }
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+            }
+            else {
+                $('.loader').addClass('d-none');
+                $("#errVerifyEmailFormat-SendEmail").show();
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+
+    });
+    //------------------------------------------------------------------------------------------------------------------------------------
+
+    // Delete Emailsetting
+
+    $('#getdata').on('click', '#btnDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var email = {
+                    EmailListId: id,
+                    EmailSettingId: $("#EmailSettingId").val()
+                };
+               
+                $.ajax({
+                    type: "POST",
+                    url: "/Master/DeleteSendEmail",
+                    data: email,
+                    beforeSend: function () {
+                        $('.loader').removeClass('d-none');
+                    },
+                    success: (Result) => {
+                        $('#displayEmail').html('');
+                        if (Result == true) {
+                            swal.fire({
+                                        title: "Deleted Successfully!",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          if (result.isConfirmed) {
+                                    var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                    window.location.href = urlToRedirect;
+                                };
+                                    });
+                            
+                        }
+                        else {
+                            swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((resultValue) => {
+                                          var urlToRedirect = '@Url.Action("EmailSettings", "Master")';
+                                window.location.href = urlToRedirect;
+                                    });
+                           
+                        }
+
+                    },
+                    complete: function () {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+
+                $("#EmailId").val('');
+                $("#displayName").val('');
+
+            }
+        })
+    });
+    //---------------------------------------------------------------------------------------------------------------------------------
+
+    // Email Validation
+
+    function emailCheck(officeEmail) {
+        var isEmailValid = true;
+        var mailformat = /^([\w-\.]+)@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        $("#errVerifyEmailFormat-OfficeEmail").hide();
+        if (!mailformat.test(officeEmail)) {
+            $("#errVerifyEmailFormat-OfficeEmail").show();
+            isEmailValid = false;
+        }
+        return isEmailValid
+    }
+
+</script>

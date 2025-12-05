@@ -1,0 +1,730 @@
+﻿@using EmployeeInformations.Common
+@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@using EmployeeInformations.Business.IService
+@using EmployeeInformations.Common.Enums
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@inject IEmployeeInformationService employeeInformationService
+@model List<EmployeeLeaveViewModel>
+@{
+    ViewBag.Title = "LeaveDetails";
+    Layout = "_Layout";
+    var loginRoleId = Context.Session.GetInt32("RoleId");
+    var loginEmpId = Context.Session.GetInt32("EmpId");
+
+    var rolePrivileges = false;
+    if (loginRoleId >= 0)
+    {
+        var id = loginRoleId.Value;
+        int leaveSummaryModuleId = (int)EmployeesInformationsPages.LeaveSummaryModule;
+        rolePrivileges = await employeeInformationService.ReadAndWritePermissionByRoleId(leaveSummaryModuleId, id);
+    }
+}
+
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Leave Details</h3>
+        </div><!-- .nk-block-head-content -->
+        @*<div class="d-flex mb-1">
+        @Html.ActionLink("Apply Leave","CreateLeave","LeaveSummary", null, new { @class = "btn btn-primary ml-auto mt-auto mb-auto btn-sm mr-2" })
+        </div>*@
+    </div><!-- .nk-block-between -->
+</div>
+
+
+<div class="card card-bordered card-preview">
+    <div class="card-inner table-card">
+        <table class="display employee-holiday-table mb-3 no-sorting" style="width:100%" data-auto-responsive="false" id="getLeaveData">         
+            <thead>
+                <tr class="nk-tb-item table-header">
+                    <th class="nk-tb-col" data-id="employeeName"><span class="sub-text">Employee Name</span></th>
+                    <th class="nk-tb-col tb-col" data-id="leaveType"><span class="sub-text">Leave Type</span></th>
+                    <th class="nk-tb-col tb-col" data-id="leaveFromDate"><span class="sub-text">From Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="leaveToDate"><span class="sub-text">To Date</span></th>
+                    <th class="nk-tb-col tb-col" data-id="totalLeave"><span class="sub-text">Applied Days</span></th>
+                    <th class="nk-tb-col tb-col" data-id="reason"><span class="sub-text">Reason</span></th>
+                    <th class="nk-tb-col tb-col" data-id="isApproved"><span class="sub-text">Status</span></th>
+                    @if (rolePrivileges)
+                    {
+                        <th class="nk-tb-col tb-col"><span class="sub-text">Action</span></th>
+
+                    }
+                </tr>
+            </thead>
+
+        </table>
+    </div>
+</div>
+
+
+
+<div class="modal" id="success_Approved_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Approved Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseApproved">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="success_Reject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Leave Details</h5>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+
+                <div class="col-12 d-flex">
+                    <label class="form-label my-auto">Employee Name</label>
+                    <div class="form-group m-0">
+                        <label class="badge badge-sm bg-outline-primary ml-2" id="employeeName"></label>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-lg-12">
+                        <div class="form-group mb-0">
+                            <label>Reason</label><span id="mustReason" style="color:red"></span>
+                            @Html.TextArea("RejectReason", null, new{cols= "5", rows= "5"})
+                        </div>
+                    </div>
+                    <span class="error text-danger" id="errValid-Reason"></span>
+                </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-primary ml-auto mr-3" id="btnreject" value="Save" />
+                    <input type="button" class="btn btn-danger" id="btnCloseReject" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="success_ReasonReject_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                Rejected Successfully!
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer" id="btnCloseReasonReject">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal" id="success_Delete_Popup" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-3 text-center">
+            <!-- Modal body -->
+            <div class="modal-body" id="txtSuccessMeg">
+                <h4 class="nk-modal-title"> Deleted Successfully!</h4>
+            </div>
+
+            <!-- Modal footer -->
+            <div class="text-center" id="btnCloseDelete">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+
+        var columnIndex = "";
+        var columnDirection = "";
+        var entries = 10;
+        BindLeaveAdminData();
+
+        function BindLeaveAdminData() {
+            var table = $("#getLeaveData").DataTable();
+
+            if (table) {
+                table.destroy();
+            }
+            $('#getLeaveData').DataTable({
+
+                serverSide: true,
+                processing: true,
+                //sortable: true,
+                pageLength: entries,
+                ajax: {
+                    url: "/LeaveSummary/GetLeaveDetails",
+                    type: 'Get',
+                    data: function (d) {
+                        var searchFilter = document.getElementById("getLeaveData_filter"); // get search div id
+                        var searchInput = searchFilter.querySelector("input[type='search']");  // get search div input
+                        var searchValue = searchInput.value;  // get search value
+                        var leaveEntry = document.getElementById("getLeaveData_length"); //get entries div id
+                        var entrySelect = leaveEntry.querySelector("select"); //get entries div select
+                        entries = entrySelect.value; // get entries value
+                        d.sSearch = searchValue; // Pass search query
+                        d.iDisplayStart = d.iDisplayStart || 0;
+                        d.iDisplayLength = d.iDisplayLength || entries;
+                        d.sEcho = d.start;
+                        d.ColumnName = columnIndex;
+                        d.ColumnDirection = columnDirection;
+
+                    }
+                },
+
+                columns: [
+                    {
+
+                        data: 'employeeName',
+                        render: function (data, type, row, meta) {
+                            var leaveCount = 1;
+                            var className = getClassNameForGrid(leaveCount);
+
+                            return "<div class='user-card'>" +
+                                (row.employeeProfileImage == "" ?
+                                    "<div class='user-avatar " + className + "'><span style='text-transform:uppercase'>" + (row.employeeName)[0] + "</span></div>" :
+                                    "<div class='user-avatar bg-light'><img src='./ProfileImages/" + row.employeeProfileImage + "' alt=''></div>") +
+                                "<div class='user-info'>" +
+                                "<div class='user-info'>" +
+                                (row.employeeStatus == true ?
+                                    "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + row.empId + "><span class='tb-lead text-danger'>" + row.employeeName + "</span></a>" :
+                                    "<a href='javascript:void(0)' id='viewEmployee' data-empid=" + row.empId + "><span class='tb-lead font-weight-bold'>" + row.employeeName + "</span></a>") +
+                                "</div><span class='tb-sub text-primary'>" + row.employeeUserName + "</span></div></div>";
+
+                        }
+                    },
+
+                    {
+                        data: 'leaveType',
+                        render: function (data, type, row) {
+                            return "<b class='tb-sub text-primary'>" + row.leaveTypes + "</b>"
+                        }
+                    },
+
+                    {
+                        data: 'fromDate',
+                        render: function (data, type, row) {
+                            if (row.appliedLeaveTypeId == 5) {
+                                return "<span>" + dateTimeFormat(row.leaveFromDate) + "</span>"
+                            } else {
+                                return "<span>" + dateFormat(row.leaveFromDate) + "</span>"
+                            }
+
+                        }
+                    },
+
+                    {
+                        data: 'toDate',
+                        render: function (data, type, row) {
+                            if (row.appliedLeaveTypeId == 5) {
+                                return "<span>" + dateTimeFormat(row.leaveToDate) + "</span>"
+                            } else {
+                                return "<span>" + dateFormat(row.leaveToDate) + "</span>"
+                            }
+
+                        }
+                    },
+
+                    {
+                        data: 'appliedDays',
+                        render: function (data, type, row) {
+                            return "<span>" + parseFloat(row.totalLeave).toFixed(1) + "</span>"
+                        }
+                    },
+
+                    {
+                        data: 'reason',
+                        render: function (data, type, row) {
+                            if (row.reason == null) { row.reason = "" } else { var trimNewValue = row.reason.replace(/'/g, "").trim(); }
+                            return "<div class='leave-reason'><p type='button' class='tb-sub font-weight-bold' data-bs-toggle='tooltip' data-bs-placement='bottom' title='" + trimNewValue + "'>" + row.reason + "</p></div>"
+                        }
+                    },
+
+                    {
+                        data: 'approvalStatus',
+                        render: function (data, type, row) {
+
+                            var approvalStatusClr = "";
+                            if (row.isApproved == 1) {
+                                approvalStatusClr = "bg-success";
+                            }
+                            else if (row.isApproved == 0) {
+                                approvalStatusClr = "bg-warning";
+                            }
+                            else if (row.isApproved == 2) {
+                                approvalStatusClr = "bg-danger";
+                            }
+                            return "<b class='badge badge-sm badge-dot has-bg " + approvalStatusClr + " d-sm-inline-flex'>" + row.approvalStatus + "</b>"
+                        }
+
+                    },
+
+                    {
+                        data: 'null',
+                        "orderable": false,
+                        render: function (data, type, row) {
+                            var html = "<div class='nk-tb-col nk-tb-col-tools py-0 border-0'><ul class='nk-tb-actions gx-1 my-n1'><li class='me-n1'><div class='dropdown'><a href='#' class='dropdown-toggle btn btn-icon btn-trigger' data-bs-toggle='dropdown'><em class='icon ni ni-more-h'></em></a><div class='dropdown-menu dropdown-menu-end'><ul class='link-list-opt no-bdr'><li><a href='javascript:void(0)' id='btnViewLeaveDetail' data-empid=" + row.empId + " data-id=" + row.appliedLeaveId + " data-empname=" + row.employeeName + "><em class='icon ni ni-eye'></em><span>View</span></a></li>";
+
+                            if (row.leaveName != null) {
+                                html += "<li><a href='javascript:void(0)' class='btnDownload' data-id=" + row.appliedLeaveId + "><em class='icon ni ni-download'></em><span>Download</span></a></li>";
+                            }
+
+                            if (@loginRoleId == 1 || @loginRoleId == 2) {
+                                if (row.isApproved == 0) {
+                                    html += "<li><a href='javascript:void(0)' id='btnLeaveApproved' data-empid=" + row.empId + " data-id=" + row.appliedLeaveId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Approve</span></a></li>" +
+                                        "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.appliedLeaveId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                }
+                            } else {
+                                if (row.empId == @loginEmpId) {
+                                    if (row.isApproved == 0) {
+                                        html += "<li><a href='javascript:void(0)' id='editLeaveBtn' data-id=" + row.appliedLeaveId + " data-isconfirm=" + row.isApproved + "><em class='icon ni ni-edit'></em><span>Edit</span></a></li>";
+                                    }
+                                } else {
+                                    if (row.isApproved == 0) {
+                                        html += "<li><a href='javascript:void(0)' id='btnLeaveApproved' data-empid=" + row.empId + " data-id=" + row.appliedLeaveId + " data-empname=" + row.employeeName + "><em class='icon ni ni-check'></em><span>Approve</span></a></li>" +
+                                            "<li><a href='javascript:void(0)' id='rejectLeaveBtn' data-empid=" + row.empId + " data-id=" + row.appliedLeaveId + " data-empname=" + row.employeeName + "><em class='icon ni ni-cross'></em><span>Reject</span></a></li>";
+                                    }
+                                }
+                            }
+
+                            html += "</ul></div></div></li></ul></div>";
+                            return html;
+                        }
+
+                    },
+                ],
+
+                "columnDefs": [
+                    { "width": "300px", "targets": [0, 1, 2, 3, 4, 5] },
+                    { "width": "200px", "targets": [6] }
+                    // { 'sortable': false, 'targets': [7] }
+                ],
+
+                "createdRow": function (row, data, dataIndex, settings) {
+                    // Add custom class to the row
+                    $(row).addClass('nk-tb-item');
+                    // Add custom classes to each cell in the row if necessary
+                    $(row).find('td').addClass('nk-tb-col tb-col');
+                },
+
+            });
+            // $('[data-bs-toggle="tooltip"]').tooltip();
+            $("body").tooltip({ selector: '[data-bs-toggle=tooltip]' });
+        }       
+
+        $(document).on('click', '.sorting, .sorting_asc, .sorting_desc', function (e) {
+            var target = e.target;
+            var parent = target.parentNode;
+            var index = [].indexOf.call(parent.children, target);
+
+            if ($(this).hasClass('sorting_asc')) {
+                columnDirection = 'desc';
+            } 
+            else {
+                columnDirection = 'asc'; // Assuming default sorting direction is descending
+            }
+
+            columnIndex = $(this).data('id');           
+        });
+
+    });
+
+
+
+    function getClassNameForGrid(input) {
+        var className = "";
+        switch (input) {
+            case 1:
+                className = "bg-success";
+                break;
+            case 2:
+                className = "bg-warning";
+                break;
+            case 3:
+                className = "bg-info";
+                break;
+            case 4:
+                className = "bg-blue";
+                break;
+            case 5:
+                className = "bg-pink";
+                break;
+            case 6:
+                className = "bg-danger";
+                break;
+        }
+        return className;
+    }    
+
+    function dateFormat(startDate) {
+
+        var dateObject = new Date(startDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var formattedDate = day + "/" + month + "/" + year;
+        return formattedDate;
+    }
+
+    function dateTimeFormat(createdDate) {
+        var dateObject = new Date(createdDate);
+        var day = ("0" + dateObject.getDate()).slice(-2);
+        var month = ("0" + (dateObject.getMonth() + 1)).slice(-2);
+        var year = dateObject.getFullYear();
+        var hours = dateObject.getHours();
+        var minutes = dateObject.getMinutes();
+        var seconds = dateObject.getSeconds();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+
+        // Convert hours from 24-hour to 12-hour format
+        if (hours > 12) {
+            hours = hours - 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+
+        // Add leading zeros to minutes and seconds
+        minutes = ("0" + minutes).slice(-2);
+        seconds = ("0" + seconds).slice(-2);
+
+        var formattedDate = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ampm;
+        return formattedDate;
+    }
+
+
+    $(document).ready(function () {
+
+        $('#getLeaveData').on('click', '.btnDownload', function () {
+            var appliedLeaveId = $(this).data("id")
+            window.location.href = "/LeaveSummary/DownloadFile?appliedLeaveId=" + appliedLeaveId;
+            $('.loader').addClass('d-none');
+        });
+
+    })
+
+
+    $('#getLeaveData').on('click', '#editLeaveBtn', function () {
+        var id = $(this).data("id")
+        var tr = $(this).closest('tr');
+        var FirstCol = tr.find('td:eq(0)').text().trim();
+        var SecondCol = tr.find('td:eq(1)').text().trim();
+        var ThirdCol = tr.find('td:eq(2)').text().trim();
+        var ForthCol = tr.find('td:eq(3)').text().trim();
+        var FifthCol = tr.find('td:eq(4)').text().trim();
+        var SixthCol = tr.find('td:eq(5)').text().trim();
+        var SeventhCol = tr.find('td:eq(6)').text().trim();
+        var EighthCol = tr.find('td:eq(7)').text().trim();
+        var NinethCol = tr.find('td:eq(8)').text().trim();
+
+        $('#AppliedLeaveId').val(id);
+        $('#UserName').val(FirstCol);
+        //$('#exdateOfJoining').val(SecondCol);
+        //$('#dateOfRelieving').val(ThirdCol);
+    });
+
+    $('#getLeaveData').on('click', '#viewEmployee', function () {
+        var empId = $(this).data('empid');
+        window.location.href = "/Employees/ViewEmployee?empId=" + empId;
+    });
+
+    $('#getLeaveData').on('click', '#editLeaveBtn', function () {
+        var id = $(this).data('id');
+        PageUtil.goToContent("/LeaveSummary/ChangeLeave?AppliedLeaveId=" + id);
+    });
+
+    $('#getLeaveData').on('click', '#btnViewLeaveDetail', function () {
+        var id = $(this).data('id');
+        PageUtil.goToContent("/LeaveSummary/ViewEmployeeLeave?appliedLeaveId=" + id);
+    });
+
+    // Delete Leave
+
+    $('#getLeaveData').on('click', '#btnLeaveDelete', function () {
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            // text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var id = $(this).data("id")
+                var empid = $(this).data("empid")
+                var leave = {
+                    appliedLeaveId: id,
+                    empId: empid
+                };
+
+                $('.loader').removeClass('d-none');
+                $.ajax({
+                    type: "POST",
+                    url: "/LeaveSummary/DeleteLeave",
+                    data: leave,
+                    success: (Result) => {
+
+                        if (Result == "Success") {
+                            swal.fire({
+                                title: "Deleted Successfully",
+                                text: "",
+                                icon: "success",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                window.location.href = "/LeaveSummary/LeaveDetails";
+                            });
+                        }
+                        else {
+                            swal.fire({
+                                title: "Something error",
+                                text: "",
+                                icon: "error",
+                                allowOutsideClick: false  // This prevents closing on outside click
+                            }).then((result) => {
+                                window.location.href = "/LeaveSummary/LeaveDetails";
+                            });
+                        }
+                        $('.loader').addClass('d-none');
+                    },
+                    error: (Result) => {
+                        $('.loader').addClass('d-none');
+                    }
+                });
+
+
+            }
+        })
+    });
+
+    // Approved Leave
+
+    $('#getLeaveData').on('click', '#btnLeaveApproved', function () {
+        Swal.fire({
+            title: 'Are you sure want to Approve?',
+            //  text: "You are Approve this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //$('#success_Reject_Popup').show();
+                $("#errValid-Reason").text("");
+                $("#success_Reject_Popup").modal("show");
+                var employeename = $(this).data("empname")
+                $("#employeeName").text(employeename);
+                var id = $(this).data("id");
+                $('#success_Reject_Popup').on('click', '#btnreject', function () {
+                    var isValid = true;
+                    // if ($("#RejectReason").val() == "") {
+                    //     $("#errValid-Reason").text("Reason field is required");
+                    //     isValid = false;
+                    // }
+
+                    var reason = $("#RejectReason").val();
+                    var leave = {
+                        appliedLeaveId: id,
+                        rejectReason: reason
+                    };
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/LeaveSummary/ApprovedLeave",
+                            data: leave,
+                            success: (Result) => {
+                                if (Result == true) {
+                                    $("#success_Reject_Popup").modal("hide");
+                                    Swal.fire({
+                                        title: 'Approved Successfully',
+                                        text: "",
+                                        icon: 'success',
+                                        allowOutsideClick: false
+                                    }).then((result) => {
+                                        window.location.href = "/LeaveSummary/LeaveDetails";
+                                    });
+                                } else {
+                                    swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((result) => {
+                                        window.location.href = "/LeaveSummary/LeaveDetails";
+                                    });
+                                }
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+
+                })
+
+                $("#btnCloseReject").click(function () {
+                    window.location.href = "/LeaveSummary/LeaveDetails";
+                })
+            }
+        })
+    });
+
+    // Reject Leave
+
+    $('#getLeaveData').on('click', '#rejectLeaveBtn', function () {
+        Swal.fire({
+            title: 'Are you sure want to Reject?',
+            //text: "You are Reject this request!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#1ee0ac',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            allowOutsideClick: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $("#mustReason").text("*");
+                //$('#success_Reject_Popup').show();
+                $("#errValid-Reason").text("");
+                $("#success_Reject_Popup").modal('show');
+                 $("#RejectReason").keyup(function () {
+                    $("#errValid-Reason").text("");
+                    if ($("#RejectReason").val().trim() === "") {
+                        $("#errValid-Reason").text("Reason field is required");
+                    }
+                });
+                var employeename = $(this).data("empname")
+                $("#employeeName").text(employeename);
+                var id = $(this).data("id")
+                $('#success_Reject_Popup').on('click', '#btnreject', function () {
+                    var isValid = true;
+                    if ($("#RejectReason").val() == "") {
+                        $("#errValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+                     if ($("#RejectReason").val().trim() === "") {
+                        $("#errValid-Reason").text("Reason field is required");
+                        isValid = false;
+                    }
+                    var reason = $("#RejectReason").val();
+                    var leave = {
+                        appliedLeaveId: id,
+                        rejectReason: reason
+                    };
+
+                    if (isValid) {
+                        $('.loader').removeClass('d-none');
+                        $.ajax({
+                            type: "POST",
+                            url: "/LeaveSummary/RejectLeave",
+                            data: leave,
+                            success: (Result) => {
+                                if (Result == 1) {
+                                    $('#success_Reject_Popup').hide();
+                                    //$("#success_ReasonReject_Popup").show();
+                                    $("#success_ReasonReject_Popup").hide();
+                                    swal.fire({
+                                        title: "Rejected Successfully",
+                                        text: "",
+                                        icon: "success",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((result) => {
+                                        window.location.href = "/LeaveSummary/LeaveDetails";
+                                    });
+                                }
+                                else {
+
+                                    swal.fire({
+                                        title: "Something error",
+                                        text: "",
+                                        icon: "error",
+                                        allowOutsideClick: false  // This prevents closing on outside click
+                                    }).then((result) => {
+                                        window.location.href = "/LeaveSummary/LeaveDetails";
+                                    });
+                                }
+
+                                // $("#btnCloseReasonReject").css('display', 'none !important');
+
+                                $('.loader').addClass('d-none');
+                            },
+                            error: (Result) => {
+                                $('.loader').addClass('d-none');
+                            }
+                        });
+                    }
+                    else {
+                        return false;
+                    }
+
+                })
+
+                $("#btnCloseReject").click(function () {
+                    window.location.href = "/LeaveSummary/LeaveDetails";
+                })
+
+            }
+        })
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* ------------------------------------------------------------------------------------------------------------------------------------------------------------- *@
+@* old code *@
+
+@* <script>
+
+    $(document).ready(function () {
+
+        $.fn.dataTable.moment('DD/MM/YYYY');
+
+        $('#getLeaveData').DataTable({
+            "bInfo": true,
+            "paging": true,
+            "columnDefs": [
+                { targets: 6, type: '0' }
+            ],
+            order: [
+                [6, "desc"]
+            ],
+        });
+    });
+
+   
+</script>  *@

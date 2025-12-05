@@ -1,0 +1,199 @@
+﻿@using EmployeeInformations.Model.HelpdeskViewModel;
+@using Microsoft.AspNetCore.Http; 
+@using EmployeeInformations.Common.Enums;
+@model Helpdesk
+
+<div class="leave-dtl-block">
+    <div class="nk-block-head nk-block-head">
+        <div class="nk-block-between">
+            <div class="nk-block-head-content">
+                <h3 class="nk-block-title page-title">Update Ticket</h3>
+            </div><!-- .nk-block-head-content -->
+        </div><!-- .nk-block-between -->
+    </div>
+    <div class="card card-bordered card-preview">
+        <div class="card-inner">
+            <form>
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+                    @Html.HiddenFor(m => m.Id)
+                    <div class="col-12">
+                        <div class="form-group emp-hol-yr">
+                            <label class="form-label">Ticket Type<span class="required" style="color: #FF0000">*</span></label>
+                            <div class="selectbox">
+                                @Html.DropDownListFor(m => m.TicketTypeId, new SelectList(Model.TicketTypes, "TicketTypeId", "TicketName"), "--Select Type--", new { @class = "form-control", @disabled = true })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.TicketTypeId, "", new { @class = "error text-danger", @id = "errValid-TicketType" })
+                        </div>
+                    </div>
+
+                    <div class="col-lg-12">
+                        <div class="form-group emp-hol-yr">
+                            <label class="form-label">Status<span class="required" style="color: #FF0000">*</span></label>
+                            <div class="selectbox">
+                                @Html.DropDownListFor(m => m.Status, Html.GetEnumSelectList<TicketStatus>(), "--Select Status--", new { @class = "form-control" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Status, "", new { @class = "error text-danger", @id = "errValid-Status" })
+                        </div>
+                    </div>
+
+                    <label class="form-label w-100">Document</label>
+                    <div class="input-group custom-file-button">
+                        @Html.TextBoxFor(m => m.DocumentFilePath, "", new { type = "file", @class = "form-control", name = "file", multiple = "multiple" })
+                    </div>
+                    <span class="error text-danger" id="errValid-ErrorFileSize"></span>
+                    <div class="d-flex">
+                        @if (Model.TicketAttachments != null && Model.TicketAttachments.Count() > 0)
+                        {
+                            foreach (var item in Model.TicketAttachments)
+                            {
+                                <div id="hide_imgName" class="text-primary mt-1">
+                                    <ul class="displayTicketDoc d-flex flex-wrap p-0">
+                                        <li>
+                                            <img class='mt-1' src="~/images/image-icon.png" style='height: 40px;' />
+                                            <lable id="displayDocumentName" class="text-white help-desk-doc">@item.AttachmentName</lable>
+                                        </li>
+                                    </ul>
+                                </div>
+                            }
+                        }
+                    </div>
+
+
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="form-label">Description<span class="required" style="color: #FF0000">*</span></label>
+                            @Html.TextArea("Description", null, new { cols = "5", rows = "5", @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "error text-danger", id = "errValid-Description" })
+                        </div>
+                    </div>                                    
+                 </div>
+                <div class="col-lg-12 d-flex mt-3 p-0">
+                    <input type="button" class="btn btn-secondary ml-auto mr-3" id="btnBack" value="Back" />
+                    <input type="button" class="btn btn-primary" id="btnUpdateTicket" value="Save" />
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $("#btnBack").click(function () {
+        window.location.href = "/Helpdesk/Helpdesks";
+    });
+
+    // Change summary
+
+    $("#Status").change(function () {
+        $("#errValid-Status").text("");
+        if ($("#Status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+        }
+    });
+
+    // Keyup summary
+
+    $("#Description").keyup(function () {
+        $("#errValid-Description").text("");
+        if ($("#Description").val() == "") {
+            $("#errValid-Description").text("Description field is required");
+        }
+    });
+
+    $("#btnUpdateTicket").click(function () {
+
+        var formData = new FormData();
+        var isValid = true;
+        $("#errValid-Status").text("");
+        $("#errValid-Description").text("");
+
+        if ($("#Status").val() == "") {
+            $("#errValid-Status").text("Status field is required");
+            isValid = false;
+        }
+
+        if ($("#Description").val() == "") {
+            $("#errValid-Description").text("Description field is required");
+            isValid = false;
+        }
+       
+        var attachmentLength = $('#DocumentFilePath').prop("files").length;//file attachement length
+
+        for (var x = 0; x < attachmentLength; x++) { //attachmentlength
+            if ($('#DocumentFilePath').prop("files")[x].size > 2000000) {
+                $("#errValid-ErrorFileSize").text('Allowed file size exceeded. (Max. 2 MB)!');
+                return false;
+            }
+            else {
+                formData.append("file", $('#DocumentFilePath').prop("files")[x]);
+            }
+        }
+
+        var ticketType = $("#TicketTypeId").val();
+        var status = $("#Status").val();
+        var description = $("#Description").val();         
+        var id = $("#Id").val();
+
+        formData.append("Status", status);
+        formData.append("Description", description);
+        formData.append("TicketTypeId", ticketType);
+        formData.append("Id", id);
+
+        if (isValid) {
+            var url = "/Helpdesk/UpsertHelpdesk";
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $('.loader').removeClass('d-none');
+                },
+                success: function (Result) {
+                    $('.loader').addClass('d-none');
+                    $("#Create_Popup").css('display', 'none !important');
+
+                    if (Result == true) {
+                        swal.fire({
+                            title: "Updated Successfully",
+                            text: "",
+                            icon: "success",
+                            allowOutsideClick: false  // This prevents closing on outside click
+                        }).then((resultValue) => {
+                            if (resultValue.isConfirmed) {
+                                window.location.href = "/Helpdesk/Helpdesks";
+                            };
+                        });
+
+                    } else {
+                        swal.fire({
+                            title: "Something error",
+                            text: "",
+                            icon: "error",
+                            allowOutsideClick: false  // This prevents closing on outside click
+                        }).then((resultValue) => {
+                            window.location.href = "/Helpdesk/Helpdesks";
+                        });
+                    }
+                },
+                complete: function () {
+                    $('.loader').addClass('d-none');
+                }
+            });
+        }
+        else {
+            return false;
+        }
+    });
+
+    $(".displayTicketDoc").on('click', 'li', function () {
+        var imgName = $(this).text().trim();
+        var urlName = window.location.origin;
+        window.open(urlName + '/Management/HelpdeskTicket/' + imgName + '')
+    });
+
+</script>

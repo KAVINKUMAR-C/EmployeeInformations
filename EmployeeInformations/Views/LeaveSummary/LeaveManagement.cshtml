@@ -1,0 +1,21 @@
+﻿@using EmployeeInformations.Model.LeaveSummaryViewModel;
+@using Microsoft.AspNetCore.Http;
+@model EmployeeLeaveViewModel
+@{
+    var roleId = Context.Session.GetInt32("RoleId");   
+}
+
+<div id="bind-leavemodal-content">
+</div>
+
+<input type="hidden" id="txt-AppliedLeaveId" value="@Model.AppliedLeaveId" />
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+      
+        var id = $("#txt-AppliedLeaveId").val();
+        PageUtil.goToLeaveContent("/LeaveSummary/UpdateLeave?AppliedLeaveId=" + id);
+    });
+
+</script>
