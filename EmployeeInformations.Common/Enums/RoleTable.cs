@@ -187,7 +187,7 @@ namespace EmployeeInformations.Common.Enums
     {
         Admin = 1,
         HR = 2,
-        ProjectManager = 3,
+        Manager = 3,
         TeamLead = 4,
         Employee = 5,
         Sales = 6,
