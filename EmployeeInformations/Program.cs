@@ -1,9 +1,14 @@
+using System;
+
 namespace EmployeeInformations
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            // Allow local DateTime to work with PostgreSQL timestamptz
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -13,6 +18,5 @@ namespace EmployeeInformations
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
     }
 }

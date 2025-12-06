@@ -176,8 +176,16 @@ namespace EmployeeInformations.CoreModels.DbConnection
 
             // Explicit mapping for EmployeesEntity in case PostgreSQL needs it
             //modelBuilder.Entity<EmployeesEntity>().ToTable("employees", "public");
-
-            // You can repeat ToTable mappings here for other entities if needed
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetColumnType("timestamp without time zone");
+                    }
+                }
+            }
         }
 
     }

@@ -39,15 +39,9 @@ namespace EmployeeInformations.CoreModels.Model
 
         public bool IsProbationary { get; set; }
 
-        public DateTime? ProbationDate { get; set; }
-
-        public DateTime CreatedDate { get; set; }
-
         public int CreatedBy { get; set; }
 
         public int? UpdatedBy { get; set; }
-
-        public DateTime? UpdatedDate { get; set; }
 
         public byte RoleId { get; set; }
 
@@ -61,11 +55,15 @@ namespace EmployeeInformations.CoreModels.Model
 
         public bool IsVerified { get; set; }
 
-        public DateTime? ReleavedDate { get; set; }
-
         public bool IsOnboarding { get; set; }
 
         public string? UANNumber { get; set; }
+
+        public DateTime? ProbationDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        public DateTime? ReleavedDate { get; set; }
+
     }
 }
 
