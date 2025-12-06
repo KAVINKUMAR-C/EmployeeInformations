@@ -2178,6 +2178,7 @@ namespace EmployeeInformations.Business.Service
             }
             var completionPercentage = Convert.ToString(percentage);
             progress.ProfileCompletion= completionPercentage;
+            progress.EmpId = empId;
             return progress;
 
         }

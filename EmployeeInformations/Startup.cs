@@ -1,5 +1,9 @@
-﻿using EmployeeInformations.CoreModels;
+﻿using EmployeeInformations.Business.IService;
+using EmployeeInformations.Business.Service;
+using EmployeeInformations.CoreModels;
 using EmployeeInformations.CoreModels.DbConnection;
+using EmployeeInformations.Data.IRepository;
+using EmployeeInformations.Data.Repository;
 using EmployeeInformations.DI;
 using EmployeeInformations.Model.EmployeesViewModel;
 using EmployeeInformations.Schedules;
@@ -25,15 +29,19 @@ namespace EmployeeInformations
         }
         public void ConfigureServices(IServiceCollection services)
         {
-            // ✅ PostgreSQL DB for Employees
+            // PostgreSQL DB for Employees
             var dbConnectionString = Configuration.GetConnectionString("EmployeeInfoDbConnection");
-            services.AddDbContext<EmployeesDbContext>(options =>
-                    options.UseNpgsql(dbConnectionString, b =>
-            b.MigrationsAssembly("EmployeeInformations.CoreModels"))
+            var attendanceDbConnectionString = Configuration.GetConnectionString("EmployeeAttendanceInfoDbConnection");
 
-                //options.UseNpgsql(dbConnectionString, b =>
-                //    b.MigrationsAssembly("EmployeeInformations.Data"))
-            ); // Migrations in Data project
+            // EmployeesDbContext
+            services.AddDbContext<EmployeesDbContext>(options =>
+                options.UseNpgsql(dbConnectionString, b =>
+                    b.MigrationsAssembly("EmployeeInformations.CoreModels")));
+
+            // AttendanceDbContext
+            services.AddDbContext<AttendanceDbContext>(options =>
+                options.UseNpgsql(attendanceDbConnectionString, b =>
+                    b.MigrationsAssembly("EmployeeInformations.CoreModels")));
 
             // ✅ Authentication & Authorization
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -59,7 +67,6 @@ namespace EmployeeInformations
             services.AddSingleton<ICompanyContext, CompanyContext>();
             services.AddSingleton<ILog, Log>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
             // ✅ Configuration, AutoMapper, MemoryCache, HttpClient
             services.AddSingleton<ApprovalsSettings>(sp => sp.GetRequiredService<IOptions<ApprovalsSettings>>().Value);
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -68,7 +75,12 @@ namespace EmployeeInformations
             services.AddRazorPages();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddApiVersioning();
-
+            // Other services
+            services.AddControllersWithViews();
+            services.AddScoped<IAttendanceRepository, AttendanceRepository>();
+            services.AddScoped<IAttendanceService, AttendanceService>();
+            // Register your Dashboard service
+            services.AddScoped<IDashboardService, DashboardService>();
             // ✅ Session
             services.AddSession(options =>
             {
