@@ -53,7 +53,7 @@ namespace EmployeeInformations.WebAPI
             services.AddDbContext<EmployeesDbContext>(options =>
             {
                 options.UseNpgsql(employeeDbConnection, b =>
-                    b.MigrationsAssembly("EmployeeInformations.Data")); // Change only if migrations are stored here
+                    b.MigrationsAssembly("EmployeeInformations.CoreModels")); // Change only if migrations are stored here
             });
 
             // ✅ Register AttendanceDbContext with SQL Server
