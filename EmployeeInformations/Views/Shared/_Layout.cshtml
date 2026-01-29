@@ -213,8 +213,6 @@
                 <div class="nk-sidebar-element">
                     <div class="nk-sidebar-content">
                         <div class="nk-sidebar-menu" data-simplebar>
-                            <!-- COMPLETE MENU STRUCTURE - Replace the entire <ul class="nk-menu"> section in your layout -->
-
                             <ul class="nk-menu">
                                 @if (isOnboarding == 0)
                                 {
@@ -241,10 +239,9 @@
                                 }
                                 else
                                 {
-                                    <!-- DASHBOARD -->
                                     @if (roleId == 5)
                                     {
-                                        <li class="nk-menu-item">
+                                        <li class="nk-menu-item has-sub">
                                             <a href="/Dashboard/EmployeeHome" class="nk-menu-link">
                                                 <span class="nk-menu-icon"><em class="icon ti-bar-chart-alt"></em></span>
                                                 <span class="nk-menu-text">Dashboard</span>
@@ -253,7 +250,7 @@
                                     }
                                     else
                                     {
-                                        <li class="nk-menu-item">
+                                        <li class="nk-menu-item has-sub">
                                             <a href="/Dashboard/Home" class="nk-menu-link">
                                                 <span class="nk-menu-icon"><em class="icon ti-bar-chart-alt"></em></span>
                                                 <span class="nk-menu-text">Dashboard</span>
@@ -261,318 +258,588 @@
                                         </li>
                                     }
 
-                                    <!-- ========== RECRUITMENT SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Recruitment</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-world"></em></span>
-                                            <span class="nk-menu-text">Jobs</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/WebsiteJobApply" class="nk-menu-link"><span class="nk-menu-text">Applied Jobs</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/WebsiteJobPost" class="nk-menu-link"><span class="nk-menu-text">Job Post</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/QuickQuote" class="nk-menu-link"><span class="nk-menu-text">New Leads</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/SoftwareConsultant" class="nk-menu-link"><span class="nk-menu-text">Software Consultant</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/WebsiteCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Candidate Menu</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/SelectedCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Selected Candidate</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/RejectedCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Rejected Candidate</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WebsiteJob/CandidateSchedule" class="nk-menu-link"><span class="nk-menu-text">Candidate Schedule</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AppliedJobModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.JobPostModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.QiuckQuoteModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.SoftwareConsultantModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.WebsiteCandidateMenu) || (RolePrivileges.Contains((int)EmployeesInformationsPages.CandidatePrivileges)) ||
+                                   (RolePrivileges.Contains((int)EmployeesInformationsPages.SelectedCandidateMenu)) || (RolePrivileges.Contains((int)EmployeesInformationsPages.RejectedCandidateMenu)) || (RolePrivileges.Contains((int)EmployeesInformationsPages.TeamsMeeting)))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt"> Recruitment </h6>
+                                        </li>
 
-                                    <!-- ========== ORGANIZATION SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Organization</h6>
-                                    </li>
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-world"></em></span>
+                                                <span class="nk-menu-text">Jobs</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AppliedJobModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/WebsiteJobApply" class="nk-menu-link"><span class="nk-menu-text">Applied Jobs</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.JobPostModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/WebsiteJobPost" class="nk-menu-link"><span class="nk-menu-text">Job Post</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.QiuckQuoteModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/QuickQuote" class="nk-menu-link"><span class="nk-menu-text">Quick Quote</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.SoftwareConsultantModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/SoftwareConsultant" class="nk-menu-link"><span class="nk-menu-text">Software Consultant</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.WebsiteCandidateMenu))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/WebsiteCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Candidate Menu</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.SelectedCandidateMenu))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/SelectedCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Selected Candidate</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.RejectedCandidateMenu))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/RejectedCandidateMenu" class="nk-menu-link"><span class="nk-menu-text">Rejected Candidate</span></a>
+                                                    </li>
+                                                }
+                                                @* @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CandidatePrivileges))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/CandidatePrivilege" class="nk-menu-link"><span class="nk-menu-text">Candidate Privilege</span></a>
+                                                    </li>
+                                                } *@
 
-                                    <!-- Employees Menu -->
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="javascript:void(0)" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-user"></em></span>
-                                            <span class="nk-menu-text">Employees</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Employees/EmployeesInfo" class="nk-menu-link"><span class="nk-menu-text">Employee Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/LeaveSummary/LeaveDetails" class="nk-menu-link"><span class="nk-menu-text">Leave Admin</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WorkFromHome/WorkFromHome" class="nk-menu-link"><span class="nk-menu-text">Work From Home</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/WorkFromHome/CompensatoryOffRequests" class="nk-menu-link"><span class="nk-menu-text">CompensatoryOff</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/LeaveSummary/EmployeesLeaveDetails" class="nk-menu-link"><span class="nk-menu-text">Employee Leave Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/LeaveSummary/LeaveApporvedEmployees" class="nk-menu-link"><span class="nk-menu-text">Leave Approval</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/LeaveSummary/EmployeeHolidays" class="nk-menu-link"><span class="nk-menu-text">Holiday</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/TimeSheet/TimeSheet" class="nk-menu-link"><span class="nk-menu-text">TimeSheet</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Benefit/BenefitTab" class="nk-menu-link"><span class="nk-menu-text">Benefits</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Expenses/Expenses" class="nk-menu-link"><span class="nk-menu-text">Expenses</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Expenses/EmployeeExpenses" class="nk-menu-link"><span class="nk-menu-text">Employee Expenses</span></a>
-                                            </li>
-                                            @if (roleId == 1 || roleId == 2)
-                                            {
-                                                <li class="nk-menu-item">
-                                                    <a href="/Attendance/List" class="nk-menu-link"><span class="nk-menu-text">Attendance (HR)</span></a>
-                                                </li>
-                                                <li class="nk-menu-item">
-                                                    <a href="/Attendance/AttendanceAdmin" class="nk-menu-link"><span class="nk-menu-text">Attendance (Admin)</span></a>
-                                                </li>
-                                            }
-                                            else
-                                            {
-                                                <li class="nk-menu-item">
-                                                    <a href="/Attendance/AttendanceEmployee" class="nk-menu-link"><span class="nk-menu-text">Attendance</span></a>
-                                                </li>
-                                            }
-                                            <li class="nk-menu-item">
-                                                <a href="/Attendance/ViewAttendanceData" class="nk-menu-link"><span class="nk-menu-text">In/Out Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Employees/EmployeesChangeLog" class="nk-menu-link"><span class="nk-menu-text">Employees Log</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Login/EmployeeActivityLog" class="nk-menu-link"><span class="nk-menu-text">Employee Activity Log</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/EmployeeSetting/CreateSetting" class="nk-menu-link"><span class="nk-menu-text">Employee Setting</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Helpdesk/Helpdesks" class="nk-menu-link"><span class="nk-menu-text">Help Desk</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CandidateSchedule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WebsiteJob/CandidateSchedule" class="nk-menu-link"><span class="nk-menu-text">Candidate Schedule</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.TeamsMeeting))
+                                                {
+                                                    <li class="nk-menu-item">
 
-                                    <!-- Assets Menu -->
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-palette"></em></span>
-                                            <span class="nk-menu-text">Assets</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Asset/Asset" class="nk-menu-link"><span class="nk-menu-text">Category</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Asset/Types" class="nk-menu-link"><span class="nk-menu-text">Type</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Asset/Brand" class="nk-menu-link"><span class="nk-menu-text">Brand</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Asset/AllAssets" class="nk-menu-link"><span class="nk-menu-text">Asset</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Asset/HistoryAssetLog" class="nk-menu-link"><span class="nk-menu-text">Asset History</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                                        @{
+                                                            string authorizationUrl = $"https://login.microsoftonline.com/{@configuration.GetSection("AzureAD").GetSection("TenantId").Value}/oauth2/v2.0/authorize?" +
+                                                            $"client_id={@configuration.GetSection("AzureAD").GetSection("ClientId").Value}&response_type={@configuration.GetSection("AzureAD").GetSection("responseType").Value}&redirect_uri={@configuration.GetSection("AzureAD").GetSection("RedirectUri").Value}" +
+                                                            $"&response_mode={@configuration.GetSection("AzureAD").GetSection("responseMode").Value}&scope={@configuration.GetSection("AzureAD").GetSection("Scope").Value}&state={@configuration.GetSection("AzureAD").GetSection("state").Value}";
+                                                        }
+                                                        <a href="@authorizationUrl" class="nk-menu-link"><span class="nk-menu-text">Teams Meeting</span></a>
 
-                                    <!-- ========== COMPANY SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Company</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-comment-alt"></em></span>
-                                            <span class="nk-menu-text">Company</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Company/Company" class="nk-menu-link"><span class="nk-menu-text">Company Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/CompanyPolicy/CompanyPolicy" class="nk-menu-link"><span class="nk-menu-text">Policy Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/EmailSettings" class="nk-menu-link"><span class="nk-menu-text">Email Settings</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/Announcement" class="nk-menu-link"><span class="nk-menu-text">Announcement</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/EmailDraft/EmailDraftType" class="nk-menu-link"><span class="nk-menu-text">Email Draft</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Company/BranchLocation" class="nk-menu-link"><span class="nk-menu-text">Branch Location</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Company/MailScheduler" class="nk-menu-link"><span class="nk-menu-text">Mail Scheduler</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                                    </li>
+                                                }
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                    }
 
-                                    <!-- ========== PROJECT SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Project</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-folder"></em></span>
-                                            <span class="nk-menu-text">Projects</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/ProjectDetails/Project" class="nk-menu-link"><span class="nk-menu-text">Project Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/ProjectDetails/Assignation" class="nk-menu-link"><span class="nk-menu-text">Project Assignation</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AssetCategoryModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AssetTypeModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.AllAssetsModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AssetLogModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.BenefitModule)
+                                   || RolePrivileges.Contains((int)EmployeesInformationsPages.ExpenseModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveSummaryModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.WorkFromHome) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.CompensatoryOff) || RolePrivileges.Contains((int)EmployeesInformationsPages.HolidayModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.TimeSheetModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.BenefitModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.ExpenseModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeExpenses) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.HelpDesk))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Organization</h6>
+                                        </li>
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="javascript:void(0)" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-user"></em></span>
+                                                <span class="nk-menu-text">Employees</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Employees/EmployeesInfo" class="nk-menu-link"><span class="nk-menu-text">Employee Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveSummaryModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/LeaveSummary/LeaveDetails" class="nk-menu-link">
+                                                            <span class="nk-menu-text">Leave Admin</span>
+                                                        </a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.WorkFromHome))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WorkFromHome/WorkFromHome" class="nk-menu-link"><span class="nk-menu-text">Work From Home</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CompensatoryOff))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/WorkFromHome/CompensatoryOffRequests" class="nk-menu-link"><span class="nk-menu-text">CompensatoryOff</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveDetailsEmployees))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/LeaveSummary/EmployeesLeaveDetails" class="nk-menu-link"><span class="nk-menu-text"> Employee Leave Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveApprovedEmployees))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/LeaveSummary/LeaveApporvedEmployees" class="nk-menu-link"><span class="nk-menu-text">Leave Approval</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.HolidayModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/LeaveSummary/EmployeeHolidays" class="nk-menu-link"><span class="nk-menu-text">Holiday</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.TimeSheetModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/TimeSheet/TimeSheet" class="nk-menu-link">
+                                                            <span class="nk-menu-text">TimeSheet</span>
+                                                        </a>
+                                                    </li>
+                                                }                                               
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.BenefitModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Benefit/BenefitTab" class="nk-menu-link">
+                                                            <span class="nk-menu-text">Benefits</span>
+                                                        </a>
+                                                    </li>
+                                                }
 
-                                    <!-- ========== CLIENT SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Client</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-briefcase"></em></span>
-                                            <span class="nk-menu-text">Clients</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Client/Client" class="nk-menu-link"><span class="nk-menu-text">Client Details</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ExpenseModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Expenses/Expenses" class="nk-menu-link">
+                                                            <span class="nk-menu-text">Expenses</span>
+                                                        </a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeExpenses))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Expenses/EmployeeExpenses" class="nk-menu-link">
+                                                            <span class="nk-menu-text">Employee Expenses</span>
+                                                        </a>
+                                                    </li>
+                                                }
 
-                                    <!-- ========== PRIVILEGES SECTION (Role 1 only) ========== -->
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModuleHR) && roleId == 1 || RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModuleHR) && roleId == 2)
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Attendance/List" class="nk-menu-link"><span class="nk-menu-text">Attendance (HR)</span></a>
+                                                    </li>
+
+                                                }
+
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModule) && roleId == 1 || RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModule) && roleId == 2)
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Attendance/AttendanceAdmin" class="nk-menu-link"><span class="nk-menu-text">Attendance (Admin)</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModule) && roleId != 1 || RolePrivileges.Contains((int)EmployeesInformationsPages.AttendanceModule) && roleId != 2)
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Attendance/AttendanceEmployee" class="nk-menu-link"><span class="nk-menu-text">Attendance</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.InOutDetails))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Attendance/ViewAttendanceData" class="nk-menu-link"><span class="nk-menu-text">In/Out Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeesLog))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Employees/EmployeesChangeLog" class="nk-menu-link"><span class="nk-menu-text">Employees Log</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeActivityLog))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Login/EmployeeActivityLog" class="nk-menu-link"><span class="nk-menu-text">Employee Activity Log</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeeSetting))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/EmployeeSetting/CreateSetting" class="nk-menu-link"><span class="nk-menu-text"> Employee Setting</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.HelpDesk))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Helpdesk/Helpdesks" class="nk-menu-link"><span class="nk-menu-text">Help Desk</span></a>
+                                                    </li>
+                                                }                                               
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                   }
+
+                                    <!-- .nk-menu-item -->
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AssetCategoryModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AssetTypeModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.AllAssetsModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AssetLogModule))
+                                    {
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-palette"></em></span>
+                                                <span class="nk-menu-text">Assets</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AssetCategoryModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Asset/Asset" class="nk-menu-link"><span class="nk-menu-text">Category</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AssetTypeModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Asset/Types" class="nk-menu-link"><span class="nk-menu-text">Type</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AssetBrandType))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Asset/Brand" class="nk-menu-link"><span class="nk-menu-text">Brand</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AllAssetsModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Asset/AllAssets" class="nk-menu-link"><span class="nk-menu-text">Asset</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AssetLogModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Asset/HistoryAssetLog" class="nk-menu-link"><span class="nk-menu-text">Asset History</span></a>
+                                                    </li>
+                                                }
+
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                    }
+
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CompanyModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.CompanyPolicyModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.EmailSettingsModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.AnnouncementModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.EmailDraftModule))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Company</h6>
+                                        </li>
+
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-comment-alt"></em></span>
+                                                <span class="nk-menu-text">Company</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CompanyModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Company/Company" class="nk-menu-link"><span class="nk-menu-text">Company Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CompanyPolicyModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/CompanyPolicy/CompanyPolicy" class="nk-menu-link"><span class="nk-menu-text">Policy Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmailSettingsModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/EmailSettings" class="nk-menu-link"><span class="nk-menu-text">Email Settings</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.AnnouncementModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/Announcement" class="nk-menu-link"><span class="nk-menu-text">Announcement</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmailDraftModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/EmailDraft/EmailDraftType" class="nk-menu-link"><span class="nk-menu-text">Email Draft</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.BranchLocationModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Company/BranchLocation" class="nk-menu-link"><span class="nk-menu-text">Branch Location</span></a>
+                                                    </li>
+                                                }
+
+                                                @* @if (RolePrivileges.Contains((int)EmployeesInformationsPages.CompanySettingModule))
+                                        {
+                                        <li class="nk-menu-item">
+                                        <a href="/CompanyPolicy/CompanySetting" class="nk-menu-link"><span class="nk-menu-text">Company Setting</span></a>
+                                        </li>
+                                        }*@
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.MailScheduler))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Company/MailScheduler" class="nk-menu-link"><span class="nk-menu-text">Mail Scheduler</span></a>
+                                                    </li>
+                                                }
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                    }
+
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ProjectModule))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Project</h6>
+                                        </li>
+
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-folder"></em></span>
+                                                <span class="nk-menu-text">Projects</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ProjectModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/ProjectDetails/Project" class="nk-menu-link"><span class="nk-menu-text">Project Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ProjectAssignaationModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/ProjectDetails/Assignation" class="nk-menu-link"><span class="nk-menu-text">Project Assignation</span></a>
+                                                    </li>
+                                                }
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                    }
+
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ClientsModule))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Client</h6>
+                                        </li>
+
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-briefcase"></em></span>
+                                                <span class="nk-menu-text">Clients</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ClientsModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Client/Client" class="nk-menu-link"><span class="nk-menu-text">Client Details</span></a>
+                                                    </li>
+                                                }
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                    }
+
                                     @if (roleId.Value == 1)
                                     {
+                                        @*RolePrivileges.Contains((int)EmployeesInformationsPages.PermissionModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.RoleModule)*@
                                         <li class="nk-menu-heading">
                                             <h6 class="overline-title text-primary-alt">Privileges</h6>
                                         </li>
+
                                         <li class="nk-menu-item has-sub">
                                             <a href="#" class="nk-menu-link nk-menu-toggle">
                                                 <span class="nk-menu-icon"><em class="icon ti-folder"></em></span>
                                                 <span class="nk-menu-text">Permissions</span>
                                             </a>
                                             <ul class="nk-menu-sub">
+
                                                 <li class="nk-menu-item">
                                                     <a href="/Master/Role" class="nk-menu-link"><span class="nk-menu-text">Role</span></a>
                                                 </li>
+
                                                 <li class="nk-menu-item">
                                                     <a href="/Permission/RoleList" class="nk-menu-link"><span class="nk-menu-text">Permission</span></a>
                                                 </li>
+
                                                 <li class="nk-menu-item">
                                                     <a href="/Permission/DashboardRoleList" class="nk-menu-link"><span class="nk-menu-text">Dashboard Permission</span></a>
                                                 </li>
                                                 <li class="nk-menu-item">
                                                     <a href="/Permission/LeavePermission" class="nk-menu-link"><span class="nk-menu-text">Leave Permission</span></a>
                                                 </li>
-                                            </ul>
+
+                                            </ul><!-- .nk-menu-sub -->
                                         </li>
+                                        <!-- .nk-menu-item -->
                                     }
 
-                                    <!-- ========== SETTINGS SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Settings</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-package"></em></span>
-                                            <span class="nk-menu-text">Entities</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/Designation" class="nk-menu-link"><span class="nk-menu-text">Designation</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/Department" class="nk-menu-link"><span class="nk-menu-text">Department</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/ProjectTypes" class="nk-menu-link"><span class="nk-menu-text">Project Types</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/Modules" class="nk-menu-link"><span class="nk-menu-text">Module Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/SubModules" class="nk-menu-link"><span class="nk-menu-text">Sub Module Details</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/DocumentTypes" class="nk-menu-link"><span class="nk-menu-text">Document Types</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/SkillSet" class="nk-menu-link"><span class="nk-menu-text">SkillSet</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/LeaveType" class="nk-menu-link"><span class="nk-menu-text">Leave Types</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/DashboardMenus" class="nk-menu-link"><span class="nk-menu-text">Dashboard Menus</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/RelievingReason" class="nk-menu-link"><span class="nk-menu-text">Relieving Reason</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Master/TicketTypes" class="nk-menu-link"><span class="nk-menu-text">Ticket Types</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.DesignationModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.DepartmentModule) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.Module) || RolePrivileges.Contains((int)EmployeesInformationsPages.SubModules) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.ProjectTypeModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.SkillSetModule)
+                                   || RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveTypesModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.DashboardMenus) ||
+                                   RolePrivileges.Contains((int)EmployeesInformationsPages.TicketTypes))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Settings</h6>
+                                        </li>
 
-                                    <!-- ========== REPORTS SECTION ========== -->
-                                    <li class="nk-menu-heading">
-                                        <h6 class="overline-title text-primary-alt">Reports</h6>
-                                    </li>
-                                    <li class="nk-menu-item has-sub">
-                                        <a href="#" class="nk-menu-link nk-menu-toggle">
-                                            <span class="nk-menu-icon"><em class="icon ti-bar-chart-alt"></em></span>
-                                            <span class="nk-menu-text">Reports</span>
-                                        </a>
-                                        <ul class="nk-menu-sub">
-                                            <li class="nk-menu-item">
-                                                <a href="/Reports/LeaveReports" class="nk-menu-link"><span class="nk-menu-text">Leave Reports</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Reports/LeaveRemainingReport" class="nk-menu-link"><span class="nk-menu-text">Leave Remaining Reports</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Reports/ManualLogReports" class="nk-menu-link"><span class="nk-menu-text">Manual Log Reports</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Reports/TimeSheetReports" class="nk-menu-link"><span class="nk-menu-text">TimeSheet Log Reports</span></a>
-                                            </li>
-                                            <li class="nk-menu-item">
-                                                <a href="/Reports/AllEmployeesReport" class="nk-menu-link"><span class="nk-menu-text">Employees Details Reports</span></a>
-                                            </li>
-                                        </ul>
-                                    </li>
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-package"></em></span>
+                                                <span class="nk-menu-text">Entities</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.DesignationModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/Designation" class="nk-menu-link"><span class="nk-menu-text">Designation</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.DepartmentModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/Department" class="nk-menu-link"><span class="nk-menu-text">Department</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ProjectTypeModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/ProjectTypes" class="nk-menu-link"><span class="nk-menu-text">Project Types</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.Module))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/Modules" class="nk-menu-link"><span class="nk-menu-text">Module Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.SubModules))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/SubModules" class="nk-menu-link"><span class="nk-menu-text">Sub Module Details</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.DocumentTypesModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/DocumentTypes" class="nk-menu-link"><span class="nk-menu-text">Document Types</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.SkillSetModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/SkillSet" class="nk-menu-link"><span class="nk-menu-text">SkillSet</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveTypesModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/LeaveType" class="nk-menu-link"><span class="nk-menu-text">Leave Types</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.DashboardMenus))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/DashboardMenus" class="nk-menu-link"><span class="nk-menu-text">Dashboard Menus</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.RelievingReason))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/RelievingReason" class="nk-menu-link"><span class="nk-menu-text">Relieving Reason</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.TicketTypes))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Master/TicketTypes" class="nk-menu-link"><span class="nk-menu-text">Ticket Types</span></a>
+                                                    </li>
+                                                }
+
+                                                @*                                            <li class="nk-menu-item">
+                                        <a href="/Demo/DemoTab" class="nk-menu-link"><span class="nk-menu-text">Demo Test</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                        <a href="/Customer/Show" class="nk-menu-link"><span class="nk-menu-text">Customer Details</span></a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                        <a href="/Customer/CustomerOtherDetails" class="nk-menu-link"><span class="nk-menu-text">Customer Documents</span></a>
+                                        </li>*@
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                    }
+
+                                    @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveReportModule) || RolePrivileges.Contains((int)EmployeesInformationsPages.ManualLogReportModule) 
+                                   || RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveRemainingDetails))
+                                    {
+                                        <li class="nk-menu-heading">
+                                            <h6 class="overline-title text-primary-alt">Reports</h6>
+                                        </li>
+
+                                        <li class="nk-menu-item has-sub">
+                                            <a href="#" class="nk-menu-link nk-menu-toggle">
+                                                <span class="nk-menu-icon"><em class="icon ti-bar-chart-alt"></em></span>
+                                                <span class="nk-menu-text">Reports</span>
+                                            </a>
+                                            <ul class="nk-menu-sub">
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveReportModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Reports/LeaveReports" class="nk-menu-link"><span class="nk-menu-text">Leave Reports</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.LeaveRemainingDetails))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Reports/LeaveRemainingReport" class="nk-menu-link"><span class="nk-menu-text">Leave Remaining Reports</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.ManualLogReportModule))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Reports/ManualLogReports" class="nk-menu-link"><span class="nk-menu-text">Manual Log Reports</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.TimeSheetReport))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Reports/TimeSheetReports" class="nk-menu-link"><span class="nk-menu-text">TimeSheet Log Reports</span></a>
+                                                    </li>
+                                                }
+                                                @if (RolePrivileges.Contains((int)EmployeesInformationsPages.EmployeesListModules))
+                                                {
+                                                    <li class="nk-menu-item">
+                                                        <a href="/Reports/AllEmployeesReport" class="nk-menu-link"><span class="nk-menu-text">Employees Details Reports</span></a>
+                                                    </li>
+                                                }
+
+                                            </ul><!-- .nk-menu-sub -->
+                                        </li>
+                                        <!-- .nk-menu-item -->
+                                   }
+
                                 }
-                            </ul>
+                            </ul><!-- .nk-menu -->
                         </div><!-- .nk-sidebar-menu -->
                     </div><!-- .nk-sidebar-content -->
                 </div><!-- .nk-sidebar-element -->
