@@ -66,7 +66,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CandidateMenuId"));
 
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Attachment")
                         .HasColumnType("text");
@@ -84,7 +84,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Experience")
                         .HasColumnType("text");
@@ -111,13 +111,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SkillSet")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("CandidateMenuId");
 
@@ -135,7 +135,7 @@ namespace EmployeeInformations.CoreModels.Migrations
             modelBuilder.Entity("EmployeeInformations.CoreModels.APIModel.WebsiteCandidateMenusModel", b =>
                 {
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Attachment")
                         .HasColumnType("text");
@@ -165,7 +165,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Experience")
                         .HasColumnType("text");
@@ -195,7 +195,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SkillSet")
                         .HasColumnType("text");
@@ -204,7 +204,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.ToTable("websiteCandidateMenuModel", "public");
                 });
@@ -273,7 +273,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("JobApplyId"));
 
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Attachment")
                         .HasColumnType("text");
@@ -313,7 +313,7 @@ namespace EmployeeInformations.CoreModels.Migrations
             modelBuilder.Entity("EmployeeInformations.CoreModels.APIModel.WebsiteJobApplyViewModel", b =>
                 {
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -376,7 +376,7 @@ namespace EmployeeInformations.CoreModels.Migrations
             modelBuilder.Entity("EmployeeInformations.CoreModels.APIModel.WebsiteJobPostEntity", b =>
                 {
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Createdby")
                         .HasColumnType("integer");
@@ -403,7 +403,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("JobPostedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("JobSummary")
                         .IsRequired()
@@ -428,7 +428,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Updatedby")
                         .HasColumnType("integer");
@@ -445,7 +445,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("JobId"));
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Createdby")
                         .HasColumnType("integer");
@@ -473,7 +473,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("JobPostedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("JobSummary")
                         .IsRequired()
@@ -501,7 +501,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Updatedby")
                         .HasColumnType("integer");
@@ -557,7 +557,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuoteId"));
 
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Comment")
                         .HasColumnType("text");
@@ -712,10 +712,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("AnnouncementDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("AnnouncementEndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("AnnouncementId")
                         .HasColumnType("integer");
@@ -773,7 +773,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -819,7 +819,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("IssueDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("StatusName")
                         .HasColumnType("text");
@@ -848,7 +848,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -997,7 +997,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -1136,7 +1136,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("MailTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ReportName")
                         .IsRequired()
@@ -1176,7 +1176,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("LastLoginDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -1205,7 +1205,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DayCount")
                         .HasColumnType("integer");
@@ -1241,10 +1241,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("WorkedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.ToTable("EmployeeCompensatoryFilterModel", "public");
                 });
@@ -1278,10 +1278,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("LeaveFromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LeaveToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveType")
                         .HasColumnType("text");
@@ -1304,7 +1304,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -1384,10 +1384,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("DateOfJoining")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DateOfRelieving")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("integer");
@@ -1464,7 +1464,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -1519,7 +1519,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("FromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("IsApproved")
                         .HasColumnType("integer");
@@ -1528,7 +1528,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.ToTable("employeeExpensesEntities", "public");
                 });
@@ -1549,7 +1549,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EntryStatus")
                         .IsRequired()
@@ -1564,7 +1564,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -1602,7 +1602,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -1641,7 +1641,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CurrencyCode")
                         .HasColumnType("text");
@@ -1650,7 +1650,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Enddate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Hours")
                         .HasColumnType("integer");
@@ -1681,7 +1681,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("Startdate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Technology")
                         .IsRequired()
@@ -1712,13 +1712,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("MeetingName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TeamsMeetingId")
                         .HasColumnType("integer");
@@ -1751,7 +1751,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -1765,10 +1765,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -1805,7 +1805,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("EmpId")
                         .HasColumnType("integer");
@@ -1815,7 +1815,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
@@ -1825,10 +1825,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Status")
                         .HasColumnType("integer");
@@ -1873,7 +1873,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Id")
                         .HasColumnType("integer");
@@ -1886,10 +1886,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("Startdate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -1912,7 +1912,7 @@ namespace EmployeeInformations.CoreModels.Migrations
             modelBuilder.Entity("EmployeeInformations.CoreModels.DataViewModel.WebsiteCandidatesMenuModel", b =>
                 {
                     b.Property<DateTime?>("ApplyDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Attachment")
                         .HasColumnType("text");
@@ -1940,7 +1940,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Experience")
                         .HasColumnType("text");
@@ -1973,13 +1973,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ScheduledDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SkillSet")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.ToTable("websiteCandidateMenu", "public");
                 });
@@ -2006,7 +2006,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -2027,7 +2027,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LeaveFromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveName")
                         .HasColumnType("text");
@@ -2036,7 +2036,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("LeaveToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveType")
                         .HasColumnType("text");
@@ -2083,10 +2083,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("LeaveFromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("LeaveToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveType")
                         .IsRequired()
@@ -2127,7 +2127,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -2166,7 +2166,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("AddressId");
 
@@ -2210,7 +2210,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -2225,7 +2225,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("IssueDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("LocationId")
                         .HasColumnType("integer");
@@ -2237,7 +2237,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("PurchaseDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("PurchaseNumber")
                         .HasColumnType("integer");
@@ -2249,22 +2249,22 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ReturnDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("VendorName")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("WarrantyEndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("WarrantyStartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("AllAssetsId");
 
@@ -2362,10 +2362,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("AnnouncementDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("AnnouncementEndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("AnnouncementName")
                         .IsRequired()
@@ -2378,7 +2378,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DepartmentId")
                         .HasColumnType("text");
@@ -2416,7 +2416,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Error")
                         .HasColumnType("text");
@@ -2523,7 +2523,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -2654,7 +2654,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -2670,7 +2670,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("BankId");
 
@@ -2803,7 +2803,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -2819,7 +2819,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ZipCode")
                         .IsRequired()
@@ -2885,7 +2885,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Industry")
                         .IsRequired()
@@ -2939,7 +2939,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("CompanyId");
 
@@ -2961,7 +2961,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -2974,7 +2974,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("PolicyId");
 
@@ -3042,7 +3042,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DayCount")
                         .HasColumnType("integer");
@@ -3067,10 +3067,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("WorkedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("CompensatoryId");
 
@@ -3179,7 +3179,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3377,7 +3377,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DisplayName")
                         .HasColumnType("text");
@@ -3401,7 +3401,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("EmailQueueID");
 
@@ -3468,7 +3468,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastLoginDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -3493,7 +3493,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -3511,13 +3511,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LeaveFromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LeaveToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -3530,7 +3530,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("AppliedLeaveId");
 
@@ -3555,7 +3555,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -3567,7 +3567,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("BenefitId");
 
@@ -3589,10 +3589,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("HolidayDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -3605,7 +3605,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("HolidayId");
 
@@ -3650,13 +3650,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LeaveFromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveName")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LeaveToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LeaveTypes")
                         .IsRequired()
@@ -3697,7 +3697,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -3721,7 +3721,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("MedicalBenefitId");
 
@@ -3756,7 +3756,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -3765,7 +3765,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdateDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("integer");
@@ -3790,7 +3790,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("integer");
@@ -3839,13 +3839,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ProbationDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("RejectReason")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("ReleavedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("RelieveId")
                         .HasColumnType("integer");
@@ -3863,7 +3863,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -3891,7 +3891,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -3994,7 +3994,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DetailId")
                         .HasColumnType("integer");
@@ -4015,7 +4015,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ExpenseId");
 
@@ -4041,7 +4041,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Document")
                         .HasColumnType("text");
@@ -4066,7 +4066,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("DetailId");
 
@@ -4090,7 +4090,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -4100,7 +4100,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("FromDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("IsApproved")
                         .HasColumnType("integer");
@@ -4112,7 +4112,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ToDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric");
@@ -4121,7 +4121,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ExpenseId");
 
@@ -4172,13 +4172,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateOfJoining")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateOfRelieving")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -4194,7 +4194,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ExperienceId");
 
@@ -4217,7 +4217,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -4250,7 +4250,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.ToTable("HelpDeskFilterEntity", "public");
                 });
@@ -4267,7 +4267,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -4288,7 +4288,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -4339,7 +4339,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("DurationId")
                         .HasColumnType("integer");
@@ -4361,7 +4361,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("MailTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ReportName")
                         .IsRequired()
@@ -4371,7 +4371,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("WhomToSend")
                         .IsRequired()
@@ -4398,14 +4398,14 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EntryStatus")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TotalHours")
                         .IsRequired()
@@ -4488,7 +4488,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DocumentNumber")
                         .IsRequired()
@@ -4510,13 +4510,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ValidFrom")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ValidTo")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("DetailId");
 
@@ -4580,13 +4580,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("DateOfJoining")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -4626,7 +4626,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ProfileId");
 
@@ -4650,7 +4650,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
@@ -4668,7 +4668,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -4693,7 +4693,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CurrencyCode")
                         .HasColumnType("text");
@@ -4702,7 +4702,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("Enddate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("Hours")
                         .HasColumnType("integer");
@@ -4729,7 +4729,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("Startdate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Symbol")
                         .HasColumnType("text");
@@ -4741,7 +4741,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("ProjectId");
 
@@ -4811,7 +4811,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -4835,7 +4835,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("YearOfPassing")
                         .HasColumnType("integer");
@@ -4965,7 +4965,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -4987,7 +4987,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
@@ -5002,7 +5002,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -5142,10 +5142,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5159,13 +5159,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("TeamsMeetingId");
 
@@ -5238,16 +5238,16 @@ namespace EmployeeInformations.CoreModels.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TimeLoggerId"));
 
                     b.Property<DateTime>("ClockInTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ClockOutTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("integer");
@@ -5288,13 +5288,13 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EmpId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -5303,10 +5303,10 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Startdate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -5323,7 +5323,7 @@ namespace EmployeeInformations.CoreModels.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("TimeSheetId");
 
