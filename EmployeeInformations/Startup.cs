@@ -103,7 +103,14 @@ namespace EmployeeInformations
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             // Seed database on startup
-            SeedDatabase(app, logger);
+            if (env.IsDevelopment())
+            {
+                SeedDatabase(app, logger);
+            }
+            else
+            {
+                logger.LogInformation("Production environment - skipping automatic database seeding.");
+            }
 
             if (env.IsDevelopment())
             {
@@ -156,18 +163,23 @@ namespace EmployeeInformations
                     var context = scope.ServiceProvider.GetRequiredService<EmployeesDbContext>();
                     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
 
-                    // Apply migrations if needed
-                    context.Database.Migrate();
+                    // ✅ FIX: Check if migrations have been applied
+                    var pendingMigrations = context.Database.GetPendingMigrations();
+                    if (pendingMigrations.Any())
+                    {
+                        logger.LogWarning($"⚠️  Database has {pendingMigrations.Count()} pending migrations. Skipping seeding.");
+                        logger.LogWarning($"Run 'dotnet ef database update' or use --migrate flag.");
+                        return;
+                    }
 
-                    // Seed the database
+                    // Only seed if database is already migrated
                     seeder.Seed();
-
-                    logger.LogInformation("Database seeding completed successfully!");
+                    logger.LogInformation("✅ Database seeding completed successfully!");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "An error occurred while seeding the database.");
-                    // Don't throw here to allow the app to start even if seeding fails
+                    logger.LogError(ex, "⚠️  An error occurred while seeding the database.");
+                    // Don't throw - let the app start anyway
                 }
             }
         }
