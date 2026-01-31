@@ -10,6 +10,7 @@ using EmployeeInformations.Model.EmployeesViewModel;
 using EmployeeInformations.Model.MasterViewModel;
 using EmployeeInformations.Model.PagerViewModel;
 using EmployeeInformations.Model.PrivilegeViewModel;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
@@ -306,8 +307,8 @@ namespace EmployeeInformations.Business.Service
                         var allemployee = await _employeesRepository.GetAllEmployees(companyId);
                         List<int> reportingPersonEmployeeIds = await _employeesRepository.GetReportingPersonEmployeeById(data, companyId);
                         var reportingPersion = await GetemployeeNameByReportingPersionId(reportingPersonEmployeeIds, allemployee);
-                        var bodyContent = EmailBodyContent.WelcomeEmployeeEmailBodyContent(employeesEntity, randomPassword, domainName, infoEmailName, reportingPersion, emailDraftContentEntity.DraftBody);
-                        await InsertEmailQueue(employees.OfficeEmail, emailDraftContentEntity, bodyContent);
+                        //var bodyContent = EmailBodyContent.WelcomeEmployeeEmailBodyContent(employeesEntity, randomPassword, domainName, infoEmailName, reportingPersion, emailDraftContentEntity.DraftBody);
+                        //await InsertEmailQueue(employees.OfficeEmail, emailDraftContentEntity, bodyContent);
                         result = data;
                         await InsertEmployeesLog(Common.Constant.CreateEmployeesLog, result, Common.Constant.Add, sessionEmployeeId, companyId);
                     }
@@ -711,17 +712,25 @@ namespace EmployeeInformations.Business.Service
         }
 
         /// <summary>
-        /// Logic to get role list 
+           /// Logic to get role list 
         /// </summary>
         public async Task<List<RoleViewModel>> GetAllRoleTable(int companyId)
         {
-            var listOfRoleTable = new List<RoleViewModel>();
             var listRoleTable = await _employeesRepository.GetAllRoleTable(companyId);
-            if (listRoleTable != null)
-            {
-                listOfRoleTable = _mapper.Map<List<RoleViewModel>>(listRoleTable);
-            }
-            return listOfRoleTable;
+
+            var rolePermission = listRoleTable
+                .Where(r => !r.IsDeleted && r.CompanyId == companyId)
+                .Select(r => new RoleViewModel
+                {
+                    RoleId = Enum.IsDefined(typeof(Common.Enums.Role), r.RoleId)
+                                ? (Common.Enums.Role)r.RoleId
+                                : Common.Enums.Role.Employee, // fallback
+                    RoleName = r.RoleName,
+                    IsActive = r.IsActive
+                })
+                .ToList();
+
+            return rolePermission;
         }
 
         /// <summary>

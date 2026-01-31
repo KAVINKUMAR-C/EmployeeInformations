@@ -1,0 +1,93 @@
+Migration
+
+
+🟢 DO THIS NOW (step-by-step)
+1️⃣ Close Package Manager Console
+
+Do NOT run anything from PM>
+
+2️⃣ Open Developer PowerShell
+
+(or normal PowerShell / CMD)
+
+Go to your solution folder (where .sln exists):
+
+cd C:\Path\To\EmployeeInformations
+
+3️⃣ Verify EF CLI version (again)
+dotnet ef --version
+
+
+✔ Must be 9.x-preview
+
+If not:
+
+dotnet tool uninstall --global dotnet-ef
+dotnet tool install --global dotnet-ef --version 9.0.0-preview.*
+
+4️⃣ Run migration (THIS WILL WORK)
+dotnet ef migrations add InitialCreate `
+  --project EmployeeInformations.CoreModels `
+  --startup-project EmployeeInformations `
+  --context EmployeesDbContext
+
+
+Then:
+
+dotnet ef database update `
+  --project EmployeeInformations.CoreModels `
+  --startup-project EmployeeInformations `
+  --context EmployeesDbContext
+
+
+
+
+
+Add-Migration InitialCreate -Project EmployeeInformations.CoreModels -StartupProject EmployeeInformations -Context EmployeesDbContext
+
+Update-Database -Project EmployeeInformations.CoreModels -StartupProject EmployeeInformations -Context EmployeesDbContext
+
+
+Remove-Migration -Project EmployeeInformations.CoreModels -StartupProject EmployeeInformations -Context EmployeesDbContext
+
+
+Add-Migration InitialCreateAttendance -Project EmployeeInformations.CoreModels -StartupProject EmployeeInformations -Context AttendanceDbContext
+
+Server Db Connect:
+
+🧭 Step-by-Step in pgAdmin 4
+1️⃣ Open pgAdmin 4
+
+Launch pgAdmin 4
+
+Login with your pgAdmin master password
+
+2️⃣ Create New Server
+
+Right-click on Servers
+
+Click Register → Server…
+
+3️⃣ General Tab
+
+Fill like this:
+
+Field	Value
+Name	Render_Postgres (or any name you like)
+4️⃣ Connection Tab (Very Important)
+
+Fill exactly as below:
+
+Field	Value
+Host name/address	dpg-d5torn718n1s73bc86kg-a.oregon-postgres.render.com
+Port	5432
+Maintenance database	vphospital_db_9nlj
+Username	vphospital_db_9nlj_user
+Password	Bg7n0Sfkt2JYE4R8KhyCwxEYAHI7W3fE
+Save password?	✅ Yes
+5️⃣ SSL Tab (🔥 This is required for Render)
+
+Go to SSL tab and set:
+
+Field	Value
+SSL Mode	require
