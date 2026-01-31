@@ -1,0 +1,14 @@
+﻿# .dockerignore
+**/.git
+**/.gitignore
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/publish
+**/node_modules
+**/*.dockerignore
+**/*.pubxml
+Dockerfile*
+docker-compose*
+README.md
