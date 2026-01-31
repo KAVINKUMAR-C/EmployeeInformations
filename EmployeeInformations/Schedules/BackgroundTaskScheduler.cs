@@ -1,5 +1,4 @@
 ﻿using ClosedXML.Excel;
-using EFCore.BulkExtensions;
 using EmployeeInformations.Common;
 using EmployeeInformations.Common.Enums;
 using EmployeeInformations.Common.Helpers;
