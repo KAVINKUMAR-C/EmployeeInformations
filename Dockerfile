@@ -1,29 +1,33 @@
-﻿# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+﻿# Stage 1: Build all projects
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-# Copy everything
+# Copy solution file first
+COPY *.sln ./
+
+# Copy csproj files
+COPY EmployeeInformations/*.csproj ./EmployeeInformations/
+COPY EmployeeInformations.Business/*.csproj ./EmployeeInformations.Business/
+COPY EmployeeInformations.Common/*.csproj ./EmployeeInformations.Common/
+COPY EmployeeInformations.CoreModels/*.csproj ./EmployeeInformations.CoreModels/
+COPY EmployeeInformations.Data/*.csproj ./EmployeeInformations.Data/
+COPY EmployeeInformations.DI/*.csproj ./EmployeeInformations.DI/
+COPY EmployeeInformations.Model/*.csproj ./EmployeeInformations.Model/
+
+# Restore all projects
+RUN dotnet restore
+
+# Copy everything else
 COPY . .
 
-# Restore dependencies
-RUN dotnet restore "EmployeeInformations/EmployeeInformations.csproj"
+# Build and publish MVC project
+WORKDIR /src/EmployeeInformations
+RUN dotnet publish -c Release -o /app/publish
 
-# Publish the app
-RUN dotnet publish "EmployeeInformations/EmployeeInformations.csproj" -c Release -o /app/publish
-
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Stage 2: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-
-# Copy from build stage
 COPY --from=build /app/publish .
-
-# Expose port
 EXPOSE 8080
-
-# Set environment
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:8080
-
-# Run the app
 ENTRYPOINT ["dotnet", "EmployeeInformations.dll"]

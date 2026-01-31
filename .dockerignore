@@ -1,4 +1,4 @@
-﻿# .dockerignore
+﻿# .dockerignore - Improved
 **/.git
 **/.gitignore
 **/.vs
@@ -6,9 +6,17 @@
 **/bin
 **/obj
 **/publish
+**/publish-output
+**/published-app
 **/node_modules
+**/test-*
 **/*.dockerignore
 **/*.pubxml
-Dockerfile*
-docker-compose*
+**/*.user
+**/*.suo
+**/Dockerfile*
+**/docker-compose*
 README.md
+*.zip
+*.rar
+*.7z
